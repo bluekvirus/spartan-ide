@@ -1,0 +1,46 @@
+/**
+ * Theme variables override
+ * @author Tim Lauv
+ * @updated 2014.07.24
+ * @updated 2016.12.30
+ */
+
+//Fonts (don't forget to copy font files -- use stagejs theme <project> --fonts f1,f2,f3...)
+@import "open-sans-fontface/open-sans.less";
+@import "fontawesome/less/font-awesome.less";
+//Logo/non-svg Icons
+@import "img/img.less"; //this is produced by the theme prep tool.
+
+//Icon Fonts Path override
+@icon-font-path: "../fonts/bootstrap/";
+@fa-font-path: "../fonts/fontawesome";
+
+//Fonts
+@OpenSansPath: "../fonts/open-sans-fontface";
+@font-family-base: "Open Sans", @font-family-sans-serif;
+
+//Grid (1em gap)
+@grid-gutter-width: @font-size-base;
+
+//Border
+@border-color-base: lighten(@text-color, 60%);
+
+//Radius (Pager, Badge, Label have their own separate radius values)
+@border-radius-base: 0;
+@border-radius-large: 0;
+@border-radius-small: 0;
+//@pager-border-radius: 15px;
+//@badge-border-radius: 10px;
+//.label {border-radius: .25em;} -- already reset to @border-radius-base in components.less
+
+//Navbar
+@navbar-margin-bottom: 0;
+
+//Breadcrumbs
+@breadcrumb-padding-vertical:  0.5em;
+@breadcrumb-padding-horizontal: 0;
+//** Breadcrumb background color
+@breadcrumb-bg: transparent;
+
+//Notification
+@notification-width-base: auto;
