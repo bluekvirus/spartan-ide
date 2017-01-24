@@ -10,8 +10,10 @@
 ;(function($){
 
 	$.fn.flexLayout = function(layout, opts, _cb/*TBI*/){
+		
 		var _options = {}, /*store options*/
 			_layoutArr = []; /*store array*/
+
 		//check whether layout is given
 		if($.isPlainObject(layout)){
 			opts = layout;
@@ -81,6 +83,7 @@
 	 * Make $.fn.flexlayout = $.fn.flexLayout, for convenience
 	 */
 	$.fn.flexlayout = $.fn.flexLayout;
+
 
 	/**
 	 * main layout setup function
