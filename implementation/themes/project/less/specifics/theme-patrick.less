@@ -1,0 +1,71 @@
+/**
+ * @author: Patrick Zhu
+ * @created: 1/23/2017
+ */
+
+html,
+body,
+[region="app"] {
+	height: 100%;
+	.regional-main {
+		height: 100%;
+	}
+}
+
+.region-contexts {
+	height: 100%;
+	//------------------------ styling for create context ------------------------//
+	.context-create {
+		height: 100%;
+		width: 100%;
+		background-color: transparent;
+		position: relative;
+		.settings {
+			position: fixed;
+			right: 1px;
+			top: 1px;
+		}
+		//=========== styling for guide lines ===========//
+		.region-guide {
+			position: absolute;
+			left: 0px;
+			right: 0px;
+			top: 0px;
+			bottom: 0px;
+			z-index: 1;
+			//horizontal guide line
+			.horizontal-line {
+				position: absolute;
+				background-color: @border;
+				height: 1px;
+				left: 0;
+				right: 0;
+				top: 0;
+			}
+			//vertical guide line
+			.vertical-line {
+				position: absolute;
+				background-color: @border;
+				width: 1px;
+				left: 0;
+				top: 0;
+				bottom: 0;
+			}
+		}
+		//=========== styling for svg layout ===========//
+		.region-layout {
+			height: 100%;
+			width: 100%;
+			position: relative;
+			[data-view-name="Create.Layout"] {
+				height: 100%;
+				width: 100%;
+				svg {
+					position: absolute !important; //fix svg tag styling problem
+					top: 0;
+					left: 0;
+				}
+			}
+		}
+	}
+}
