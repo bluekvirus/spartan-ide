@@ -5,6 +5,13 @@
 		attributes: {
 			tabindex: "1" //make this div focusable in order to use keypress event
 		},
+		initialize: function(){
+			//create a global object to store points, horizontal lines and vertical lines
+			app._global = app._global || {};
+			app._global.endPoints = app._global.endPoints || {};
+			app._global['vertical-line'] = app._global['vertical-line'] || [];
+			app._global['horizontal-line'] = app._global['horizontal-line'] || [];
+		},
 		onReady: function(){
 			var that = this;
 			//guide line
@@ -46,13 +53,15 @@
 			});
 
 			this.$el.on('click', function(e){
-				//console.log(e);
+				//only trigger if this.$el is already focused
+				if(that.$el.is(':focus'))
+					//tell guide line view user clicked
+					app.coop('guideline-click');
 			});
 		},
 		checkConstrain: function(e){
-			if(e.pageX < 0 || e.pageX > this.$el.width() || e.pageY < 0 || e.pageY > this.$el.height())
+			if(e.pageX < 1 || e.pageX > this.$el.width() - 1 || e.pageY < 1 || e.pageY > this.$el.height() - 1)
 				return false;
-
 
 			return true;
 		},
