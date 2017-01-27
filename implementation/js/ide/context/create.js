@@ -5,13 +5,6 @@
 		attributes: {
 			tabindex: "1" //make this div focusable in order to use keypress event
 		},
-		initialize: function(){
-			//create a global object to store points, horizontal lines and vertical lines
-			app._global = app._global || {};
-			app._global.endPoints = app._global.endPoints || {};
-			app._global['vertical-line'] = app._global['vertical-line'] || [];
-			app._global['horizontal-line'] = app._global['horizontal-line'] || [];
-		},
 		onReady: function(){
 			var that = this;
 			//guide line
