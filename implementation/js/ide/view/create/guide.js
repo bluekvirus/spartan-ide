@@ -18,36 +18,50 @@
 			app._global.endPoints = app._global.endPoints || {};
 			app._global['vertical-line'] = app._global['vertical-line'] || [];
 			app._global['horizontal-line'] = app._global['horizontal-line'] || [];
-		},
-		onReady: function(){
+
 			//!!Note: all stored coordinates should be translate into percetage to work with window.resize() event!!
 			//!!Note: all stored corrdinates only keep two digits after dicimal for easier comparison!!
 			
-			//add initial four lines on frame
+			//add initial four lines to represent the frame
 			//top
-			app._global['horizontal-line'].push({x1: 0, x2: 100, y: 0, id: _.uniqueId('horizontal')});
+			var top = genHorizontal(0, 100, 0);
 			//bottom
-			app._global['horizontal-line'].push({x1: 0, x2: 100, y: 100, id: _.uniqueId('horizontal')});
+			var bottom = genHorizontal(0, 100, 100);
 			//left
-			app._global['vertical-line'].push({y1: 0, y2: 100, x: 0, id: _.uniqueId('vertical')});
+			var left = genVertical(0, 100, 0);
 			//right
-			app._global['vertical-line'].push({y1: 0, y2: 100, x: 100, id: _.uniqueId('vertical')});
+			var right = genVertical(0, 100, 100);
 
-			//add initial four points on frame
-			//top-left
-			//app._global.endPoints.push({x: 0, y: 0, id: _.uniqueId('point'), right: app._global['horizontal-line'][0].id, bottom: app._global['vertical-line'][0].id});
-			//top-right
-			//app._global.endPoints.push({x: 100, y: 0, id: _.uniqueId('point'), left: app._global['horizontal-line'][0].id, bottom: app._global['vertical-line'][1].id});
-			//bottom-left
-			//app._global.endPoints.push({x: 0, y: 100, id: _.uniqueId('point'), right: app._global['horizontal-line'][1].id, top: app._global['vertical-line'][0].id});
-			//bottom-right
-			//app._global.endPoints.push({x: 100, y: 100, id: _.uniqueId('point'), left: app._global['horizontal-line'][1].id, top: app._global['vertical-line'][1].id});
+			//add initial 4 points at four corners
+			//top left
+			var topLeft = genPoint(0, 0, {right: top, bottom: left});
+			//top right
+			var topRight = genPoint(100, 0, {left: top, bottom: right});
+			//bottom left
+			var bottomLeft = genPoint(0, 100, {right: bottom, top: left});
+			//bottom right
+			var bottomRight = genPoint(100, 100, {left: bottom, top: right});
 
-			//link initial points back to initial lines
-			//top line
-			//app._global['horizontal-line'][0].left = app._global.endPoints[0].id;
-			//app._global['horizontal-line'][0].right = app._global.endPoints[1].id;
-			//bottom line
+			//link lines back to newly generated points
+			var temp;
+			//top
+			temp = app._global['horizontal-line'][_.findIndex(app._global['horizontal-line'], function(obj){ return obj.id === top; })];
+			temp.left = topLeft;
+			temp.right = topRight;
+			//bottom
+			temp = app._global['horizontal-line'][_.findIndex(app._global['horizontal-line'], function(obj){ return obj.id === bottom; })];
+			temp.left = bottomLeft;
+			temp.right = bottomRight;
+			//left
+			temp = app._global['vertical-line'][_.findIndex(app._global['vertical-line'], function(obj){ return obj.id === left; })];
+			temp.top = topLeft;
+			temp.bottom = bottomLeft;
+			//right
+			temp = app._global['vertical-line'][_.findIndex(app._global['vertical-line'], function(obj){ return obj.id === right; })];
+			temp.top = topRight;
+			temp.bottom = bottomRight;
+		},
+		onReady: function(){
 				
 		},
 		onGuidelineMove: function(position){
@@ -62,7 +76,29 @@
 		onGuidelineClick: function(){
 			var $horizontal = this.$el.find('.horizontal-line'),
 				$vertical = this.$el.find('.vertical-line');
-			var x1, x2, y1, y2;
+			//variables for later use
+			var x1, x2, y1, y2, 
+				occupiedStart, occupiedEnd,
+				newStart, newEnd,
+				newLineId, newPointId,
+				newStartPoint, newEndPoint,
+				oldLine;
+
+
+
+			////////////////////////////
+			///
+			///
+			///
+			///
+			///TODO: 	Clean up this part into a function!!!!!!
+			///			Make delete
+			///			Make drag
+			///
+			///
+			///
+			///
+
 
 			if(this._horizontal){//horizontal line
 
@@ -70,7 +106,92 @@
 				x2 =  trimNumber((parseInt($horizontal.css('left')) + $horizontal.width()) / this.$el.width() * 100);
 				y1 = y2 = trimNumber(parseInt($horizontal.css('top')) / this.$el.height() * 100);
 
-				genHorizontal(x1, x2, y1, {}, true);
+				//add a new horizontal line
+				//1). add two endPoints into the collection
+				//2). add a horizontal line into the collection
+				
+				//first check whether there is a point already at those coordinates
+				_.each(app._global.endPoints, function(endPoint, id){
+					if(endPoint.x === x1 && endPoint.y === y1)
+						occupiedStart = id;
+					else if(endPoint.x === x2 && endPoint.y === y2)
+						occupiedEnd = id;
+				});
+				newLineId = _.uniqueId('horizontal-');
+
+				//left endPoint
+				if(occupiedStart){
+					//set right pointer to the new horizontal line
+					occupiedStart.right = newLineId;
+
+				}else{
+					//find out it should attach to which vertical line
+					oldLine = _.find(app._global['vertical-line'], function(vline){ return vline.x === x1 && y1 < vline.y2 && y1 > vline.y1; });
+					//!!Note: there should not be a horizontal line attached to the left of this new point.
+					//!!Otherwise there should already be a point there.
+				
+					newPointId = _.uniqueId('endPoint-');
+					//now break the vertical line into two shorter vertical line
+					//add two newLines
+					newStart = genVertical(oldLine.y1, y1, x1, {
+						top: oldLine.top,
+						bottom: newPointId
+					});
+
+					newEnd = genVertical(y1, oldLine.y2, x1, {
+						top: newPointId,
+						bottom: oldLine.bottom
+					});
+
+					//delete the original line from collection
+					app._global['vertical-line'] = _.without(app._global['vertical-line'], _.find(app._global['vertical-line'], function(vline){ return vline.id === oldLine.id; }));
+
+					//add new left endPoint
+					newStartPoint = genPoint(x1, y1, {
+						right: newLineId,
+						top: newStart,
+						bottom: newEnd
+					}, newPointId);
+				}
+				//right endPoint
+				if(occupiedEnd){
+					//set left pointer to the new horizontal line
+					occupiedEnd.left = newId;
+
+				}else{
+					oldLine = _.find(app._global['vertical-line'], function(vline){ return vline.x === x2 && y1 < vline.y2 && y1 > vline.y1; });
+
+					newPointId = _.uniqueId('endPoint-');
+					//now break the vertical line into two shorter vertical line
+					//add two newLines
+					newStart = genVertical(oldLine.y1, y1, x2, {
+						top: oldLine.top,
+						bottom: newPointId
+					});
+
+					newEnd = genVertical(y1, oldLine.y2, x2, {
+						top: newPointId,
+						bottom: oldLine.bottom
+					});
+
+					//delete the original line from collection
+					app._global['vertical-line'] = _.without(app._global['vertical-line'], _.find(app._global['vertical-line'], function(vline){ return vline.id === oldLine.id; }));
+
+					//add new right endPoint
+					newEndPoint = genPoint(x2, y2, {
+						left: newLineId,
+						top: newStart,
+						bottom: newEnd
+					}, newPointId);
+				}
+				
+
+				genHorizontal(x1, x2, y1, {
+					left: newStartPoint,
+					right: newEndPoint
+				}, newLineId);
+
+				console.log(app._global['horizontal-line'], app._global['vertical-line'], app._global.endPoints);
 
 			}
 			else{//vertical line
@@ -178,66 +299,69 @@
 	}
 
 	//generate new point and add to global collection
-	function genPoint(x, y, adjcents, preid/*pre-defined id for easier initialization*/){
-		var obj = {}, id = preid ? preid : uniqueId('endPoint');
+	function genPoint(x, y, adjcents, preid/*pre-defined id*/){
+		var obj = {}, id = preid ? preid : _.uniqueId('endPoint-');
 
 		obj.x = x;
 		obj.y = y;
 
 		if(adjcents)
 			_.each(adjcents, function(id, position){
-				obj.position = id;
+				obj[position] = id;
 			});
 
-		app._global.endPoints.id = obj;
+		app._global.endPoints[id] = obj;
 
-		return app._global.endPoints.id;
+		//return id for easier querying
+		return id;
 	}
 
 	//generate new horizontal line and add to global collection
-	function genHorizontal(x1, x2, y, adjcents, sort){
+	function genHorizontal(x1, x2, y, adjcents, preid/*pre-defined id*/){
 		var obj = {};
 		obj.x1 = x1;
 		obj.x2 = x2;
 		obj.y = y;
-		obj.id = _.uniqueId('horizontal');
+		obj.id = preid ? preid : _.uniqueId('horizontal-');
 
 		if(adjcents)
 			_.each(adjcents, function(id, position){
-				obj.position = id;
+				obj[position] = id;
 			});
 
 		app._global['horizontal-line'].push(obj);
 
-		if(sort)
-			app._global['horizontal-line'] = _.sortBy(app._global['horizontal-line'], function(coords){
-				return coords.y;
-			});
+		//re-sort the array
+		app._global['horizontal-line'] = _.sortBy(app._global['horizontal-line'], function(coords){
+			return coords.y;
+		});
 
-		return obj;
+		//return id for easier querying
+		return obj.id;
 	}
 
 	//generate new vertical line and add to global collection
-	function genVertical(y1, y2, x, adjcents, sort){
+	function genVertical(y1, y2, x, adjcents, preid/*pre-defined id*/){
 		var obj = {};
 		obj.y1 = y1;
 		obj.y2 = y2;
 		obj.x = x;
-		obj.id = _.uniqueId('vertical');
+		obj.id = preid ? preid : _.uniqueId('vertical-');
 
 		if(adjcents)
 			_.each(adjcents, function(id, position){
-				obj.position = id;
+				obj[position] = id;
 			});
 
 		app._global['vertical-line'].push(obj);
 
-		if(sort)
-			app._global['vertical-line'] = _.sortBy(app._global['vertical-line'], function(coords){
-				return coords.x;
-			});
+		//re-sort the array
+		app._global['vertical-line'] = _.sortBy(app._global['vertical-line'], function(coords){
+			return coords.x;
+		});
 
-		return obj;
+		//return id for easier querying
+		return obj.id;
 	}
 
 })(Application);
