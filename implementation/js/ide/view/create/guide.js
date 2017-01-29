@@ -7,7 +7,7 @@
 
 	app.view('Create.Guide', {
 		template: '@view/create/guide.html',
-		coop:['guideline-move', 'guideline-switch', 'guideline-click'],
+		coop:['guideline-move', 'guideline-switch', 'guideline-click', 'gen-new-line'],
 		initialize: function(){
 			this._horizontal = true; //flag indicates that now showing horizontal line or vertical line
 			this._x = 0; //0 - 100 in percentage
@@ -80,10 +80,14 @@
 			var x1, x2, y1, y2,
 				newStartPoint, newEndPoint,
 				occupied, oldLine,
-				tolerance = 0.02/*since some time points won't match down to every digit, we intoduce a tolerance parameter here.*/;
+				tolerance = 0.02;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here.*/
 
 			///TODO: 	!!DONE: Clean up this part into a function!!!!!!
-			///			Make delete
+			///			!!DONE: Make delete is on line
+			///			!!	0). make every point has choices execpt the ones on the frame
+			///			!!	1). check whether a line is deletable
+			///			!!	2). if no one color
+			///			!!	3). if yes, show in one color, remove
 			///			Make drag
 			///			!!DONE: Magnate
 			///			!!DONE: 2em gap
@@ -97,7 +101,7 @@
 				y1 = y2 = trimNumber(parseInt($horizontal.css('top')) / this.$el.height() * 100);
 				
 				//first check whether there is a point already at those coordinates
-				occupied = checkOccupied({x1: x1, y1: y1, x2: x2, y2: y2});
+				occupied = checkOccupied({x1: x1, y1: y1, x2: x2, y2: y2}, tolerance);
 
 				//generate new line id here for easier reference
 				newLineId = _.uniqueId('horizontal-');
@@ -105,7 +109,7 @@
 				//left endPoint
 				if(occupied.occupiedStart){
 					//set right pointer to the new horizontal line
-					occupied.occupiedStart.right = newLineId;
+					occupied.occupiedStart.endPoint.right = newLineId;
 					//refer start point to the occupied point
 					newStartPoint = occupied.occupiedStart.id;
 
@@ -120,7 +124,7 @@
 				//right endPoint
 				if(occupied.occupiedEnd){
 					//set left pointer to the new horizontal line
-					occupied.occupiedEnd.left = newId;
+					occupied.occupiedEnd.endPoint.left = newId;
 					//refer end point to the end point
 					newEndPoint = occupied.occupiedEnd.id;
 
@@ -144,7 +148,7 @@
 				y2 = trimNumber((parseInt($vertical.css('top')) + $vertical.height()) / this.$el.height() * 100);
 
 				//check occupation
-				occupied = checkOccupied({x1: x1, y1: y1, x2: x2, y2: y2});
+				occupied = checkOccupied({x1: x1, y1: y1, x2: x2, y2: y2}, tolerance);
 
 				//generate new line id here for easier reference
 				newLineId = _.uniqueId('vertical-');
@@ -152,7 +156,7 @@
 				//top end point
 				if(occupied.occupiedStart){
 					//set bottom pointer to the new vertical line
-					occupied.occupiedStart.bottom = newLineId;
+					occupied.occupiedStart.endPoint.bottom = newLineId;
 					//set start reference to the occupied point
 					newStartPoint = occupied.occupiedStart.id;
 				}else{
@@ -165,7 +169,7 @@
 				//bottom end point
 				if(occupied.occupiedEnd){
 					//set top pointer to the new vertical line
-					occupied.occupiedEnd.top = newLineId;
+					occupied.occupiedEnd.endPoint.top = newLineId;
 					//set end reference to the occupied point
 					newEndPoint = occupied.occupiedEnd.id;
 				}else{
@@ -182,10 +186,12 @@
 					bottom: newEndPoint
 				}, newLineId);
 			}
+			//for debugging, log all the existing lines
+			app.debug('horizontal-line', app._global['horizontal-line']);
+			app.debug('vertical-line', app._global['vertical-line']);
+			app.debug('end points', app._global.endPoints);
 			
-
-			console.log(app._global['horizontal-line'], app._global['vertical-line'], app._global.endPoints);
-			
+			//coop event to svg view to draw newly added line
 			app.coop('layout-added', {
 				x1: x1,
 				y1: y1,
@@ -195,7 +201,19 @@
 				endPoint: newEndPoint,
 				lineId: newLineId
 			});
-				
+		},
+		onGenNewLine: function(info){
+			if(info.dir === 'h'){
+				genLine('h', {x1: info.x1, x2: info.x2, y: info.y1}, {
+					left: info.startPoint,
+					right: info.endPoint
+				}, info.id);
+			}else{
+				genLine('v', {y1: info.y1, y2: info.y2, x: info.x1}, {
+					top: info.startPoint,
+					bottom: info.endPoint
+				}, info.id);
+			}
 		},
 		setupGuideLines: function(switched){
 			//four constrain varibles
@@ -275,7 +293,7 @@
 			}
 
 			return obj;
-		}
+		},
 	});
 
 	//trim number only leave two digits after decimal point
@@ -289,6 +307,7 @@
 
 		obj.x = x;
 		obj.y = y;
+		obj.id = id; //save a copy of its own id
 
 		if(adjcents)
 			_.each(adjcents, function(id, position){
@@ -302,14 +321,15 @@
 	}
 
 	//check whether there is already end points at the position the new line needs to be installed
-	function checkOccupied(coords/*x1,y1 as first point and x2,y2 as second point*/){
+	function checkOccupied(coords/*x1,y1 as first point and x2,y2 as second point*/, tolerance){
 		var occupiedStart, occupiedEnd;
+
 		//check
 		_.each(app._global.endPoints, function(endPoint, id){
-			if(endPoint.x === coords.x1 && endPoint.y === coords.y1)
-				occupiedStart = id;
-			else if(endPoint.x === coords.x2 && endPoint.y === coords.y2)
-				occupiedEnd = id;
+			if(coords.x1 <= endPoint.x * (1 + tolerance) && coords.x1 >= endPoint.x * (1 - tolerance) && coords.y1 <= endPoint.y * (1 + tolerance) && coords.y1 >= endPoint.y * (1 - tolerance))
+				occupiedStart = {endPoint: endPoint, id: id};
+			else if(coords.x2 <= endPoint.x * (1 + tolerance) && coords.x2 >= endPoint.x * (1 - tolerance) && coords.y2 <= endPoint.y * (1 + tolerance) && coords.y2 >= endPoint.y * (1 - tolerance))
+				occupiedEnd = {endPoint: endPoint, id: id};
 		});
 
 		//return as an object
@@ -339,6 +359,9 @@
 				bottom: oldLine.bottom
 			});
 
+			//update oldLine's top-endPoint's bottom pointer and bottom-endPoint's top pointer
+			app._global.endPoints[oldLine.top].bottom = newStartLine;
+			app._global.endPoints[oldLine.bottom].top = newEndLine;
 			//delete the original line from collection
 			app._global['vertical-line'] = _.without(app._global['vertical-line'], _.find(app._global['vertical-line'], function(vline){ return vline.id === oldLine.id; }));
 
@@ -358,6 +381,10 @@
 				left: newPointId,
 				right: oldLine.right
 			});
+
+			//update oldLine's left-endPoint's right pointer and right-endPoint's left pointer
+			app._global.endPoints[oldLine.left].right = newStartLine;
+			app._global.endPoints[oldLine.right].left = newEndLine;
 
 			//delete the original line from collection
 			app._global['horizontal-line'] = _.without(app._global['horizontal-line'], _.find(app._global['horizontal-line'], function(hline){ return hline.id === oldLine.id; }));

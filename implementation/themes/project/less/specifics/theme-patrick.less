@@ -26,6 +26,47 @@ body,
 			right: 1px;
 			top: 1px;
 		}
+		//=========== styling for arrow menu on hovering end points ===========//
+		.region-arrows {
+			.regional-create-arrows {
+				.end-point-menu {
+					position: absolute;
+					height: 75px;
+					width: 75px;
+					z-index: 2;
+					.up {
+						position: absolute;
+						left: 25px;
+						top: 0;
+						cursor: pointer;
+					}
+					.down {
+						position: absolute;
+						left: 25px;
+						bottom: -2px;
+						cursor: pointer;
+					}
+					.left {
+						position: absolute;
+						left: 0;
+						top: 25px;
+						cursor: pointer;
+					}
+					.right {
+						position: absolute;
+						right: 0px;
+						top: 25px;
+						cursor: pointer;
+					}
+					.close {
+						position: absolute;
+						right: 0;
+						top: 0;
+						cursor: pointer;
+					}
+				}
+			}
+		}
 		//=========== styling for guide lines ===========//
 		.region-guide {
 			position: absolute;
@@ -73,6 +114,15 @@ body,
 					position: absolute !important; //fix svg tag styling problem
 					top: 0;
 					left: 0;
+					.end-point {
+						cursor: pointer;
+						&:hover {
+							fill: @brand-primary;
+						}
+						&.active {
+							fill: @brand-primary;
+						}
+					}
 				}
 			}
 		}

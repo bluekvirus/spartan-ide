@@ -8,6 +8,7 @@
 		initialize: function(){
 			//indicate whether click event will be triggered or not
 			this.clickable = true;
+			//indicate whether menu is able to be moved or not
 		},
 		onReady: function(){
 			var that = this;
@@ -15,12 +16,14 @@
 			this.show('guide', 'Create.Guide');
 			//layout svg
 			this.show('layout', 'Create.Layout');
+			//menu arrows
+			this.show('arrows', 'Create.Arrows');
 			
 			//focus on this.$el to trigger events
 			this.$el.focus();
 
 			//on mouse move use app.coop to show the guide lines
-			this.$el.on('mousemove', function(e){
+			this.$el.on('mousemove', _.throttle(function(e){
 				//prevent default events
 				e.preventDefault();
 
@@ -63,7 +66,7 @@
 
 				}
 
-			});
+			}, 25));
 
 			//on press shift key switch the direction of guide line
 			this.$el.on('keyup', function(e){
@@ -88,8 +91,14 @@
 			//stay inside window
 			if(e.pageX < 1 || e.pageX > this.$el.width() - 1 || e.pageY < 1 || e.pageY > this.$el.height() - 1)
 				return false;
+			//menu is showing return false
+			if(!this.$el.find('.end-point-menu').hasClass('hidden')) return false;
 			//hover on points
-			if(_.string.include($(e.target).attr('class'), 'end-point')) return false;
+			if(_.string.include($(e.target).attr('class'), 'end-point')){
+				//trigger an hover event specially for end points
+				//app.coop('hover-endpoint', e); should be a click event
+				return false;	
+			}
 			//keep a 2em gap
 			var horizontal = this.getViewIn('guide')._horizontal, //get now doing horizontal line or vertical line
 				em = horizontal ? (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.height() * 100
@@ -122,7 +131,7 @@
 				//calculate distance
 				distance = horizontal ? Math.abs(endPoint.y - yPer) : Math.abs(endPoint.x - xPer);
 				//if less than 1 em assign new x, y for return
-				if(distance < 1 * em){
+				if(distance < 1.25 * em){
 					if(horizontal){
 						x = e.pageX;
 						y = endPoint.y / 100 * that.$el.height();

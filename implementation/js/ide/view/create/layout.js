@@ -2,7 +2,7 @@
 
 	app.view('Create.Layout', {
 		svg: true,
-		coop: ['layout-added'],
+		coop: ['layout-added', 'line-deleted'],
 		radius: 8,
 		onReady: function(){
 			var that = this;
@@ -36,9 +36,12 @@
 
 			//draw points
 			var circle = this.paper.circle(x1, y1, this.radius).attr({fill: '#000'});
-			circle.node.setAttribute('class', 'end-point draggble');
+			addPointAttr(circle.node, endPoints.startPoint);
 			circle = this.paper.circle(x2, y2, this.radius).attr({fill: '#000'});
-			circle.node.setAttribute('class', 'end-point draggble');
+			addPointAttr(circle.node, endPoints.endPoint);
+		},
+		onLineDeleted: function(){
+			this.redrawAll();
 		},
 		//function to redraw all lines based on global object, mainly used for window resize event
 		redrawAll: function(){
@@ -73,7 +76,7 @@
 					y = that.calSvgCoord(endPoint.y);
 
 				var circle = that.paper.circle(x, y, that.radius).attr({fill: '#000'});
-				circle.node.setAttribute('class', 'end-point draggble');
+				addPointAttr(circle.node, id);
 			});
 		},
 		calSvgCoord: function(coord, w/*width*/){
@@ -86,5 +89,13 @@
 				return coord / 100 * height;
 		},
 	});
+
+	function addPointAttr(node, id){
+		node.setAttribute('class', 'end-point draggble');
+		node.setAttribute('point-id', id);
+		node.addEventListener('click', app.throttle(function(e){
+			app.coop('click-endpoint', e);
+		}));
+	}
 
 })(Application);
