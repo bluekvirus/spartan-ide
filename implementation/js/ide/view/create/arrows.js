@@ -62,6 +62,8 @@
 			close: function(){
 				//hide menu
 				this.$el.find('.end-point-menu').addClass('hidden');
+				//cleanup
+				this.cleanIndication();
 			}
 		},
 		cleanIndication: function(){
