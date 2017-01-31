@@ -8,7 +8,6 @@
 		initialize: function(){
 			//indicate whether click event will be triggered or not
 			this.clickable = true;
-			//indicate whether menu is able to be moved or not
 		},
 		onReady: function(){
 			var that = this;
@@ -80,6 +79,12 @@
 			});
 
 			this.$el.on('click', function(e){
+				//if end point menu is being shown, close menu ONLY and no further operations
+				var Menu = that.getViewIn('arrows');
+				if(Menu.shown){
+					Menu.closeMenu();
+					return;
+				}
 				//only trigger if this.$el is already focused
 				if(that.$el.is(':focus') && that.clickable)
 					//tell guide line view user clicked
@@ -92,7 +97,7 @@
 			if(e.pageX < 1 || e.pageX > this.$el.width() - 1 || e.pageY < 1 || e.pageY > this.$el.height() - 1)
 				return false;
 			//menu is showing return false
-			if(!this.$el.find('.end-point-menu').hasClass('hidden')) return false;
+			if(this.getViewIn('arrows').shown) return false;
 			//hover on points
 			if(_.string.include($(e.target).attr('class'), 'end-point')){
 				//trigger an hover event specially for end points

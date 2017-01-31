@@ -34,29 +34,46 @@ body,
 					height: 75px;
 					width: 75px;
 					z-index: 2;
-					.up {
-						position: absolute;
-						left: 25px;
-						top: 0;
-						cursor: pointer;
-					}
-					.down {
-						position: absolute;
-						left: 25px;
-						bottom: -2px;
-						cursor: pointer;
-					}
-					.left {
-						position: absolute;
-						left: 0;
-						top: 25px;
-						cursor: pointer;
-					}
-					.right {
-						position: absolute;
-						right: 0px;
-						top: 25px;
-						cursor: pointer;
+					.indicator {
+						&.up {
+							position: absolute;
+							left: 27px;
+							top: 0;
+							cursor: pointer;
+						}
+						&.down {
+							position: absolute;
+							left: 27px;
+							bottom: -2px;
+							cursor: pointer;
+						}
+						&.left {
+							position: absolute;
+							left: 0;
+							top: 25px;
+							cursor: pointer;
+						}
+						&.right {
+							position: absolute;
+							right: 0px;
+							top: 25px;
+							cursor: pointer;
+						}
+						&.vertical {
+							position: absolute;
+							right: -10px;
+							top: 26px;
+							transform: scale(1, 2);
+						}
+						&.horizontal {
+							position: absolute;
+							bottom: -18px;
+							left: 25px;
+							transform: scale(2, 1);
+						}
+						.text-muted {
+							color: lighten(@gray-light, 30%) !important;
+						}
 					}
 					.close {
 						position: absolute;
@@ -114,6 +131,7 @@ body,
 					position: absolute !important; //fix svg tag styling problem
 					top: 0;
 					left: 0;
+					z-index: 1;
 					.end-point {
 						cursor: pointer;
 						&:hover {

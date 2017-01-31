@@ -18,6 +18,8 @@
 			app._global.endPoints = app._global.endPoints || {};
 			app._global['vertical-line'] = app._global['vertical-line'] || [];
 			app._global['horizontal-line'] = app._global['horizontal-line'] || [];
+			//setup a tolerance for coordinates matching
+			app._global.tolerance = 0.02;
 
 			//!!Note: all stored coordinates should be translate into percetage to work with window.resize() event!!
 			//!!Note: all stored corrdinates only keep two digits after dicimal for easier comparison!!
@@ -80,7 +82,7 @@
 			var x1, x2, y1, y2,
 				newStartPoint, newEndPoint,
 				occupied, oldLine,
-				tolerance = 0.02;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here.*/
+				tolerance = app._global.tolerance;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here.*/
 
 			///TODO: 	!!DONE: Clean up this part into a function!!!!!!
 			///			!!DONE: Make delete is on line
@@ -91,7 +93,10 @@
 			///			Make drag
 			///			!!DONE: Magnate
 			///			!!DONE: 2em gap
+			///			!!DONE: crosses instead of arrows
+			///			!!DONE: close mechanism for arrow menu
 			///			Clean up code
+			///			Change style
 
 
 			if(this._horizontal){//horizontal line
@@ -395,7 +400,6 @@
 		}
 
 		return newPointId;
-
 	}
 
 	//generate a new line and add it to the global collection

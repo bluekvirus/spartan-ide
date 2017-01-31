@@ -10,6 +10,7 @@
 			right: ''
 		},
 		point: '',//store the point currently focusing on
+		shown: false,//variable indicate whether currently menu is showing or not. for other views and events to consult.
 		onReady: function(){
 
 		},
@@ -30,13 +31,21 @@
 			this.point = point;
 
 			//check if point is on frame, if yes do not show menu
-			if(point.x === 0 || point.y === 0 || point.x === 100 || point.y === 100) {
+			if(
+				point.x <= 0 + app._global.tolerance || 
+				point.y <= 0 + app._global.tolerance || 
+				point.x >= 100 * (1 - app._global.tolerance) || 
+				point.y >= 100 * (1 - app._global.tolerance)
+			) {
+				//notification
 				app.notify('Cannot be Operated', 'End points on outter frame cannot be operated! Choose inside end points inside!', 'error', {icon: 'fa fa-reddit-alien'});
+				//
+				this.closeMenu();
 				return;
 			}
 
 			//add active tag to current element
-			//!!Note: jQuery 2 does NOT support SVG element addClass
+			//!!Note: jQuery2 does NOT support SVG element addClass. jQuery3 claims it has solved this problem.
 			$target.attr('class', 'end-point draggble active');
 			
 			//show menu
@@ -44,6 +53,9 @@
 				left: (x - width / 2 + radius) + 'px',
 				top: (y - height / 2 + radius) + 'px'
 			}).removeClass('hidden');
+
+			//flip flag
+			this.shown = true;
 
 			//NOW check in four directions whether there is a line attached 
 			//if no pass
@@ -58,22 +70,20 @@
 				}else{//NOT deletable
 					app.notify('Cannot Delete', 'This line cannot be deleted!', 'error', {icon: 'fa fa-reddit-alien'});
 				}
-			},
-			close: function(){
-				//hide menu
-				this.$el.find('.end-point-menu').addClass('hidden');
-				//cleanup
-				this.cleanIndication();
 			}
+		},
+		closeMenu: function(){
+			//hide menu
+			this.$el.find('.end-point-menu').addClass('hidden');
+			this.shown = false;
+			//cleanup
+			this.cleanIndication();
 		},
 		cleanIndication: function(){
 			//remove active class
 			this.parentCt.$el.find('.end-point.active').attr('class', 'end-point draggble');
 			//clean all the indication color
-			this.$el.find('.up > i').removeClass('text-success text-danger deletable');
-			this.$el.find('.down > i').removeClass('text-success text-danger deletable');
-			this.$el.find('.left > i').removeClass('text-success text-danger deletable');
-			this.$el.find('.right > i').removeClass('text-success text-danger deletable');
+			this.$el.find('.indicator > i').removeClass('text-muted text-danger deletable');
 		},
 		checkDeletable: function(lineId, position){
 			var line, dir, startPoint, endPoint,
@@ -95,11 +105,11 @@
 				endPoint = app._global.endPoints[line.right];
 
 				if(startPoint.top && startPoint.bottom && endPoint.top && endPoint.bottom){//deletable
-					this.$el.find('.' + position + ' > i').addClass('text-success deletable');
+					this.$el.find('.' + position + ' > i').addClass('text-danger deletable');
 					return true;
 				}
 				else//not deletable
-					this.$el.find('.' + position + ' > i').addClass('text-danger');
+					this.$el.find('.' + position + ' > i').addClass('text-muted');
 			}
 			//if vertical line, two end points need to both have left and right
 			else{
@@ -107,11 +117,11 @@
 				endPoint = app._global.endPoints[line.bottom];
 
 				if(startPoint.left && startPoint.right && endPoint.left && endPoint.right){//deletable
-					this.$el.find('.' + position + ' > i').addClass('text-success deletable');
+					this.$el.find('.' + position + ' > i').addClass('text-danger deletable');
 					return true;
 				}
 				else//not deletable
-					this.$el.find('.' + position + ' > i').addClass('text-danger');
+					this.$el.find('.' + position + ' > i').addClass('text-muted');
 			}
 
 			return false;
@@ -163,8 +173,12 @@
 					});
 				});
 			}
-			else
+			else{
 				this.$el.find('.end-point-menu').addClass('hidden');
+				//flip flag
+				this.shown = false;
+			}
+				
 		},
 		colorArrows: function(point){
 			this.cleanIndication();
@@ -172,25 +186,25 @@
 			if(point.top){
 				this.checkDeletable(point.top, 'up');
 			}else{
-				this.$el.find('.up > i').addClass('text-danger');
+				this.$el.find('.up > i').addClass('text-muted');
 			}
 			//bottom
 			if(point.bottom){
 				this.checkDeletable(point.bottom, 'down');
 			}else{
-				this.$el.find('.down > i').addClass('text-danger');
+				this.$el.find('.down > i').addClass('text-muted');
 			}
 			//left
 			if(point.left){
 				this.checkDeletable(point.left, 'left');
 			}else{
-				this.$el.find('.left > i').addClass('text-danger');
+				this.$el.find('.left > i').addClass('text-muted');
 			}
 			//right
 			if(point.right){
 				this.checkDeletable(point.right, 'right');
 			}else{
-				this.$el.find('.right > i').addClass('text-danger');
+				this.$el.find('.right > i').addClass('text-muted');
 			}
 		},
 	});
