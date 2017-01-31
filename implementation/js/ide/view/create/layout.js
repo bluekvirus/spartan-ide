@@ -4,6 +4,7 @@
 		svg: true,
 		coop: ['layout-added', 'line-deleted'],
 		radius: 8,
+		dragging: false,//for other view to consult whether dragging an end point
 		onReady: function(){
 			var that = this;
 
@@ -35,9 +36,9 @@
 
 			//draw points
 			circle = this.drawCircle(x1, y1);
-			addPointAttr(circle.node, endPoints.startPoint);
+			this.addPointAttr(circle.node, endPoints.startPoint);
 			circle = this.drawCircle(x2, y2);
-			addPointAttr(circle.node, endPoints.endPoint);
+			this.addPointAttr(circle.node, endPoints.endPoint);
 		},
 		onLineDeleted: function(){
 			this.redrawAll();
@@ -73,7 +74,7 @@
 					y = that.calSvgCoord(endPoint.y);
 
 				var circle = that.drawCircle(x, y);
-				addPointAttr(circle.node, id);
+				that.addPointAttr(circle.node, id);
 			});
 		},
 		calSvgCoord: function(coord, w/*width*/){
@@ -97,58 +98,98 @@
 			var circle = this.paper.circle(x, y, this.radius).attr({'stroke' : '#DEDEDE', 'stroke-width':'2', 'fill': 'rgba(0, 0, 0, 0)'});
 			return circle;
 		},
+		addPointAttr: function(node, id){
+			var $node = $(node),
+				$body = $('body');
+
+			var that = this;
+			//jquery2 cannot use addClass on SVG element
+			node.setAttribute('class', 'end-point draggble');
+			node.setAttribute('point-id', id);
+
+			$node.one('click', function(e){
+				clickCallback(e, $node);
+			});
+
+			$node.one('mousedown', function(e){
+				mousedownCallback(e, $node, $body, that);
+			});
+		},
 	});
 
-	function addPointAttr(node, id){
-		var $node = $(node),
-			$body = $('body');
-		//jquery2 cannot use addClass on SVG element
-		node.setAttribute('class', 'end-point draggble');
-		node.setAttribute('point-id', id);
+	function clickCallback(e, $node){
+		//prevent default
+		e.preventDefault();
+		//stop event poping to parent element
+		e.stopPropagation();
+		
+		//trigger end point click event
+		app.coop('click-endpoint', e);
 
-
-		$node.on('click', function(e){
-			//prevent default
-			e.preventDefault();
-			//stop event poping to parent element
-			e.stopPropagation();
-			
-			//trigger end point click event
-			app.coop('click-endpoint', e);
+		$node.one('click', function(event){
+			clickCallback(event, $node);
 		});
+	}
 
-		$node.once('mousedown', function(e){
+	function mousedownCallback(e, $node, $body, View){
+		//prevent default
+		e.preventDefault();
+		//stop event poping to parent element
+		e.stopPropagation();
+		//set dragging flag true
+		View.dragging = true;
+
+		//use body as the mousemove view port
+		$body
+		.on('mousemove', function(e){
 			//prevent default
 			e.preventDefault();
-			//stop event poping to parent element
-			e.stopPropagation();
 
-			$node.once('mousemove', function(e){
-				
-				$node.unbind('click');
+			//unbind original click event and mousedown event,
+			//unbind click until mousemove to avoid mousedown and click event conflict
+			$node.unbind('click').unbind('mousedown');
 
+			//update lines and points positions only when it meets the constrain
+			if(checkMovingConstrain($node.attr('point-id'))){
+
+				//!!TBD: update all lines and points
 				$node.attr('cx', e.pageX);
 
-				console.log('mousemove', e);
-			});
-
-			
-		
+			}/*else{
+				_.debounce(function(){
+					app.notify('Cannot be moved this far.', 'This line attached to the current end point cannot be moved this far!', 'error', {icon: 'fa fa-reddit-alien'});
+				}, 500);
+			}*/
 		})
-		.once('mouseup', function(e){
-			//unbind mousemove
+		.one('mouseup', function(e){
+			//prevent default
+			e.preventDefault();
+			//unbind mousemove event on body
 			$body.unbind('mousemove');
-			//rebind click event
-			$node.on('click', function(e){
-				//prevent default
-				e.preventDefault();
-				//stop event poping to parent element
-				e.stopPropagation();
-				
-				//trigger end point click event
-				app.coop('click-endpoint', e);
+			//reset dragging flag to false
+			View.dragging = false;
+			//mouseup has a bit delay. use defer to register click and mousedown event on node again
+			_.defer(function(){
+				//click
+				$node.one('click', function(event){
+					clickCallback(event, $node);
+				});
+				//mousedown
+				$node.one('mousedown', function(event){
+					mousedownCallback(event, $node, $body, View);
+				});
 			});
 		});
+	}
+
+	//TBD
+	function checkMovingConstrain(id/*point id*/){
+
+
+		//!!check xmax, xmin, ymax, ymin at least 2em!!
+
+
+		return false;
 	}
 
 })(Application);

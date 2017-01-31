@@ -98,6 +98,8 @@
 				return false;
 			//menu is showing return false
 			if(this.getViewIn('arrows').shown) return false;
+			//dragging an end point return false
+			if(this.getViewIn('layout').dragging) return false;
 			//hover on points
 			if(_.string.include($(e.target).attr('class'), 'end-point')){
 				//trigger an hover event specially for end points
