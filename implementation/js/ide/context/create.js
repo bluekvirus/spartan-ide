@@ -93,6 +93,8 @@
 		},
 		checkConstrain: function(e){
 			var that = this;
+			//layout checkbox is off
+			if(!this.$el.find('#layout-switch').prop('checked')) return false;
 			//stay inside window
 			if(e.pageX < 1 || e.pageX > this.$el.width() - 1 || e.pageY < 1 || e.pageY > this.$el.height() - 1)
 				return false;

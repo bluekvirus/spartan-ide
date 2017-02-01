@@ -147,7 +147,7 @@
 
 			//use body as the mousemove view port
 			$body
-			.on('mousemove', function(e){
+			.on('mousemove', _.throttle(function(e){
 				//prevent default
 				e.preventDefault();
 
@@ -174,7 +174,7 @@
 				// 		app.notify('Cannot be moved this far.', 'This line attached to the current end point cannot be moved this far!', 'error', {icon: 'fa fa-reddit-alien'});
 				// 	}, 500);
 				// }
-			})
+			}, 100))
 			.one('mouseup', function(e){
 				//prevent default
 				e.preventDefault();
@@ -256,8 +256,8 @@
 				if(
 					!_.contains(extensions.hlines, hline.id) &&
 					(
-						(hline.x1 < extensions.right /** (1 + app._global.tolerance)*/ && hline.x1 > extensions.left/* * (1 - app._global.tolerance)*/) ||
-						(hline.x2 < extensions.right /** (1 + app._global.tolerance)*/ && hline.x2 > extensions.left/* * (1 - app._global.tolerance)*/)
+						(hline.x1 < extensions.right * (1 + app._global.tolerance) && hline.x1 > extensions.left * (1 - app._global.tolerance)) ||
+						(hline.x2 < extensions.right * (1 + app._global.tolerance) && hline.x2 > extensions.left * (1 - app._global.tolerance))
 					)
 				){
 					if(hline.y <= point.y * (1 + app._global.tolerance)){//ymin
@@ -278,8 +278,8 @@
 			_.each(app._global['vertical-line'], function(vline){
 				if(	
 					!_.contains(extensions.vlines, vline.id) &&
-					((vline.y1 < extensions.bottom/* * (1 + app._global.tolerance)*/ && vline.y1 > extensions.top/* * (1 - app._global.tolerance)*/) ||
-					(vline.y2 < extensions.bottom/* * (1 + app._global.tolerance)*/ && vline.y2 > extensions.top/* * (1 - app._global.tolerance)*/))
+					((vline.y1 < extensions.bottom * (1 + app._global.tolerance) && vline.y1 > extensions.top * (1 - app._global.tolerance)) ||
+					(vline.y2 < extensions.bottom * (1 + app._global.tolerance) && vline.y2 > extensions.top * (1 - app._global.tolerance)))
 
 				){
 					if(vline.x <= point.x * (1 + app._global.tolerance)){//xmin
@@ -304,8 +304,6 @@
 			};
 		},
 		updateRelated: function(hlines, vlines, points, event, anchorId, originalCoords){
-			var magneted = false;
-
 			var height = this.$el.height(),
 				width = this.$el.width();
 
@@ -364,12 +362,7 @@
 
 			});
 
-			//check whether anchor can be merged with other points
-				
-
 			this.redrawAll();
-
-			return magneted;
 		},
 	});
 

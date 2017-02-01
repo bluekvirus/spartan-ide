@@ -96,7 +96,7 @@
 			///			!!DONE: crosses instead of arrows
 			///			!!DONE: close mechanism for arrow menu
 			///			Clean up code
-			///			Change style
+			///			!!DONE: Change style
 
 
 			if(this._horizontal){//horizontal line
@@ -129,7 +129,7 @@
 				//right endPoint
 				if(occupied.occupiedEnd){
 					//set left pointer to the new horizontal line
-					occupied.occupiedEnd.endPoint.left = newId;
+					occupied.occupiedEnd.endPoint.left = newLineId;
 					//refer end point to the end point
 					newEndPoint = occupied.occupiedEnd.id;
 
