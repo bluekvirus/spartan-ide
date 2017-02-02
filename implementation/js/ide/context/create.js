@@ -112,7 +112,7 @@
 			var horizontal = this.getViewIn('guide')._horizontal, //get now doing horizontal line or vertical line
 				em = horizontal ? (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.height() * 100
 								: (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.width() * 100, //get default em and translate it into percentage
-				out = true,
+				tooClose = false,
 				yPer = e.pageY / this.$el.height() * 100,
 				xPer = e.pageX / this.$el.width() * 100;
 
@@ -121,17 +121,17 @@
 				//check
 				_.each(app._global['horizontal-line'], function(hline){
 					if(xPer <= hline.x2 && xPer >= hline.x1 && yPer >= hline.y - 2 * em && yPer <= hline.y + 2 * em)
-						out = false;
+						tooClose = true;
 				});
 
 			}else{//vertical lines
 				_.each(app._global['vertical-line'], function(vline){
 					if(yPer <= vline.y2 && yPer >= vline.y1 && xPer >= vline.x - 2 * em && xPer <= vline.x + 2 * em)
-						out = false;
+						tooClose = true;
 				});
 			}
 
-			if(!out) return false;
+			if(tooClose) return false;
 
 			//magnet effect within 1em radius to a certain point
 			var x,y, distance;
@@ -151,7 +151,7 @@
 				}
 			});
 
-			if(x && y) return {x: x, y: y};
+			if(x && y) return {x: x, y: y};//returns an object differs from return a boolean, though truely.
 
 			return true;
 		},

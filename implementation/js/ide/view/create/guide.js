@@ -19,7 +19,7 @@
 			app._global['vertical-line'] = app._global['vertical-line'] || [];
 			app._global['horizontal-line'] = app._global['horizontal-line'] || [];
 			//setup a tolerance for coordinates matching
-			app._global.tolerance = 0.02;
+			app._global.tolerance = 0.02;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here.*/
 
 			//!!Note: all stored coordinates should be translate into percetage to work with window.resize() event!!
 			//!!Note: all stored corrdinates only keep two digits after dicimal for easier comparison!!
@@ -82,7 +82,7 @@
 			var x1, x2, y1, y2,
 				newStartPoint, newEndPoint,
 				occupied, oldLine,
-				tolerance = app._global.tolerance;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here.*/
+				tolerance = app._global.tolerance;
 
 			///TODO: 	!!DONE: Clean up this part into a function!!!!!!
 			///			!!DONE: Make delete is on line
@@ -90,12 +90,12 @@
 			///			!!	1). check whether a line is deletable
 			///			!!	2). if no one color
 			///			!!	3). if yes, show in one color, remove
-			///			Make drag
+			///			!!DONE: Make drag
 			///			!!DONE: Magnate
 			///			!!DONE: 2em gap
 			///			!!DONE: crosses instead of arrows
 			///			!!DONE: close mechanism for arrow menu
-			///			Clean up code
+			///			!!DONE: Clean up code
 			///			!!DONE: Change style
 
 

@@ -10,7 +10,7 @@
 
 			this.paper.clear();
 
-			//initial draw all the lines
+			//initial draw all the lines and end points on the frame
 			this.redrawAll();
 
 			//listen to resize event
@@ -163,18 +163,8 @@
 					//update all related lines and end points
 					that.updateRelated(constrains.hlines, constrains.vlines, constrains.endPoints, e, $node.attr('point-id'), originalCoords);
 				}
-				// //update lines and points positions only when it meets the constrain
-				// if(checkMovingConstrain($node.attr('point-id'), View)){
-
-				// 	//!!TBD: update all lines and points
-				// 	$node.attr('cx', e.pageX);
-
-				// }else{
-				// 	_.debounce(function(){
-				// 		app.notify('Cannot be moved this far.', 'This line attached to the current end point cannot be moved this far!', 'error', {icon: 'fa fa-reddit-alien'});
-				// 	}, 500);
-				// }
-			}, 100))
+				
+			}, 25))
 			.one('mouseup', function(e){
 				//prevent default
 				e.preventDefault();
@@ -278,8 +268,10 @@
 			_.each(app._global['vertical-line'], function(vline){
 				if(	
 					!_.contains(extensions.vlines, vline.id) &&
-					((vline.y1 < extensions.bottom * (1 + app._global.tolerance) && vline.y1 > extensions.top * (1 - app._global.tolerance)) ||
-					(vline.y2 < extensions.bottom * (1 + app._global.tolerance) && vline.y2 > extensions.top * (1 - app._global.tolerance)))
+					(
+						(vline.y1 < extensions.bottom * (1 + app._global.tolerance) && vline.y1 > extensions.top * (1 - app._global.tolerance)) ||
+						(vline.y2 < extensions.bottom * (1 + app._global.tolerance) && vline.y2 > extensions.top * (1 - app._global.tolerance))
+					)
 
 				){
 					if(vline.x <= point.x * (1 + app._global.tolerance)){//xmin

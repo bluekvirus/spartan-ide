@@ -39,8 +39,9 @@
 			) {
 				//notification
 				app.notify('Cannot be Operated', 'End points on outter frame cannot be operated! Choose inside end points inside!', 'error', {icon: 'fa fa-reddit-alien'});
-				//
-				this.closeMenu();
+				//close currently opened menu, if showing
+				if(this.shown)
+					this.closeMenu();
 				return;
 			}
 
@@ -225,7 +226,7 @@
 				(point.left && point.left !== selfId) ||
 				(point.right && point.right !== selfId)
 			)
-			return true;
+				return true;
 		}
 		
 		return false;
