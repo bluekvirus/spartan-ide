@@ -97,6 +97,7 @@
 			///			!!DONE: close mechanism for arrow menu
 			///			!!DONE: Clean up code
 			///			!!DONE: Change style
+			///			Side menu
 
 
 			if(this._horizontal){//horizontal line

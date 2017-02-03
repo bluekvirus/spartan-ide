@@ -21,11 +21,28 @@ body,
 		width: 100%;
 		background-color: transparent;
 		position: relative;
-		.settings {
-			position: fixed;
-			right: 1px;
-			top: 1px;
-			z-index: 2;
+		.side-menu {
+			position: absolute;
+			right: 0px;
+			top: 0px;
+			z-index: 3;
+			.side-menu-trigger {
+				background-color: @brand-primary;
+				height: 2.4em;
+				width: 2.4em;
+				padding-left: 0.75em;
+				line-height: 1.75em;
+				text-align: center;
+				border-bottom-left-radius: 100%;
+				box-shadow: -1px 1px 3px @brand-primary;
+				cursor: pointer;
+				> i {
+					color: #fff;
+				}
+			}
+			.side-menu-list {
+				
+			}
 		}
 		//=========== styling for arrow menu on hovering end points ===========//
 		.region-arrows {

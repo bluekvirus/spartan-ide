@@ -8,6 +8,7 @@ stagejs build ./dist/app
 rm -rf ../site/*
 cp -r ./dist/app/. ../site/
 cd ../site
+git pull
 git add -A
 git commit -m "sync site with master branch"
 git push origin gh-pages
