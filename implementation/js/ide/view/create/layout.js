@@ -121,7 +121,7 @@
 			e.preventDefault();
 			//stop event poping to parent element
 			e.stopPropagation();
-			
+
 			//trigger end point click event
 			app.coop('click-endpoint', e);
 
@@ -132,6 +132,7 @@
 		mousedownCallback: function(e, $node, $body){
 			var that = this,
 				id = $node.attr('point-id');
+
 			//prevent default
 			e.preventDefault();
 			//stop event poping to parent element
@@ -144,6 +145,19 @@
 					x: app._global.endPoints[id].x,
 					y: app._global.endPoints[id].y
 				};
+
+			//check whether if the nodes are on the frame
+			if(
+				originalCoords.x < 0 + app._global.tolerance || originalCoords.x > 100 - app._global.tolerance ||
+				originalCoords.y < 0 + app._global.tolerance || originalCoords.y > 100 - app._global.tolerance
+			){
+				//send notification
+				app.notify('Cannot be Operated', 'End points on outter frame cannot be operated! Choose inside end points inside!', 'error', {icon: 'fa fa-reddit-alien'});
+				//set dragging false
+				this.dragging = false;
+				//return
+				return;
+			}
 
 			//use body as the mousemove view port
 			$body

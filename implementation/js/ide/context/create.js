@@ -8,6 +8,8 @@
 		initialize: function(){
 			//indicate whether click event will be triggered or not
 			this.clickable = true;
+			//lock all the interactions
+			this.locked = false;
 		},
 		onReady: function(){
 			var that = this;
@@ -90,11 +92,21 @@
 					//tell guide line view user clicked
 					app.coop('guideline-click');
 			});
+
+			//click event to show menu
+			this.$el.find('.side-menu-trigger').on('click', function(e){
+				//prevent default events
+				e.preventDefault();
+
+				//
+				$(this).toggleClass('active');
+				that.$el.find('.side-menu-list').toggleClass('active');
+			});
 		},
 		checkConstrain: function(e){
 			var that = this;
-			//layout checkbox is off
-			if(!this.$el.find('#layout-switch').prop('checked')) return false;
+			//if locked return false
+			if(this.locked) return false;
 			//stay inside window
 			if(e.pageX < 1 || e.pageX > this.$el.width() - 1 || e.pageY < 1 || e.pageY > this.$el.height() - 1)
 				return false;
@@ -103,10 +115,13 @@
 			//dragging an end point return false
 			if(this.getViewIn('layout').dragging) return false;
 			//hover on points
-			if(_.string.include($(e.target).attr('class'), 'end-point')){
-				//trigger an hover event specially for end points
-				//app.coop('hover-endpoint', e); should be a click event
-				return false;	
+			if(_.string.include($(e.target).attr('class'), 'end-point') || 
+				_.string.include($(e.target).attr('class'), 'side-menu-trigger') || 
+				_.string.include($(e.target).attr('class'), 'side-menu-list') ||
+				_.string.include($(e.target).attr('class'), 'side-menu-item')
+			){//trigger an hover event specially for end points and menu
+				
+				return false;
 			}
 			//keep a 2em gap
 			var horizontal = this.getViewIn('guide')._horizontal, //get now doing horizontal line or vertical line
@@ -155,6 +170,14 @@
 
 			return true;
 		},
+		actions: {
+			lock: function($self){
+				$self.find('.lock').toggleClass('hidden');
+				$self.find('.unlock').toggleClass('hidden');
+				this.$el.find('.locker').toggleClass('hidden');
+				this.locked = !this.locked;
+			}
+		}
 	});
 
 })(Application);

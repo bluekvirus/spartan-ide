@@ -21,28 +21,66 @@ body,
 		width: 100%;
 		background-color: transparent;
 		position: relative;
-		.side-menu {
+		.locker {
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			z-index: 3;
+		}
+		.side-menu-trigger {
 			position: absolute;
 			right: 0px;
 			top: 0px;
-			z-index: 3;
-			.side-menu-trigger {
-				background-color: @brand-primary;
-				height: 2.4em;
-				width: 2.4em;
-				padding-left: 0.75em;
-				line-height: 1.75em;
-				text-align: center;
-				border-bottom-left-radius: 100%;
-				box-shadow: -1px 1px 3px @brand-primary;
+			z-index: 5;
+			background-color: @brand-primary;
+			height: 2.4em;
+			width: 2.4em;
+			padding-left: 0.75em;
+			line-height: 1.75em;
+			text-align: center;
+			border-bottom-left-radius: 100%;
+			box-shadow: -1px 1px 3px @brand-primary;
+			cursor: pointer;
+			> i {
+				color: #fff;
+			}
+			&.active {
+				transition: 0.25s;
+				right: 199px;
+			}
+			transition: 0.25s;
+		}
+		.side-menu-list {
+			position: absolute;
+			right: -200px;
+			top: 0px;
+			bottom: 0px;
+			z-index: 4;
+			width: 200px;
+			text-align: center;
+			background-color: @brand-primary;
+			box-shadow: -1px 1px 3px @brand-primary;
+			.side-menu-item {
+				border-bottom: 1px solid @border;
 				cursor: pointer;
-				> i {
+				>span {
+					font-weight: 600;
 					color: #fff;
 				}
+				&:hover {
+					opacity: 0.8;
+				}
+				&:nth-child(even) {
+					background-color: lighten(@brand-primary, 10%);
+				}
 			}
-			.side-menu-list {
-				
+			&.active {
+				transition: 0.25s;
+				right: 0px;
 			}
+			transition: 0.25s;
 		}
 		//=========== styling for arrow menu on hovering end points ===========//
 		.region-arrows {

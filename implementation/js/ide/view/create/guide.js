@@ -98,6 +98,9 @@
 			///			!!DONE: Clean up code
 			///			!!DONE: Change style
 			///			Side menu
+			///				1). use app.store(),
+			///				2). align all the segments before generate
+			///				3). finish reset all
 
 
 			if(this._horizontal){//horizontal line
