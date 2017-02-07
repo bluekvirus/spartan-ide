@@ -34,7 +34,7 @@
 
 			//show all stored templates
 			_.each(app.store.getAll(), function(item, key){
-				if(key !== 'endPoints' && key !== 'horizontal-line' && key !== 'vertical-line' && key !== 'current'){//only focus on stored object
+				if(key !== 'endPoints' && key !== 'horizontal-line' && key !== 'vertical-line'){//only focus on stored object
 					that.addTemplateOnMenu(key);
 				}
 			});
@@ -223,8 +223,10 @@
 				app.debug('v-lines exported from generate action', app._global['vertical-line']);
 			},
 			reset: function(){
-				//clear cache
-				app.store.clear();
+				//clear cache for current layout
+				app.store.remove('endPoints');
+				app.store.remove('horizontal-line');
+				app.store.remove('vertical-line');
 				//reset global objects
 				app._global.endPoints = undefined;
 				app._global['horizontal-line'] = undefined;
@@ -254,13 +256,6 @@
 				app.store.set('horizontal-line', temp['horizontal-line']);
 				app.store.set('vertical-line', temp['vertical-line']);
 
-				//change color
-				this.$el.find('.side-menu-templates-holder .side-menu-item-text').removeClass('active');
-				$self.addClass('active');
-
-				//change stored current
-				app.store.set('current', $self.attr('template-name'));
-
 				//refresh
 				this.show('guide', 'Create.Guide');
 				//layout svg
@@ -269,7 +264,12 @@
 				this.show('arrows', 'Create.Arrows');
 			},
 			'delete-template': function($self){
-
+				//get template id
+				var id = $self.attr('template-name');
+				//remove tempalte saved in local storage
+				app.store.remove(id);
+				//remove menu item in DOM
+				$self.parent().remove();
 			},
 		},
 		checkConstrain: function(e){
@@ -346,12 +346,6 @@
 								'<div class="pull-right" action="delete-template" template-name="' + name + '"><i class="fa fa-close"></i></div>' +
 							'</div>',
 			$elem = $(htmlStr);
-
-			if(newly){
-				this.$el.find('.side-menu-templates-holder .side-menu-item-text').removeClass('active');
-				$elem.find('.side-menu-item-text').addClass('active');
-				app.store.set('current', name);
-			}
 
 			this.$el.find('.side-menu-templates-holder').append($elem);
 		}

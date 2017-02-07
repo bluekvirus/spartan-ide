@@ -12,7 +12,11 @@
 				label: 'Template Name',
 				help: 'please give a template name',
 				validate: {
-					required: true
+					required: true,
+					fn: function(val, parentCt){
+						if(val === 'horizontal-line' || val === 'vertical-line' || val === 'endPoints')
+							return 'The name "' + val + '" is reserved for system use.';
+					},
 				},
 				layout: {
 					label: 'col-md-4',
