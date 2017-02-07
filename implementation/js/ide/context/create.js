@@ -124,6 +124,21 @@
 			this.$el.find('.locker').hover(function(e){
 				e.stopPropagation();
 			});
+
+			//set up templates holder height for scroll
+			var height = this.$el.height(),
+				blockHeight = this.$el.find('.side-menu-section').outerHeight() * 2 + this.$el.find('.side-menu-item').outerHeight() * 4,
+				adjust = (parseFloat(getComputedStyle(document.body).fontSize)) * 0.5; //wrapper class adjustment
+			this.$el.find('.side-menu-templates-holder').css({
+				height: (height - blockHeight - adjust) + 'px'
+			});
+			//for resize
+			this.listenTo(app, 'app:resized', function(){
+				var height = that.$el.height();
+				that.$el.find('.side-menu-templates-holder').css({
+					height: (height - blockHeight - adjust) + 'px'
+				});
+			});
 		},
 		checkConstrain: function(e){
 			var that = this;
@@ -140,7 +155,8 @@
 			if(_.string.include($(e.target).attr('class'), 'end-point') || 
 				_.string.include($(e.target).attr('class'), 'side-menu-trigger') || 
 				_.string.include($(e.target).attr('class'), 'side-menu-list') ||
-				_.string.include($(e.target).attr('class'), 'side-menu-item')
+				_.string.include($(e.target).attr('class'), 'side-menu-item') ||
+				_.string.include($(e.target).attr('class'), 'fa')
 			){//trigger an hover event specially for end points and menu
 				
 				return false;

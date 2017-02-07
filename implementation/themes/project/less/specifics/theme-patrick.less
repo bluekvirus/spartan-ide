@@ -69,12 +69,24 @@ body,
 					font-weight: 600;
 					color: #fff;
 				}
-				&:hover {
-					opacity: 0.8;
+				&:not(.side-menu-section) {
+					&:hover{
+						opacity: 0.8;
+					}
 				}
-				&:nth-child(even) {
-					background-color: lighten(@brand-primary, 10%);
+				&.side-menu-section {
+					background-color: lighten(@brand-primary, 20%);
+					cursor: default !important;
+					text-align: left;
+					font-size: 0.8em;
+					>span{
+						color: @gray-lighter;
+					}
 				}
+			}
+			.side-menu-templates-holder{
+				height: 400px;
+				overflow-y: auto;	
 			}
 			&.active {
 				transition: 0.25s;
