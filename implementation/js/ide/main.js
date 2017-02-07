@@ -29,7 +29,17 @@
 
 	///////////initializers/////////// - [optional]
 	app.addInitializer(function(){
-
+		//reload previously stored configuration
+		var endPoints = app.store.get('endPoints'),
+			hlines = app.store.get('horizontal-line'),
+			vlines = app.store.get('vertical-line');
+		
+		if(endPoints && hlines && vlines){
+			app._global = app._global || {};
+			app._global.endPoints = endPoints;
+			app._global['horizontal-line'] = hlines;
+			app._global['vertical-line'] = vlines;
+		}
 	});
 
 	app.addInitializer(function(){

@@ -12,6 +12,7 @@
 			this._horizontal = true; //flag indicates that now showing horizontal line or vertical line
 			this._x = 0; //0 - 100 in percentage
 			this._y = 0; //0 - 100 in percentage
+			this._blank = true;
 
 			//create a global object to store points, horizontal lines and vertical lines
 			app._global = app._global || {};
@@ -19,49 +20,51 @@
 			app._global['vertical-line'] = app._global['vertical-line'] || [];
 			app._global['horizontal-line'] = app._global['horizontal-line'] || [];
 			//setup a tolerance for coordinates matching
-			app._global.tolerance = 0.02;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here.*/
+			app._global.tolerance = app._global.tolerance || 0.02;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here(2%).*/
 
 			//!!Note: all stored coordinates should be translate into percetage to work with window.resize() event!!
 			//!!Note: all stored corrdinates only keep two digits after dicimal for easier comparison!!
 			
-			//add initial four lines to represent the frame
-			//top
-			var top = genLine('h', {x1: 0, x2: 100, y: 0});
-			//bottom
-			var bottom = genLine('h', {x1: 0, x2: 100, y: 100});
-			//left
-			var left = genLine('v', {y1: 0, y2: 100, x: 0});
-			//right
-			var right = genLine('v', {y1: 0, y2: 100, x: 100});
+			if(!(_.keys(app._global.endPoints).length)){
+				//add initial four lines to represent the frame
+				//top
+				var top = genLine('h', {x1: 0, x2: 100, y: 0});
+				//bottom
+				var bottom = genLine('h', {x1: 0, x2: 100, y: 100});
+				//left
+				var left = genLine('v', {y1: 0, y2: 100, x: 0});
+				//right
+				var right = genLine('v', {y1: 0, y2: 100, x: 100});
 
-			//add initial 4 points at four corners
-			//top left
-			var topLeft = genPoint(0, 0, {right: top, bottom: left});
-			//top right
-			var topRight = genPoint(100, 0, {left: top, bottom: right});
-			//bottom left
-			var bottomLeft = genPoint(0, 100, {right: bottom, top: left});
-			//bottom right
-			var bottomRight = genPoint(100, 100, {left: bottom, top: right});
+				//add initial 4 points at four corners
+				//top left
+				var topLeft = genPoint(0, 0, {right: top, bottom: left});
+				//top right
+				var topRight = genPoint(100, 0, {left: top, bottom: right});
+				//bottom left
+				var bottomLeft = genPoint(0, 100, {right: bottom, top: left});
+				//bottom right
+				var bottomRight = genPoint(100, 100, {left: bottom, top: right});
 
-			//link lines back to newly generated points
-			var temp;
-			//top
-			temp = app._global['horizontal-line'][_.findIndex(app._global['horizontal-line'], function(obj){ return obj.id === top; })];
-			temp.left = topLeft;
-			temp.right = topRight;
-			//bottom
-			temp = app._global['horizontal-line'][_.findIndex(app._global['horizontal-line'], function(obj){ return obj.id === bottom; })];
-			temp.left = bottomLeft;
-			temp.right = bottomRight;
-			//left
-			temp = app._global['vertical-line'][_.findIndex(app._global['vertical-line'], function(obj){ return obj.id === left; })];
-			temp.top = topLeft;
-			temp.bottom = bottomLeft;
-			//right
-			temp = app._global['vertical-line'][_.findIndex(app._global['vertical-line'], function(obj){ return obj.id === right; })];
-			temp.top = topRight;
-			temp.bottom = bottomRight;
+				//link lines back to newly generated points
+				var temp;
+				//top
+				temp = app._global['horizontal-line'][_.findIndex(app._global['horizontal-line'], function(obj){ return obj.id === top; })];
+				temp.left = topLeft;
+				temp.right = topRight;
+				//bottom
+				temp = app._global['horizontal-line'][_.findIndex(app._global['horizontal-line'], function(obj){ return obj.id === bottom; })];
+				temp.left = bottomLeft;
+				temp.right = bottomRight;
+				//left
+				temp = app._global['vertical-line'][_.findIndex(app._global['vertical-line'], function(obj){ return obj.id === left; })];
+				temp.top = topLeft;
+				temp.bottom = bottomLeft;
+				//right
+				temp = app._global['vertical-line'][_.findIndex(app._global['vertical-line'], function(obj){ return obj.id === right; })];
+				temp.top = topRight;
+				temp.bottom = bottomRight;
+			}
 		},
 		onReady: function(){
 				
@@ -97,10 +100,10 @@
 			///			!!DONE: close mechanism for arrow menu
 			///			!!DONE: Clean up code
 			///			!!DONE: Change style
-			///			Side menu
-			///				1). use app.store(),
-			///				2). align all the segments before generate
-			///				3). finish reset all
+			///			!!DONE: Side menu
+			///			!!DONE: 	1). use app.store(),
+			///			!!DONE: 	2). align all the segments before generate
+			///			!!DONE: 	3). finish reset all
 
 
 			if(this._horizontal){//horizontal line
@@ -200,6 +203,9 @@
 			app.debug('vertical-line', app._global['vertical-line']);
 			app.debug('end points', app._global.endPoints);
 			
+			//sync local storage
+			this.coop('sync-local');
+
 			//coop event to svg view to draw newly added line
 			app.coop('layout-added', {
 				x1: x1,
@@ -324,6 +330,9 @@
 			});
 
 		app._global.endPoints[id] = obj;
+
+		//sync with local storage
+		
 
 		//return id for easier querying
 		return id;

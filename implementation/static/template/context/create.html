@@ -7,23 +7,26 @@
 <!-- region to block all interactions on svg -->
 <div class="locker hidden"></div>
 <!-- side menu -->
-<div class="side-menu-trigger"><i class="fa fa-bars"></i></div>
+<div class="side-menu-trigger"><i class="fa fa-bars"></i><i class="fa fa-arrow-right hidden"></i></div>
 <div class="side-menu-list wrapper">
 	<div class="side-menu-item wrapper clearfix lock" action="lock">
-		<span class="lock"><i class="fa fa-lock"></i> LOCK</span>
-		<span class="unlock hidden"><i class="fa fa-unlock"></i> UNLOCK</span>
+		<span class="lock side-menu-item-text"><i class="fa fa-lock"></i> LOCK</span>
+		<span class="unlock hidden side-menu-item-text"><i class="fa fa-unlock"></i> UNLOCK</span>
 	</div>
 	<div class="side-menu-item wrapper" action="generate">
-		<span><i class="fa fa-flash"></i> GENERATE</span>
-	</div>
-	<div class="side-menu-item wrapper">
-		<span><i class="fa fa-file"></i> Template 1</span>
-	</div>
-	<div class="side-menu-item wrapper">
-		<span><i class="fa fa-file"></i> Template 2</span>
+		<span class="side-menu-item-text"><i class="fa fa-flash"></i> GENERATE</span>
 	</div>
 	<div class="side-menu-item wrapper" action="reset">
-		<span><i class="fa fa-close"></i> RESET ALL</span>
+		<span class="side-menu-item-text"><i class="fa fa-close"></i> RESET</span>
+	</div>
+	<div class="side-menu-item wrapper">
+		<span class="side-menu-item-text invisible">Placeholder</span>
+	</div>
+	<div class="side-menu-item wrapper">
+		<span class="side-menu-item-text"><i class="fa fa-file"></i> Template 1</span>
+	</div>
+	<div class="side-menu-item wrapper">
+		<span class="side-menu-item-text"><i class="fa fa-file"></i> Template 2</span>
 	</div>
 </div>
 

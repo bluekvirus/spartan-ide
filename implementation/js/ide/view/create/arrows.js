@@ -68,6 +68,7 @@
 				if($self.find('i').hasClass('deletable')){//deletable
 					var line = this.lines[$self.data('direction')];
 					this.deleteLine(line, $self.data('direction'));
+					this.coop('sync-local');
 				}else{//NOT deletable
 					app.notify('Cannot Delete', 'This line cannot be deleted!', 'error', {icon: 'fa fa-reddit-alien'});
 				}
@@ -179,6 +180,8 @@
 				//flip flag
 				this.shown = false;
 			}
+
+			app.notify('Success!', 'Line has been deleted.', 'ok', {icon: 'fa fa-fort-awesome'});
 				
 		},
 		colorArrows: function(point){

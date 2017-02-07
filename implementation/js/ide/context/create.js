@@ -11,6 +11,14 @@
 			//lock all the interactions
 			this.locked = false;
 		},
+		onSyncLocal: function(){
+			//sync end points
+			app.store.set('endPoints', app._global.endPoints);
+			//sync horizontal lines
+			app.store.set('horizontal-line', app._global['horizontal-line']);
+			//sync vertical lines
+			app.store.set('vertical-line', app._global['vertical-line']);
+		},
 		onReady: function(){
 			var that = this;
 			//guide line
@@ -98,9 +106,23 @@
 				//prevent default events
 				e.preventDefault();
 
+				var $this = $(this);
 				//
-				$(this).toggleClass('active');
+				$this.toggleClass('active');
 				that.$el.find('.side-menu-list').toggleClass('active');
+
+				//toggle icon
+				$this.find('.fa').toggleClass('hidden');
+			});
+
+			//stop hover on side menu being popup
+			this.$el.find('[class^="side-menu"]').hover(function(e){
+				e.stopPropagation();
+			});
+
+			//stop hover on block being popup
+			this.$el.find('.locker').hover(function(e){
+				e.stopPropagation();
 			});
 		},
 		checkConstrain: function(e){
@@ -176,8 +198,104 @@
 				$self.find('.unlock').toggleClass('hidden');
 				this.$el.find('.locker').toggleClass('hidden');
 				this.locked = !this.locked;
-			}
+			},
+			generate: function(){//need to align lines, ignore margin of errors
+				var x = [], y = [];
+				//generate a list of x and y coordinates from end points
+				_.each(app._global.endPoints, function(endPoint, pid){
+					var flag = false;
+					if(!_.contains(x, endPoint.x)){//not contained in the x 
+						if(!checkContained(x, endPoint, 'x')){//adjust the coordinate if necessary
+							x.push(endPoint.x);
+							//sort
+							x = _.sortBy(x, function(num){ return num;});
+						}
+					}
+
+					if(!_.contains(y, endPoint.y)){//y
+						if(!checkContained(y, endPoint, 'y')){
+							y.push(endPoint.y);
+							//sort
+							y = _.sortBy(y, function(num){ return num;});
+						}
+					}
+				});
+
+				//augment horizontal lines and vertical lines based on coordiates extracted
+				//horizontal
+				_.each(app._global['horizontal-line'], function(hline){
+					//left anchor
+					checkContained(x, hline, 'x1');
+					//right anchor
+					checkContained(x, hline, 'x2');
+					//y
+					checkContained(y, hline, 'y');
+				});
+
+				//vertical
+				_.each(app._global['vertical-line'], function(vline){
+					//top anchor
+					checkContained(y, vline, 'y1');
+					//bottom anchor
+					checkContained(y, vline, 'y2');
+					//x
+					checkContained(x, vline, 'x');
+				});
+
+				app.remote({
+					url: '/api/generate',
+					payload: {
+						endPoints: app._global.endPoints,
+						hlines: app._global['horizontal-line'],
+						vlines: app._global['vertical-line']
+					}
+				})
+				.done(function(data){
+					app.notify('Generated!', 'Layout has been generated.', 'ok', {icon: 'fa fa-fort-awesome'});
+				})
+				.fail(function(error){
+					app.notify('Error!', 'Generating error.', 'error', {icon: 'fa fa-reddit-alien'});
+				});
+
+				//debug log
+				app.debug('x array', x, 'y array', y);
+				app.debug('endPoints exported from generate action', app._global.endPoints);
+				app.debug('h-lines exported from generate action', app._global['horizontal-line']);
+				app.debug('v-lines exported from generate action', app._global['vertical-line']);
+			},
+			reset: function(){
+				//clear cache
+				app.store.clear();
+				//reset global objects
+				app._global.endPoints = undefined;
+				app._global['horizontal-line'] = undefined;
+				app._global['vertical-line'] = undefined;
+
+				//refresh
+				this.show('guide', 'Create.Guide');
+				//layout svg
+				this.show('layout', 'Create.Layout');
+				//menu arrows
+				this.show('arrows', 'Create.Arrows');
+			},
 		}
 	});
+
+	function checkContained(arr, obj, key){
+		var flag = false;
+		//check whether in the margin of error
+		//if yes, correct it
+		_.each(arr, function(single){
+			if(
+				(single === 0 && obj[key] <= app._global.tolerance) ||
+				(single === 100 && obj[key] >= 100 - app._global.tolerance) ||
+				(obj[key] >= single * (1 - app._global.tolerance) && obj[key] <= single * (1 + app._global.tolerance))
+			){
+				obj[key] = single;
+					flag = true;
+			}
+		});
+		return flag;
+	}
 
 })(Application);
