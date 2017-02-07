@@ -5,11 +5,15 @@
 		attributes: {
 			tabindex: "1" //make this div focusable in order to use keypress event
 		},
+		coop: ['template-added'],
 		initialize: function(){
 			//indicate whether click event will be triggered or not
 			this.clickable = true;
 			//lock all the interactions
 			this.locked = false;
+		},
+		onTemplateAdded: function(name){
+			this.addTemplateOnMenu(name, true);
 		},
 		onSyncLocal: function(){
 			//sync end points
@@ -27,6 +31,13 @@
 			this.show('layout', 'Create.Layout');
 			//menu arrows
 			this.show('arrows', 'Create.Arrows');
+
+			//show all stored templates
+			_.each(app.store.getAll(), function(item, key){
+				if(key !== 'endPoints' && key !== 'horizontal-line' && key !== 'vertical-line' && key !== 'current'){//only focus on stored object
+					that.addTemplateOnMenu(key);
+				}
+			});
 			
 			//focus on this.$el to trigger events
 			this.$el.focus();
@@ -140,74 +151,6 @@
 				});
 			});
 		},
-		checkConstrain: function(e){
-			var that = this;
-			//if locked return false
-			if(this.locked) return false;
-			//stay inside window
-			if(e.pageX < 1 || e.pageX > this.$el.width() - 1 || e.pageY < 1 || e.pageY > this.$el.height() - 1)
-				return false;
-			//menu is showing return false
-			if(this.getViewIn('arrows').shown) return false;
-			//dragging an end point return false
-			if(this.getViewIn('layout').dragging) return false;
-			//hover on points
-			if(_.string.include($(e.target).attr('class'), 'end-point') || 
-				_.string.include($(e.target).attr('class'), 'side-menu-trigger') || 
-				_.string.include($(e.target).attr('class'), 'side-menu-list') ||
-				_.string.include($(e.target).attr('class'), 'side-menu-item') ||
-				_.string.include($(e.target).attr('class'), 'fa')
-			){//trigger an hover event specially for end points and menu
-				
-				return false;
-			}
-			//keep a 2em gap
-			var horizontal = this.getViewIn('guide')._horizontal, //get now doing horizontal line or vertical line
-				em = horizontal ? (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.height() * 100
-								: (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.width() * 100, //get default em and translate it into percentage
-				tooClose = false,
-				yPer = e.pageY / this.$el.height() * 100,
-				xPer = e.pageX / this.$el.width() * 100;
-
-
-			if(horizontal){//horizontal lines
-				//check
-				_.each(app._global['horizontal-line'], function(hline){
-					if(xPer <= hline.x2 && xPer >= hline.x1 && yPer >= hline.y - 2 * em && yPer <= hline.y + 2 * em)
-						tooClose = true;
-				});
-
-			}else{//vertical lines
-				_.each(app._global['vertical-line'], function(vline){
-					if(yPer <= vline.y2 && yPer >= vline.y1 && xPer >= vline.x - 2 * em && xPer <= vline.x + 2 * em)
-						tooClose = true;
-				});
-			}
-
-			if(tooClose) return false;
-
-			//magnet effect within 1em radius to a certain point
-			var x,y, distance;
-			_.each(app._global.endPoints, function(endPoint, id){
-
-				//calculate distance
-				distance = horizontal ? Math.abs(endPoint.y - yPer) : Math.abs(endPoint.x - xPer);
-				//if less than 1 em assign new x, y for return
-				if(distance < 1.25 * em){
-					if(horizontal){
-						x = e.pageX;
-						y = endPoint.y / 100 * that.$el.height();
-					}else{
-						x = endPoint.x / 100 * that.$el.width();
-						y = e.pageY;
-					}
-				}
-			});
-
-			if(x && y) return {x: x, y: y};//returns an object differs from return a boolean, though truely.
-
-			return true;
-		},
 		actions: {
 			lock: function($self){
 				$self.find('.lock').toggleClass('hidden');
@@ -294,6 +237,123 @@
 				//menu arrows
 				this.show('arrows', 'Create.Arrows');
 			},
+			save: function(){
+				var Save = app.get('Save');
+				(new Save()).overlay();
+			},
+			'load-template': function($self){
+				var temp = app.store.get($self.attr('template-name'));
+
+				//reset app._global object
+				app._global.endPoints = temp.endPoints;
+				app._global['horizontal-line'] = temp['horizontal-line'];
+				app._global['vertical-line'] = temp['vertical-line'];
+
+				//reset local stored object for current template
+				app.store.set('endPoints', temp.endPoints);
+				app.store.set('horizontal-line', temp['horizontal-line']);
+				app.store.set('vertical-line', temp['vertical-line']);
+
+				//change color
+				this.$el.find('.side-menu-templates-holder .side-menu-item-text').removeClass('active');
+				$self.addClass('active');
+
+				//change stored current
+				app.store.set('current', $self.attr('template-name'));
+
+				//refresh
+				this.show('guide', 'Create.Guide');
+				//layout svg
+				this.show('layout', 'Create.Layout');
+				//menu arrows
+				this.show('arrows', 'Create.Arrows');
+			},
+			'delete-template': function($self){
+
+			},
+		},
+		checkConstrain: function(e){
+			var that = this;
+			//if locked return false
+			if(this.locked) return false;
+			//stay inside window
+			if(e.pageX < 1 || e.pageX > this.$el.width() - 1 || e.pageY < 1 || e.pageY > this.$el.height() - 1)
+				return false;
+			//menu is showing return false
+			if(this.getViewIn('arrows').shown) return false;
+			//dragging an end point return false
+			if(this.getViewIn('layout').dragging) return false;
+			//hover on points
+			if(_.string.include($(e.target).attr('class'), 'end-point') || 
+				_.string.include($(e.target).attr('class'), 'side-menu-trigger') || 
+				_.string.include($(e.target).attr('class'), 'side-menu-list') ||
+				_.string.include($(e.target).attr('class'), 'side-menu-item') ||
+				_.string.include($(e.target).attr('class'), 'fa')
+			){//trigger an hover event specially for end points and menu
+				
+				return false;
+			}
+			//keep a 2em gap
+			var horizontal = this.getViewIn('guide')._horizontal, //get now doing horizontal line or vertical line
+				em = horizontal ? (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.height() * 100
+								: (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.width() * 100, //get default em and translate it into percentage
+				tooClose = false,
+				yPer = e.pageY / this.$el.height() * 100,
+				xPer = e.pageX / this.$el.width() * 100;
+
+
+			if(horizontal){//horizontal lines
+				//check
+				_.each(app._global['horizontal-line'], function(hline){
+					if(xPer <= hline.x2 && xPer >= hline.x1 && yPer >= hline.y - 2 * em && yPer <= hline.y + 2 * em)
+						tooClose = true;
+				});
+
+			}else{//vertical lines
+				_.each(app._global['vertical-line'], function(vline){
+					if(yPer <= vline.y2 && yPer >= vline.y1 && xPer >= vline.x - 2 * em && xPer <= vline.x + 2 * em)
+						tooClose = true;
+				});
+			}
+
+			if(tooClose) return false;
+
+			//magnet effect within 1em radius to a certain point
+			var x,y, distance;
+			_.each(app._global.endPoints, function(endPoint, id){
+
+				//calculate distance
+				distance = horizontal ? Math.abs(endPoint.y - yPer) : Math.abs(endPoint.x - xPer);
+				//if less than 1 em assign new x, y for return
+				if(distance < 1.25 * em){
+					if(horizontal){
+						x = e.pageX;
+						y = endPoint.y / 100 * that.$el.height();
+					}else{
+						x = endPoint.x / 100 * that.$el.width();
+						y = e.pageY;
+					}
+				}
+			});
+
+			if(x && y) return {x: x, y: y};//returns an object differs from return a boolean, though truely.
+
+			return true;
+		},
+		addTemplateOnMenu: function(name, newly){
+			var htmlStr = '<div class="side-menu-item wrapper wrapper-horizontal-2x clearfix">' +
+								'<span class="side-menu-item-text" action="load-template" template-name="' + name + '"><i class="fa fa-file"></i> '+ name +'</span>' +
+								'<div class="pull-right" action="delete-template" template-name="' + name + '"><i class="fa fa-close"></i></div>' +
+							'</div>',
+			$elem = $(htmlStr);
+
+			if(newly){
+				this.$el.find('.side-menu-templates-holder .side-menu-item-text').removeClass('active');
+				$elem.find('.side-menu-item-text').addClass('active');
+				app.store.set('current', name);
+			}
+
+			this.$el.find('.side-menu-templates-holder').append($elem);
 		}
 	});
 

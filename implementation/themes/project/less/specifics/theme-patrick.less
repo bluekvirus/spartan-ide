@@ -76,9 +76,9 @@ body,
 				}
 				&.side-menu-section {
 					background-color: lighten(@brand-primary, 20%);
-					cursor: default !important;
 					text-align: left;
 					font-size: 0.8em;
+					cursor: default;
 					>span{
 						color: @gray-lighter;
 					}
@@ -86,7 +86,20 @@ body,
 			}
 			.side-menu-templates-holder{
 				height: 400px;
-				overflow-y: auto;	
+				overflow-y: auto;
+				.side-menu-item {
+					cursor: default;
+					text-align: left;
+					.side-menu-item-text{
+						cursor: pointer;
+						&.active {
+							color: @brand-success;
+						}
+					}
+					[action="delete-template"] {
+						color: @gray;
+					}
+				}
 			}
 			&.active {
 				transition: 0.25s;

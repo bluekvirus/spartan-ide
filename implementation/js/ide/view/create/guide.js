@@ -104,6 +104,8 @@
 			///			!!DONE: 	1). use app.store(),
 			///			!!DONE: 	2). align all the segments before generate
 			///			!!DONE: 	3). finish reset all
+			///						4). make it savable to different profiles
+			///						*** finish delete, *** delete an active template? delete the last one? currently active how to deal with?
 
 
 			if(this._horizontal){//horizontal line
