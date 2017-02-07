@@ -14,7 +14,6 @@
 		curtains: {},
 
 		//Note: Always set navRegion if using app template here, unless you've merged it(the tpl) with index.html;
-		
 		defaultContext: 'Create',
 		viewSrcs: 'js/ide', //set this to a folder path to enable view dynamic loading. 
 		//---------------------------------------------------------------------------------------------
