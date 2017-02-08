@@ -11,6 +11,8 @@
 			this.clickable = true;
 			//lock all the interactions
 			this.locked = false;
+			//hide end points or not
+			this.endPointsHidden = false;
 		},
 		onTemplateAdded: function(name){
 			this.addTemplateOnMenu(name, true);
@@ -128,6 +130,9 @@
 				e.preventDefault();
 
 				var $this = $(this);
+				//flash current
+				if(!$this.hasClass('active'))
+					that.flashCurrent();
 				//
 				$this.toggleClass('active');
 				that.$el.find('.side-menu-list').toggleClass('active');
@@ -136,15 +141,20 @@
 				$this.find('.fa').toggleClass('hidden');
 			});
 
-			//stop hover on side menu being popup
-			this.$el.find('[class^="side-menu"]').hover(function(e){
-				e.stopPropagation();
-			});
+			// //stop hover on side menu being popup
+			// this.$el.find('[class^="side-menu"]').hover(function(e){
+			// 	e.stopPropagation();
+			// });
 
-			//stop hover on block being popup
-			this.$el.find('.locker').hover(function(e){
-				e.stopPropagation();
-			});
+			// //stop hover on block being popup
+			// this.$el.find('.locker').hover(function(e){
+			// 	e.stopPropagation();
+			// });
+
+			// //stop hover on operations being popup
+			// this.$el.find('.operations-holder').hover(function(e){
+			// 	e.stopPropagation();
+			// });
 
 			//set up templates holder height for scroll
 			var height = this.$el.height(),
@@ -163,14 +173,15 @@
 
 			//for animation end
             this.$el.find('.side-menu-list .current-name-holder').bind('webkitAnimationEnd', function(){
-               $(this).removeClass('animated').removeClass('rubberBand');
+               $(this).removeClass('flash');
             });
             this.$el.find('.side-menu-list .current-name-holder').bind('animationend', function(){
-                $(this).removeClass('animated').removeClass('rubberBand');
+                $(this).removeClass('flash');
             });
 		},
 		actions: {
 			lock: function($self){
+				$self.toggleClass('active');
 				$self.find('.lock').toggleClass('hidden');
 				$self.find('.unlock').toggleClass('hidden');
 				this.$el.find('.locker').toggleClass('hidden');
@@ -291,7 +302,7 @@
 				//set current
 				app.store.set('current', name);
 
-				app.notify('Loaded!', 'Template ' + name + 'has been loaded.', 'ok', {icon: 'fa fa-fort-awesome'});
+				app.notify('Loaded!', 'Template <strong>' + name + '</strong> has been loaded.', 'ok', {icon: 'fa fa-fort-awesome'});
 			},
 			'delete-template': function($self){
 				var Delete = app.get('Create.Delete');
@@ -305,29 +316,82 @@
 					class: 'delete-overlay',
 				});
 			},
+			'new-template': function(){
+				//reset locally stored current
+				app.store.remove('current');
+
+				//remove all the active class
+				this.$el.find('.side-menu-templates-holder .side-menu-item-text').removeClass('active');
+
+				//change template value to untitled
+				this.$el.find('.side-menu-list .current-name').text('untitled');
+
+				//reset layout
+				this.reset();
+			},
+			'hide-end-points': function($self){
+				//appereance
+				$self.toggleClass('active');
+				$self.find('.hide-point').toggleClass('hidden');
+				$self.find('.show-point').toggleClass('hidden');
+
+				//real stuff
+				if(!this.endPointsHidden){
+					//outer circle
+					_.each($('.end-point'), function(el){
+						var $el = $(el);
+						//
+						var classes = $el.attr('class');
+						$el.attr('class', classes + ' hidden');
+					});
+
+					//inner circle
+					_.each($('.end-point-inner'), function(el){
+						var $el = $(el);
+						//
+						var classes = $el.attr('class');
+						$el.attr('class', classes + ' hidden');
+					});
+				}else{
+					//outer circle
+					_.each($('.end-point'), function(el){
+						var $el = $(el);
+						//
+						var classes = $el.attr('class');
+						$el.attr('class', classes.replace('hidden', ''));
+					});
+
+					//inner circle
+					_.each($('.end-point-inner'), function(el){
+						var $el = $(el);
+						//
+						var classes = $el.attr('class');
+						$el.attr('class', classes.replace('hidden', ''));
+					});
+				}
+				this.endPointsHidden = !this.endPointsHidden;
+			}
 		},
 		checkConstrain: function(e){
 			var that = this;
 			//if locked return false
 			if(this.locked) return false;
-			//stay inside window
-			if(e.pageX < 1 || e.pageX > this.$el.width() - 1 || e.pageY < 1 || e.pageY > this.$el.height() - 1)
+			//stay inside window, use 5px as a buffer
+			if(e.pageX < 5 || e.pageX > this.$el.width() - 5 || e.pageY < 5 || e.pageY > this.$el.height() - 5)
 				return false;
 			//menu is showing return false
 			if(this.getViewIn('arrows').shown) return false;
 			//dragging an end point return false
 			if(this.getViewIn('layout').dragging) return false;
 			//hover on points
-			if(_.string.include($(e.target).attr('class'), 'end-point') || 
-				_.string.include($(e.target).attr('class'), 'side-menu-trigger') || 
-				_.string.include($(e.target).attr('class'), 'side-menu-list') ||
-				_.string.include($(e.target).attr('class'), 'side-menu-item') ||
-				_.string.include($(e.target).attr('class'), 'fa') ||
-				_.string.include($(e.target).attr('class'), 'side-menu-templates-holder')
-			){//trigger an hover event specially for end points and menu
-				
-				return false;
-			}
+			var forbiddenClasses = ['end-point', 'side-menu-trigger', 'side-menu-list', 'side-menu-item', 'fa', 
+									'side-menu-templates-holder', 'operations-item', 'operations-holder', 'operations-subitem'],
+				forbidden = false;
+			_.each(forbiddenClasses, function(classname){
+				if(_.string.include($(e.target).attr('class'), classname))
+					forbidden = true;
+			});
+			if(forbidden) return false;
 			//keep a 2em gap
 			var horizontal = this.getViewIn('guide')._horizontal, //get now doing horizontal line or vertical line
 				em = horizontal ? (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.height() * 100
@@ -390,6 +454,9 @@
 
 				//change template value
 				this.$el.find('.side-menu-list .current-name').text(name);
+
+				//change stored current value
+				app.store.set('current', name);
 			}
 
 			this.$el.find('.side-menu-templates-holder').append($elem);
@@ -413,7 +480,7 @@
 			this.show('arrows', 'Create.Arrows');
 		},
 		flashCurrent: function(){
-			this.$el.find('.side-menu-list .current-name-holder').addClass('animated rubberBand');
+			this.$el.find('.side-menu-list .current-name-holder').addClass('flash');
 		},
 	});
 

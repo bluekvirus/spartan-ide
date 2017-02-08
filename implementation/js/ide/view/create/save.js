@@ -68,7 +68,7 @@
 				}else{//no overwrite
 					app.store.set(name, temp);
 					app.coop('template-added', name);
-					app.notify('Saved!', 'Template ' + name + ' has been saved.', 'ok', {icon: 'fa fa-fort-awesome'});
+					app.notify('Saved!', 'Template <strong>' + name + '</strong> has been saved.', 'ok', {icon: 'fa fa-fort-awesome'});
 					this.close();
 				}
 			}

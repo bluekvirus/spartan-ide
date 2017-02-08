@@ -8,9 +8,12 @@
 <div class="locker hidden"></div>
 <!-- side menu -->
 <div class="side-menu-trigger"><i class="fa fa-bars"></i><i class="fa fa-arrow-right hidden"></i></div>
-<div class="side-menu-list wrapper">
-	<div class="side-menu-item wrapper-2x wrapper-horizontal-2x side-menu-section">
+<div class="side-menu-list">
+	<div class="side-menu-item wrapper-2x wrapper-horizontal-2x side-menu-section clearfix">
 		<span class="side-menu-item-text">CURRENT TEMPLATE</span>
+		<div class="pull-right new-button-holder">
+			<div class="new-button btn btn-xs btn-success" action="new-template"><strong>NEW</strong></div>
+		</div>
 	</div>
 	<div class="side-menu-item wrapper wrapper-horizontal-2x current-name-holder">
 		<span class="side-menu-item-text current-name">untitled</span>
@@ -18,7 +21,30 @@
 	<div class="side-menu-item wrapper-2x wrapper-horizontal-2x side-menu-section">
 		<span class="side-menu-item-text">OPERATIONS</span>
 	</div>
-	<div class="side-menu-item wrapper lock" action="lock">
+	<div class="operations-holder clearfix">
+		<div class="operations-item left pull-left">
+			<div class="operations-item lock-button wrapper-horizontal-2x"  action="lock">
+				<span class="operations-subitem lock"><i class="fa fa-lock"></i> LOCK</span>
+				<span class="operations-subitem unlock hidden"><i class="fa fa-unlock"></i> UNLOCK</span>
+			</div>
+			<div class="operations-item hide-button wrapper-horizontal-2x" action="hide-end-points">
+				<span class="operations-subitem hide-point"><i class="fa fa-circle-o"></i> Points</span>
+				<span class="operations-subitem show-point hidden"><i class="fa fa-circle"></i> Points</span>
+			</div>
+		</div>
+		<div class="operations-item right pull-right">
+			<div class="operations-item wrapper wrapper-horizontal-2x" action="save">
+				<span class="side-menu-item-text"><i class="fa fa-floppy-o"></i> SAVE</span>
+			</div>
+			<div class="operations-item wrapper wrapper-horizontal-2x" action="generate">
+				<span class="side-menu-item-text"><i class="fa fa-flash"></i> GENERATE</span>
+			</div>
+			<div class="operations-item wrapper wrapper-horizontal-2x" action="reset">
+				<span class="side-menu-item-text"><i class="fa fa-close"></i> RESET</span>
+			</div>
+		</div>
+	</div>
+	<!-- <div class="side-menu-item wrapper lock" action="lock">
 		<span class="lock side-menu-item-text"><i class="fa fa-lock"></i> LOCK</span>
 		<span class="unlock hidden side-menu-item-text"><i class="fa fa-unlock"></i> UNLOCK</span>
 	</div>
@@ -30,7 +56,7 @@
 	</div>
 	<div class="side-menu-item wrapper wrapper-horizontal-2x" action="reset">
 		<span class="side-menu-item-text"><i class="fa fa-close"></i> RESET</span>
-	</div>
+	</div> -->
 	<div class="side-menu-item wrapper-2x wrapper-horizontal-2x side-menu-section">
 		<span class="side-menu-item-text">SAVED TEMPLATES</span>
 	</div>

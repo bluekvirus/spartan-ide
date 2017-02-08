@@ -5,6 +5,8 @@
 
 @side-background: darken(@background, 10%);
 @side-border: darken(@border, 10%);
+@side-menu-width: 230px;
+@side-menu-inital: -230px;
 
 html,
 body,
@@ -51,17 +53,17 @@ body,
 			}
 			&.active {
 				transition: 0.25s;
-				right: 199px;
+				right: @side-menu-width - 1;
 			}
 			transition: 0.25s;
 		}
 		.side-menu-list {
 			position: absolute;
-			right: -200px;
+			right: @side-menu-inital;
 			top: 0px;
 			bottom: 0px;
 			z-index: 4;
-			width: 200px;
+			width: @side-menu-width;
 			text-align: center;
 			background-color: @side-background;
 			box-shadow: -1px 1px 3px @side-background;
@@ -87,9 +89,60 @@ body,
 					>span{
 						color: @gray;
 					}
+					.new-button-holder {
+						.new-button {
+							margin-top: -3px;
+						}
+					}
 				}
 				&.current-name-holder{
 					cursor: default;
+				}
+			}
+			.operations-holder {
+				border-bottom: 1px solid @side-border;
+				.left,
+				.right {
+					float: left;
+				}
+				.left {
+					width: 50%;
+					border-right: 1px solid @side-border;
+					text-align: center;
+					font-weight: 600;
+					.operations-item {
+						line-height: 3.75em;
+						cursor: pointer;
+						&:not(:last-child) {
+							border-bottom: 1px solid @side-border;
+						}
+						&.hide-button {
+							.hide-point {
+								text-decoration:line-through;
+							}
+						}
+						&:hover {
+							opacity: 0.5;
+						}
+						&.active {
+							box-shadow: inset 0 5px 15px darken(@side-border, 30%);
+						}
+					}
+				}
+				.right {
+					width: 50%;
+					.operations-item {
+						cursor: pointer;
+						>span {
+							font-weight: 600;
+						}
+						&:hover {
+							opacity: 0.5;
+						}
+						&:not(:last-child) {
+							border-bottom: 1px solid @side-border;
+						}
+					}
 				}
 			}
 			.side-menu-templates-holder{
@@ -241,4 +294,30 @@ body,
 .delete-overlay {
 	background-color: transparent;
 	z-index: 999;
+}
+
+.delete-overlay {
+	.modal-title {
+		color: @brand-danger;
+	}
+}
+
+//------------------------------- animation -------------------------------//
+@keyframes flash {
+    0% {
+        background-color: @side-background;
+    }
+    50% {
+        background-color: @brand-primary;
+    }
+    100% {
+        background-color: @side-background;
+    }
+}
+
+.flash {
+    animation-name: flash;
+    animation-duration: 1000ms;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in-out;
 }

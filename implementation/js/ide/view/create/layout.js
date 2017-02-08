@@ -93,7 +93,8 @@
 		drawCircle: function(x, y){
 			//draw circle on paper
 			//inner circle, draw first, so it will be at lower index than outter circle, which has events on it.
-			this.paper.circle(x, y, this.radius - 2).attr({'stroke-width':'none', 'fill': '#000'});
+			var inner = this.paper.circle(x, y, this.radius - 2).attr({'stroke-width':'none', 'fill': '#000'});
+			$(inner.node).attr('class', 'end-point-inner' + (this.parentCt.endPointsHidden ? ' hidden' : ''));
 			//outer circle
 			var circle = this.paper.circle(x, y, this.radius).attr({'stroke' : '#DEDEDE', 'stroke-width':'2', 'fill': 'rgba(0, 0, 0, 0)'});
 			return circle;
@@ -104,7 +105,7 @@
 
 			var that = this;
 			//jquery2 cannot use addClass on SVG element
-			node.setAttribute('class', 'end-point draggble');
+			node.setAttribute('class', 'end-point draggble' + (this.parentCt.endPointsHidden ? ' hidden' : ''));
 			node.setAttribute('point-id', id);
 
 			$node.one('click', function(e){
@@ -161,7 +162,7 @@
 
 			//use body as the mousemove view port
 			$body
-			.on('mousemove', _.throttle(function(e){
+			.on('mousemove', function(e){
 				//prevent default
 				e.preventDefault();
 
@@ -173,12 +174,23 @@
 				var hPer = e.pageX / that.$el.width() * 100,
 					vPer = e.pageY / that.$el.height() * 100;
 
+				//totally inside boundary
 				if(hPer > constrains.limits.xmin && hPer < constrains.limits.xmax && vPer > constrains.limits.ymin && vPer < constrains.limits.ymax){
 					//update all related lines and end points
-					that.updateRelated(constrains.hlines, constrains.vlines, constrains.endPoints, e, $node.attr('point-id'), originalCoords);
+					that.updateRelated(constrains.hlines, constrains.vlines, constrains.endPoints, e, $node.attr('point-id'), originalCoords, {x: true, y: true});
+				}
+				//only x inside boundary
+				else if(hPer > constrains.limits.xmin && hPer < constrains.limits.xmax && (vPer < constrains.limits.ymin || vPer > constrains.limits.ymax)){
+					//update all related lines and end points
+					that.updateRelated(constrains.hlines, constrains.vlines, constrains.endPoints, e, $node.attr('point-id'), originalCoords, {x: true, y: false});
+				}
+				//only y inside boundary
+				else if((hPer < constrains.limits.xmin || hPer > constrains.limits.xmax) && vPer > constrains.limits.ymin && vPer < constrains.limits.ymax){
+					//update all related lines and end points
+					that.updateRelated(constrains.hlines, constrains.vlines, constrains.endPoints, e, $node.attr('point-id'), originalCoords, {x: false, y: true});
 				}
 				
-			}, 25))
+			})
 			.one('mouseup', function(e){
 				//prevent default
 				e.preventDefault();
@@ -309,35 +321,37 @@
 				endPoints: extensions.endPoints
 			};
 		},
-		updateRelated: function(hlines, vlines, points, event, anchorId, originalCoords){
+		updateRelated: function(hlines, vlines, points, event, anchorId, originalCoords, direction){
 			var height = this.$el.height(),
 				width = this.$el.width();
 
 			//update horizontal lines
-			_.each(hlines, function(id){
-				var line = _.find(app._global['horizontal-line'], function(hline){ return hline.id === id; }),
-					yCoord = trimNumber(event.pageY / height * 100);
-				//update line itself
-				line.y = yCoord;
-				//update its end points
-				//left
-				app._global.endPoints[line.left].y = yCoord;
-				//right
-				app._global.endPoints[line.right].y = yCoord;
-			});
+			if(direction.y)
+				_.each(hlines, function(id){
+					var line = _.find(app._global['horizontal-line'], function(hline){ return hline.id === id; }),
+						yCoord = trimNumber(event.pageY / height * 100);
+					//update line itself
+					line.y = yCoord;
+					//update its end points
+					//left
+					app._global.endPoints[line.left].y = yCoord;
+					//right
+					app._global.endPoints[line.right].y = yCoord;
+				});
 
 			//update vertical lines
-			_.each(vlines, function(id){
-				var line = _.find(app._global['vertical-line'], function(vline){ return vline.id === id; }),
-					xCoord = trimNumber(event.pageX / width * 100);
-				//update line tiself
-				line.x = xCoord;
-				//update its end points
-				//top
-				app._global.endPoints[line.top].x = xCoord;
-				//bottom
-				app._global.endPoints[line.bottom].x = xCoord;
-			});
+			if(direction.x)
+				_.each(vlines, function(id){
+					var line = _.find(app._global['vertical-line'], function(vline){ return vline.id === id; }),
+						xCoord = trimNumber(event.pageX / width * 100);
+					//update line tiself
+					line.x = xCoord;
+					//update its end points
+					//top
+					app._global.endPoints[line.top].x = xCoord;
+					//bottom
+					app._global.endPoints[line.bottom].x = xCoord;
+				});
 
 			//update length of lines that connected to the related points
 			_.each(points, function(pointId){
