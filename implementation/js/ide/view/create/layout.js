@@ -272,17 +272,17 @@
 				if(
 					!_.contains(extensions.hlines, hline.id) &&
 					(
-						(hline.x1 < extensions.right * (1 + app._global.tolerance) && hline.x1 > extensions.left * (1 - app._global.tolerance)) ||
-						(hline.x2 < extensions.right * (1 + app._global.tolerance) && hline.x2 > extensions.left * (1 - app._global.tolerance))
+						(hline.x1 < (extensions.right + app._global.tolerance) && hline.x1 > (extensions.left - app._global.tolerance)) ||
+						(hline.x2 < (extensions.right  + app._global.tolerance) && hline.x2 > (extensions.left - app._global.tolerance))
 					)
 				){
-					if(hline.y <= point.y * (1 + app._global.tolerance)){//ymin
+					if(hline.y <= (point.y + app._global.tolerance)){//ymin
 						temp = hline.y + 2 * vem;
 						if(temp > limits.ymin)
 							limits.ymin = temp;
 					}
 
-					else if(hline.y >= point.y * (1 - app._global.tolerance)){//ymax
+					else if(hline.y >= (point.y - app._global.tolerance)){//ymax
 						temp = hline.y - 2 * vem;
 						if(temp < limits.ymax)
 							limits.ymax = temp;
@@ -295,18 +295,18 @@
 				if(	
 					!_.contains(extensions.vlines, vline.id) &&
 					(
-						(vline.y1 < extensions.bottom * (1 + app._global.tolerance) && vline.y1 > extensions.top * (1 - app._global.tolerance)) ||
-						(vline.y2 < extensions.bottom * (1 + app._global.tolerance) && vline.y2 > extensions.top * (1 - app._global.tolerance))
+						(vline.y1 < (extensions.bottom + app._global.tolerance) && vline.y1 > (extensions.top - app._global.tolerance)) ||
+						(vline.y2 < (extensions.bottom + app._global.tolerance) && vline.y2 > (extensions.top - app._global.tolerance))
 					)
 
 				){
-					if(vline.x <= point.x * (1 + app._global.tolerance)){//xmin
+					if(vline.x <= (point.x + app._global.tolerance)){//xmin
 						temp = vline.x + 2 * hem;
 						if(temp > limits.xmin)
 							limits.xmin = temp;
 					}
 
-					else if(vline.x >= point.x * (1 - app._global.tolerance)){//xmax
+					else if(vline.x >= (point.x - app._global.tolerance)){//xmax
 						temp = vline.x - 2 * hem;
 						if(temp < limits.xmax)
 							limits.xmax = temp;

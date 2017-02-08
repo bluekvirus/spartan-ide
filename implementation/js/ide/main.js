@@ -55,14 +55,7 @@
 	});
 
 	app.addInitializer(function(){
-		$.fn.extend({
-		    animateCss: function (animationName) {
-		        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-		        this.addClass('animated ' + animationName).one(animationEnd, function() {
-		            $(this).removeClass('animated ' + animationName);
-		        });
-		    }
-		});
+		
 	});
 	//Note: initializer can return a promise object for async loading, 
 	//add more initializers if you need. e.g `return app.remote() or $.ajax()`.

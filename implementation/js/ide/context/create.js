@@ -141,7 +141,7 @@
 				$this.find('.fa').toggleClass('hidden');
 			});
 
-			// //stop hover on side menu being popup
+			// //stop hover on side menu being popup, not really working, now use forbiddenClasses array
 			// this.$el.find('[class^="side-menu"]').hover(function(e){
 			// 	e.stopPropagation();
 			// });
@@ -490,9 +490,9 @@
 		//if yes, correct it
 		_.each(arr, function(single){
 			if(
-				(single === 0 && obj[key] <= app._global.tolerance) ||
+				(single === 0 && obj[key] <= app._global.tolerance) ||//tolerance is 0.02 need to magnify it 100 times
 				(single === 100 && obj[key] >= 100 - app._global.tolerance) ||
-				(obj[key] >= single * (1 - app._global.tolerance) && obj[key] <= single * (1 + app._global.tolerance))
+				(obj[key] >= (single - app._global.tolerance) && obj[key] <= (single + app._global.tolerance))
 			){
 				obj[key] = single;
 					flag = true;

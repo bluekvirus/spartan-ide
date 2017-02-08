@@ -20,7 +20,7 @@
 			app._global['vertical-line'] = app._global['vertical-line'] || [];
 			app._global['horizontal-line'] = app._global['horizontal-line'] || [];
 			//setup a tolerance for coordinates matching
-			app._global.tolerance = app._global.tolerance || 0.02;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here(2%).*/
+			app._global.tolerance = app._global.tolerance || 0.2;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here(0.2%).*/
 
 			//!!Note: all stored coordinates should be translate into percetage to work with window.resize() event!!
 			//!!Note: all stored corrdinates only keep two digits after dicimal for easier comparison!!
@@ -129,7 +129,7 @@
 
 				}else{
 					//find out it should attach to which vertical line
-					oldLine = _.find(app._global['vertical-line'], function(vline){ return vline.x >= x1 * (1 - tolerance) && vline.x <= x1 * (1 + tolerance) && y1 < vline.y2 && y1 > vline.y1; });
+					oldLine = _.find(app._global['vertical-line'], function(vline){ return vline.x >= (x1 - tolerance) && vline.x <= (x1 + tolerance) && y1 < vline.y2 && y1 > vline.y1; });
 					//!!Note: there should not be a horizontal line attached to the left of this new point.
 					//!!Otherwise there should already be a point there.
 				
@@ -144,7 +144,7 @@
 
 				}else{
 					//find out which line needs to be replaced
-					oldLine = _.find(app._global['vertical-line'], function(vline){ return vline.x >= x2 * (1 - tolerance) && vline.x <= x2 * (1 + tolerance) && y1 < vline.y2 && y1 > vline.y1; });
+					oldLine = _.find(app._global['vertical-line'], function(vline){ return vline.x >= (x2 - tolerance) && vline.x <= (x2 + tolerance) && y1 < vline.y2 && y1 > vline.y1; });
 
 					newEndPoint = breakLine('h', oldLine, {x: x2, y: y2}, newLineId);
 				}
@@ -175,7 +175,7 @@
 					newStartPoint = occupied.occupiedStart.id;
 				}else{
 					//find out it should attach to which vertical line
-					oldLine = _.find(app._global['horizontal-line'], function(hline){ return hline.y >= y1 * (1 - tolerance) && hline.y <= y1 * (1 + tolerance) && x1 < hline.x2 && x1 > hline.x1; });
+					oldLine = _.find(app._global['horizontal-line'], function(hline){ return hline.y >= (y1 - tolerance) && hline.y <= (y1 + tolerance) && x1 < hline.x2 && x1 > hline.x1; });
 					//break line
 					newStartPoint = breakLine('v', oldLine, {x: x1, y: y1}, newLineId, true);
 				}
@@ -188,7 +188,7 @@
 					newEndPoint = occupied.occupiedEnd.id;
 				}else{
 					//find out it should attach to which vertical line
-					oldLine = _.find(app._global['horizontal-line'], function(hline){ return hline.y >= y2 * (1 - tolerance) && hline.y <= y2 * (1 + tolerance) && x1 < hline.x2 && x1 > hline.x1; });
+					oldLine = _.find(app._global['horizontal-line'], function(hline){ return hline.y >= (y2 - tolerance) && hline.y <= (y2 + tolerance) && x1 < hline.x2 && x1 > hline.x1; });
 					//break line
 					newEndPoint = breakLine('v', oldLine, {x: x2, y: y2}, newLineId);
 				}
@@ -346,9 +346,9 @@
 
 		//check
 		_.each(app._global.endPoints, function(endPoint, id){
-			if(coords.x1 <= endPoint.x * (1 + tolerance) && coords.x1 >= endPoint.x * (1 - tolerance) && coords.y1 <= endPoint.y * (1 + tolerance) && coords.y1 >= endPoint.y * (1 - tolerance))
+			if(coords.x1 <= (endPoint.x + tolerance) && coords.x1 >= (endPoint.x - tolerance) && coords.y1 <= (endPoint.y + tolerance) && coords.y1 >= (endPoint.y - tolerance))
 				occupiedStart = {endPoint: endPoint, id: id};
-			else if(coords.x2 <= endPoint.x * (1 + tolerance) && coords.x2 >= endPoint.x * (1 - tolerance) && coords.y2 <= endPoint.y * (1 + tolerance) && coords.y2 >= endPoint.y * (1 - tolerance))
+			else if(coords.x2 <= (endPoint.x + tolerance) && coords.x2 >= (endPoint.x - tolerance) && coords.y2 <= (endPoint.y + tolerance) && coords.y2 >= (endPoint.y - tolerance))
 				occupiedEnd = {endPoint: endPoint, id: id};
 		});
 

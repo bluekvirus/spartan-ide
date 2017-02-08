@@ -34,8 +34,8 @@
 			if(
 				point.x <= 0 + app._global.tolerance || 
 				point.y <= 0 + app._global.tolerance || 
-				point.x >= 100 * (1 - app._global.tolerance) || 
-				point.y >= 100 * (1 - app._global.tolerance)
+				point.x >= 100 - app._global.tolerance|| 
+				point.y >= 100 - app._global.tolerance
 			) {
 				//notification
 				app.notify('Cannot be Operated', 'End points on outter frame cannot be operated! Choose inside end points inside!', 'error', {icon: 'fa fa-reddit-alien'});

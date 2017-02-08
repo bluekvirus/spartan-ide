@@ -47,6 +47,7 @@
 				temp['vertical-line'] = app._global['vertical-line'];
 
 				//store
+				app.store.remove(name);
 				app.store.set(name, temp);
 
 				this.close();
