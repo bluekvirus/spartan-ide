@@ -29,9 +29,22 @@
 	///////////initializers/////////// - [optional]
 	app.addInitializer(function(){
 		//reload previously stored configuration
-		var endPoints = app.store.get('endPoints'),
-			hlines = app.store.get('horizontal-line'),
+		
+		var endPoints, hlines, vlines, temp;
+
+		if(app.store.get('current')){//has currently actived template
+
+			temp = app.store.get(app.store.get('current'));
+			endPoints = temp.endPoints;
+			hlines = temp['horizontal-line'];
+			vlines = temp['vertical-line'];
+
+		}else{//no currently actived template
+			
+			endPoints = app.store.get('endPoints');
+			hlines = app.store.get('horizontal-line');
 			vlines = app.store.get('vertical-line');
+		}
 		
 		if(endPoints && hlines && vlines){
 			app._global = app._global || {};
@@ -42,7 +55,14 @@
 	});
 
 	app.addInitializer(function(){
-
+		$.fn.extend({
+		    animateCss: function (animationName) {
+		        var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+		        this.addClass('animated ' + animationName).one(animationEnd, function() {
+		            $(this).removeClass('animated ' + animationName);
+		        });
+		    }
+		});
 	});
 	//Note: initializer can return a promise object for async loading, 
 	//add more initializers if you need. e.g `return app.remote() or $.ajax()`.

@@ -1,12 +1,19 @@
 ;(function(app){
 
-	app.view('Save', {
-		template: '@view/save.html',
+	app.view('Create.Save', {
+		template: '@view/create/save.html',
 		overlay: true,
 		onReady: function(){
+			var that = this;
 			//give default value to the editor
 			var name = $('.side-menu-list .current-name').text();
 			this.getEditor('name').setVal(name);
+
+			this.$el.on('keypress', function(e){
+				if(e.which === 13){
+					that.saveTemplate();
+				}
+			});
 		},
 		editors: {
 			name: {
@@ -31,22 +38,7 @@
 				this.close();
 			},
 			save: function(){
-				if(!this.validate(true)){
-					var temp = {}, name = this.getEditor('name').getVal();
-					temp.endPoints = app._global.endPoints;
-					temp['horizontal-line'] = app._global['horizontal-line'];
-					temp['vertical-line'] = app._global['vertical-line'];
-
-					if(app.store.get(name)){//overwrite
-						this.$el.find('.overwrite-message .name').text(name);
-						this.$el.find('.overwrite-message').removeClass('hidden');
-					}else{//no overwrite
-						app.store.set(name, temp);
-						app.coop('template-added', name);
-						app.notify('Saved!', 'Template ' + name + ' has been saved.', 'ok', {icon: 'fa fa-fort-awesome'});
-						this.close();
-					}
-				}
+				this.saveTemplate();
 			},
 			overwrite: function(){
 				var temp = {}, name = this.getEditor('name').getVal();
@@ -61,6 +53,24 @@
 			},
 			cancel: function(){
 				this.$el.find('.overwrite-message').addClass('hidden');
+			}
+		},
+		saveTemplate: function(){
+			if(!this.validate(true)){
+				var temp = {}, name = this.getEditor('name').getVal();
+				temp.endPoints = app._global.endPoints;
+				temp['horizontal-line'] = app._global['horizontal-line'];
+				temp['vertical-line'] = app._global['vertical-line'];
+
+				if(app.store.get(name)){//overwrite
+					this.$el.find('.overwrite-message .name').text(name);
+					this.$el.find('.overwrite-message').removeClass('hidden');
+				}else{//no overwrite
+					app.store.set(name, temp);
+					app.coop('template-added', name);
+					app.notify('Saved!', 'Template ' + name + ' has been saved.', 'ok', {icon: 'fa fa-fort-awesome'});
+					this.close();
+				}
 			}
 		}
 	});

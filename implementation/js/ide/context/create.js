@@ -5,7 +5,7 @@
 		attributes: {
 			tabindex: "1" //make this div focusable in order to use keypress event
 		},
-		coop: ['template-added'],
+		coop: ['template-added', 'template-reseted'],
 		initialize: function(){
 			//indicate whether click event will be triggered or not
 			this.clickable = true;
@@ -14,6 +14,10 @@
 		},
 		onTemplateAdded: function(name){
 			this.addTemplateOnMenu(name, true);
+			this.flashCurrent();
+		},
+		onTemplateReseted: function(){
+			this.reset();
 		},
 		onSyncLocal: function(){
 			//sync end points
@@ -156,6 +160,14 @@
 					height: (height - blockHeight - adjust) + 'px'
 				});
 			});
+
+			//for animation end
+            this.$el.find('.side-menu-list .current-name-holder').bind('webkitAnimationEnd', function(){
+               $(this).removeClass('animated').removeClass('rubberBand');
+            });
+            this.$el.find('.side-menu-list .current-name-holder').bind('animationend', function(){
+                $(this).removeClass('animated').removeClass('rubberBand');
+            });
 		},
 		actions: {
 			lock: function($self){
@@ -229,25 +241,10 @@
 				app.debug('v-lines exported from generate action', app._global['vertical-line']);
 			},
 			reset: function(){
-				//clear cache for current layout
-				app.store.remove('endPoints');
-				app.store.remove('horizontal-line');
-				app.store.remove('vertical-line');
-				//app.store.remove('current');
-				//reset global objects
-				app._global.endPoints = undefined;
-				app._global['horizontal-line'] = undefined;
-				app._global['vertical-line'] = undefined;
-
-				//refresh
-				this.show('guide', 'Create.Guide');
-				//layout svg
-				this.show('layout', 'Create.Layout');
-				//menu arrows
-				this.show('arrows', 'Create.Arrows');
+				this.reset();
 			},
 			save: function(){
-				var Save = app.get('Save');
+				var Save = app.get('Create.Save');
 				(new Save()).overlay({
 					effect: false,
 					class: 'save-overlay'
@@ -255,7 +252,17 @@
 			},
 			'load-template': function($self){
 				var name = $self.attr('template-name'),
-					temp = app.store.get(name);
+					temp = app.store.get(name),
+					oldName = this.$el.find('.side-menu-list .current-name').text(),
+					old = {};
+
+				//save old template, only if the current name is not untitled
+				if(oldName !== 'untitled'){
+					old.endPoints = app._global.endPoints;
+					old['horizontal-line'] = app._global['horizontal-line'];
+					old['vertical-line'] = app._global['vertical-line'];
+					app.store.set(oldName, old);
+				}
 
 				//reset app._global object
 				app._global.endPoints = temp.endPoints;
@@ -279,27 +286,24 @@
 				$self.addClass('active');
 				//change current loaded template name
 				this.$el.find('.side-menu-list .current-name').text(name);
+				//flash text
+				this.flashCurrent();
 				//set current
 				app.store.set('current', name);
 
 				app.notify('Loaded!', 'Template ' + name + 'has been loaded.', 'ok', {icon: 'fa fa-fort-awesome'});
 			},
 			'delete-template': function($self){
-				//get template id
-				var name = $self.attr('template-name');
-				//remove tempalte saved in local storage
-				app.store.remove(name);
-				//remove menu item in DOM
-				$self.parent().remove();
-
-				//remove active, change current-name to untitled
-				var active = $self.parent().find('.side-menu-item-text').hasClass('active');
-				if(active){
-					this.$el.find('.side-menu-list .current-name').text('untitled');
-					app.store.remove('current');
-				}
-
-				app.notify('Deleted!', 'Template ' + name + 'has been deleted.', 'ok', {icon: 'fa fa-fort-awesome'});
+				var Delete = app.get('Create.Delete');
+				(new Delete({
+					data: {
+						name: $self.attr('template-name'),
+						$elem: $self
+					}
+				})).overlay({
+					effect: false,
+					class: 'delete-overlay',
+				});
 			},
 		},
 		checkConstrain: function(e){
@@ -389,7 +393,28 @@
 			}
 
 			this.$el.find('.side-menu-templates-holder').append($elem);
-		}
+		},
+		reset: function(){
+			//clear cache for current layout
+			app.store.remove('endPoints');
+			app.store.remove('horizontal-line');
+			app.store.remove('vertical-line');
+			//app.store.remove('current');
+			//reset global objects
+			app._global.endPoints = undefined;
+			app._global['horizontal-line'] = undefined;
+			app._global['vertical-line'] = undefined;
+
+			//refresh
+			this.show('guide', 'Create.Guide');
+			//layout svg
+			this.show('layout', 'Create.Layout');
+			//menu arrows
+			this.show('arrows', 'Create.Arrows');
+		},
+		flashCurrent: function(){
+			this.$el.find('.side-menu-list .current-name-holder').addClass('animated rubberBand');
+		},
 	});
 
 	function checkContained(arr, obj, key){
