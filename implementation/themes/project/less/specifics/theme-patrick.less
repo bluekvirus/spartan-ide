@@ -3,6 +3,9 @@
  * @created: 1/23/2017
  */
 
+@side-background: darken(@background, 10%);
+@side-border: darken(@border, 10%);
+
 html,
 body,
 [region="app"] {
@@ -34,17 +37,17 @@ body,
 			right: 0px;
 			top: 0px;
 			z-index: 5;
-			background-color: @brand-primary;
+			background-color: @side-background;
 			height: 2.4em;
 			width: 2.4em;
 			padding-left: 0.75em;
 			line-height: 1.75em;
 			text-align: center;
 			border-bottom-left-radius: 100%;
-			box-shadow: -1px 1px 3px @brand-primary;
+			box-shadow: -1px 1px 3px @side-background;
 			cursor: pointer;
 			> i {
-				color: #fff;
+				color: #000;
 			}
 			&.active {
 				transition: 0.25s;
@@ -59,32 +62,34 @@ body,
 			bottom: 0px;
 			z-index: 4;
 			width: 200px;
-			text-align: left;
-			background-color: @brand-primary;
-			box-shadow: -1px 1px 3px @brand-primary;
+			text-align: center;
+			background-color: @side-background;
+			box-shadow: -1px 1px 3px @side-background;
 			.side-menu-item {
-				border-bottom: 1px solid @border;
+				border-bottom: 1px solid @side-border;
 				cursor: pointer;
 				>span {
 					font-weight: 600;
-					color: #fff;
+					color: #000;
 				}
 				&:not(.side-menu-section) {
-					&:hover{
-						opacity: 0.8;
+					&:not(.current-name-holder){
+						&:hover{
+							opacity: 0.5;
+						}
 					}
 				}
 				&.side-menu-section {
-					background-color: lighten(@brand-primary, 20%);
+					background-color: lighten(@side-background, 10%);
 					text-align: left;
 					font-size: 0.8em;
 					cursor: default;
 					>span{
-						color: @gray-lighter;
+						color: @gray;
 					}
 				}
-				&.lock {
-					text-align: center;
+				&.current-name-holder{
+					cursor: default;
 				}
 			}
 			.side-menu-templates-holder{
@@ -96,7 +101,7 @@ body,
 					.side-menu-item-text{
 						cursor: pointer;
 						&.active {
-							color: @brand-success;
+							color: @brand-primary;
 						}
 					}
 					[action="delete-template"] {
@@ -229,4 +234,10 @@ body,
 			}
 		}
 	}
+}
+
+//------------------------------- overlay styling -------------------------------//
+.save-overlay {
+	background-color: transparent;
+	z-index: 999;
 }

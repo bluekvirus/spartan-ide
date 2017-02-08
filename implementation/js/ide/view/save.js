@@ -4,7 +4,9 @@
 		template: '@view/save.html',
 		overlay: true,
 		onReady: function(){
-
+			//give default value to the editor
+			var name = $('.side-menu-list .current-name').text();
+			this.getEditor('name').setVal(name);
 		},
 		editors: {
 			name: {
@@ -14,14 +16,14 @@
 				validate: {
 					required: true,
 					fn: function(val, parentCt){
-						if(val === 'horizontal-line' || val === 'vertical-line' || val === 'endPoints')
+						if(val === 'horizontal-line' || val === 'vertical-line' || val === 'endPoints' || val === 'current' || val === 'untitled')
 							return 'The name "' + val + '" is reserved for system use.';
 					},
 				},
 				layout: {
 					label: 'col-md-4',
 					field: 'col-md-8',
-				}
+				},
 			}
 		},
 		actions: {
@@ -41,10 +43,10 @@
 					}else{//no overwrite
 						app.store.set(name, temp);
 						app.coop('template-added', name);
+						app.notify('Saved!', 'Template ' + name + ' has been saved.', 'ok', {icon: 'fa fa-fort-awesome'});
 						this.close();
 					}
 				}
-
 			},
 			overwrite: function(){
 				var temp = {}, name = this.getEditor('name').getVal();

@@ -34,8 +34,14 @@
 
 			//show all stored templates
 			_.each(app.store.getAll(), function(item, key){
-				if(key !== 'endPoints' && key !== 'horizontal-line' && key !== 'vertical-line'){//only focus on stored object
-					that.addTemplateOnMenu(key);
+				if(key !== 'endPoints' && key !== 'horizontal-line' && key !== 'vertical-line' && key !== 'current'){//only focus on stored object
+					
+					//actived one should be highlighed
+					if(key === app.store.get('current')){
+						that.addTemplateOnMenu(key, true);
+					}else{
+						that.addTemplateOnMenu(key);
+					}
 				}
 			});
 			
@@ -180,7 +186,7 @@
 					}
 				});
 
-				//augment horizontal lines and vertical lines based on coordiates extracted
+				//augment horizontal lines and vertical lines based on coordiates extracted from end points
 				//horizontal
 				_.each(app._global['horizontal-line'], function(hline){
 					//left anchor
@@ -227,6 +233,7 @@
 				app.store.remove('endPoints');
 				app.store.remove('horizontal-line');
 				app.store.remove('vertical-line');
+				//app.store.remove('current');
 				//reset global objects
 				app._global.endPoints = undefined;
 				app._global['horizontal-line'] = undefined;
@@ -241,10 +248,14 @@
 			},
 			save: function(){
 				var Save = app.get('Save');
-				(new Save()).overlay();
+				(new Save()).overlay({
+					effect: false,
+					class: 'save-overlay'
+				});
 			},
 			'load-template': function($self){
-				var temp = app.store.get($self.attr('template-name'));
+				var name = $self.attr('template-name'),
+					temp = app.store.get(name);
 
 				//reset app._global object
 				app._global.endPoints = temp.endPoints;
@@ -262,14 +273,33 @@
 				this.show('layout', 'Create.Layout');
 				//menu arrows
 				this.show('arrows', 'Create.Arrows');
+
+				//highlight currently actived template
+				this.$el.find('.side-menu-templates-holder .side-menu-item-text').removeClass('active');
+				$self.addClass('active');
+				//change current loaded template name
+				this.$el.find('.side-menu-list .current-name').text(name);
+				//set current
+				app.store.set('current', name);
+
+				app.notify('Loaded!', 'Template ' + name + 'has been loaded.', 'ok', {icon: 'fa fa-fort-awesome'});
 			},
 			'delete-template': function($self){
 				//get template id
-				var id = $self.attr('template-name');
+				var name = $self.attr('template-name');
 				//remove tempalte saved in local storage
-				app.store.remove(id);
+				app.store.remove(name);
 				//remove menu item in DOM
 				$self.parent().remove();
+
+				//remove active, change current-name to untitled
+				var active = $self.parent().find('.side-menu-item-text').hasClass('active');
+				if(active){
+					this.$el.find('.side-menu-list .current-name').text('untitled');
+					app.store.remove('current');
+				}
+
+				app.notify('Deleted!', 'Template ' + name + 'has been deleted.', 'ok', {icon: 'fa fa-fort-awesome'});
 			},
 		},
 		checkConstrain: function(e){
@@ -288,7 +318,8 @@
 				_.string.include($(e.target).attr('class'), 'side-menu-trigger') || 
 				_.string.include($(e.target).attr('class'), 'side-menu-list') ||
 				_.string.include($(e.target).attr('class'), 'side-menu-item') ||
-				_.string.include($(e.target).attr('class'), 'fa')
+				_.string.include($(e.target).attr('class'), 'fa') ||
+				_.string.include($(e.target).attr('class'), 'side-menu-templates-holder')
 			){//trigger an hover event specially for end points and menu
 				
 				return false;
@@ -340,12 +371,22 @@
 
 			return true;
 		},
-		addTemplateOnMenu: function(name, newly){
+		addTemplateOnMenu: function(name, active){
 			var htmlStr = '<div class="side-menu-item wrapper wrapper-horizontal-2x clearfix">' +
-								'<span class="side-menu-item-text" action="load-template" template-name="' + name + '"><i class="fa fa-file"></i> '+ name +'</span>' +
+								'<span class="side-menu-item-text" action="load-template" template-name="' + name + '">'+ name +'</span>' +
 								'<div class="pull-right" action="delete-template" template-name="' + name + '"><i class="fa fa-close"></i></div>' +
 							'</div>',
 			$elem = $(htmlStr);
+
+			//newly added template. active text and change current template value
+			if(active){
+				//change active class
+				this.$el.find('.side-menu-templates-holder .side-menu-item-text').removeClass('active');
+				$elem.find('.side-menu-item-text').addClass('active');
+
+				//change template value
+				this.$el.find('.side-menu-list .current-name').text(name);
+			}
 
 			this.$el.find('.side-menu-templates-holder').append($elem);
 		}
