@@ -14,8 +14,7 @@
 		curtains: {},
 
 		//Note: Always set navRegion if using app template here, unless you've merged it(the tpl) with index.html;
-		
-		defaultContext: 'Mockups',
+		defaultContext: 'Create',
 		viewSrcs: 'js/ide', //set this to a folder path to enable view dynamic loading. 
 		//---------------------------------------------------------------------------------------------
 		fullScreen: false, //this will put <body> to be full screen sized (window.innerHeight).
@@ -29,11 +28,36 @@
 
 	///////////initializers/////////// - [optional]
 	app.addInitializer(function(){
+		//reload previously stored configuration
+		
+		var endPoints, hlines, vlines, temp;
 
+		if(app.store.get('current')){//has currently actived template
+
+			temp = app.store.get(app.store.get('current'));
+			endPoints = temp.endPoints;
+			hlines = temp['horizontal-line'];
+			vlines = temp['vertical-line'];
+
+		}else{//no currently actived template
+			
+			endPoints = app.store.get('endPoints');
+			hlines = app.store.get('horizontal-line');
+			vlines = app.store.get('vertical-line');
+		}
+		
+		if(endPoints && hlines && vlines){
+			app._global = app._global || {};
+			app._global.endPoints = endPoints;
+			app._global['horizontal-line'] = hlines;
+			app._global['vertical-line'] = vlines;
+		}
 	});
 
 	app.addInitializer(function(){
-
+		//menu status
+		//use __opened__ as local key to store menu status
+		if(!app.store.get('__opened__')) app.store.set('__opened__', false);
 	});
 	//Note: initializer can return a promise object for async loading, 
 	//add more initializers if you need. e.g `return app.remote() or $.ajax()`.

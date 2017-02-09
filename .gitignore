@@ -3,3 +3,9 @@ bower_components/
 
 #npm
 node_modules/
+
+#test files
+test/
+
+#dists
+dist/

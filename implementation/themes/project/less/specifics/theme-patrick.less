@@ -1,0 +1,323 @@
+/**
+ * @author: Patrick Zhu
+ * @created: 1/23/2017
+ */
+
+@side-background: darken(@background, 10%);
+@side-border: darken(@border, 10%);
+@side-menu-width: 230px;
+@side-menu-inital: -230px;
+
+html,
+body,
+[region="app"] {
+	height: 100%;
+	overflow: hidden;
+	.regional-main {
+		height: 100%;
+	}
+}
+
+.region-contexts {
+	height: 100%;
+	//------------------------ styling for create context ------------------------//
+	.context-create {
+		height: 100%;
+		width: 100%;
+		background-color: transparent;
+		position: relative;
+		.locker {
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			z-index: 3;
+		}
+		.side-menu-trigger {
+			position: absolute;
+			right: 0px;
+			top: 0px;
+			z-index: 5;
+			background-color: @side-background;
+			height: 2.4em;
+			width: 2.4em;
+			padding-left: 0.75em;
+			line-height: 1.75em;
+			text-align: center;
+			border-bottom-left-radius: 100%;
+			box-shadow: -1px 1px 3px @side-background;
+			cursor: pointer;
+			> i {
+				color: #000;
+			}
+			&.active {
+				transition: 0.25s;
+				right: @side-menu-width - 1;
+			}
+			transition: 0.25s;
+		}
+		.side-menu-list {
+			position: absolute;
+			right: @side-menu-inital;
+			top: 0px;
+			bottom: 0px;
+			z-index: 4;
+			width: @side-menu-width;
+			text-align: center;
+			background-color: @side-background;
+			box-shadow: -1px 1px 3px @side-background;
+			.side-menu-item {
+				border-bottom: 1px solid @side-border;
+				cursor: pointer;
+				>span {
+					font-weight: 600;
+					color: #000;
+				}
+				&:not(.side-menu-section) {
+					&:not(.current-name-holder){
+						&:hover{
+							opacity: 0.5;
+						}
+					}
+				}
+				&.side-menu-section {
+					background-color: lighten(@side-background, 10%);
+					text-align: left;
+					font-size: 0.8em;
+					cursor: default;
+					>span{
+						color: @gray;
+					}
+					.new-button-holder {
+						.new-button {
+							margin-top: -3px;
+						}
+					}
+				}
+				&.current-name-holder{
+					cursor: default;
+				}
+			}
+			.operations-holder {
+				border-bottom: 1px solid @side-border;
+				.left,
+				.right {
+					float: left;
+				}
+				.left {
+					width: 50%;
+					border-right: 1px solid @side-border;
+					text-align: center;
+					font-weight: 600;
+					.operations-item {
+						line-height: 3.75em;
+						cursor: pointer;
+						&:not(:last-child) {
+							border-bottom: 1px solid @side-border;
+						}
+						&.hide-button {
+							.hide-point {
+								//text-decoration:line-through;
+							}
+						}
+						&:hover {
+							opacity: 0.5;
+						}
+						&.active {
+							box-shadow: inset 0 5px 15px darken(@side-border, 30%);
+						}
+					}
+				}
+				.right {
+					width: 50%;
+					.operations-item {
+						cursor: pointer;
+						>span {
+							font-weight: 600;
+						}
+						&:hover {
+							opacity: 0.5;
+						}
+						&:not(:last-child) {
+							border-bottom: 1px solid @side-border;
+						}
+					}
+				}
+			}
+			.side-menu-templates-holder{
+				height: 400px;
+				overflow-y: auto;
+				.side-menu-item {
+					cursor: default;
+					text-align: left;
+					.side-menu-item-text{
+						cursor: pointer;
+						&.active {
+							color: @brand-primary;
+						}
+					}
+					[action="delete-template"] {
+						color: @gray;
+					}
+				}
+			}
+			&.active {
+				transition: 0.25s;
+				right: 0px;
+			}
+			transition: 0.25s;
+		}
+		//=========== styling for arrow menu on hovering end points ===========//
+		.region-arrows {
+			.regional-create-arrows {
+				.end-point-menu {
+					position: absolute;
+					height: 75px;
+					width: 75px;
+					z-index: 2;
+					.indicator {
+						&.up {
+							position: absolute;
+							left: 27px;
+							top: 0;
+							cursor: pointer;
+						}
+						&.down {
+							position: absolute;
+							left: 27px;
+							bottom: -2px;
+							cursor: pointer;
+						}
+						&.left {
+							position: absolute;
+							left: 0;
+							top: 25px;
+							cursor: pointer;
+						}
+						&.right {
+							position: absolute;
+							right: 0px;
+							top: 25px;
+							cursor: pointer;
+						}
+						&.vertical {
+							position: absolute;
+							right: -10px;
+							top: 26px;
+							transform: scale(1, 2);
+						}
+						&.horizontal {
+							position: absolute;
+							bottom: -18px;
+							left: 25px;
+							transform: scale(2, 1);
+						}
+						.text-muted {
+							color: lighten(@gray-light, 30%) !important;
+						}
+					}
+					.close {
+						position: absolute;
+						right: 0;
+						top: 0;
+						cursor: pointer;
+					}
+				}
+			}
+		}
+		//=========== styling for guide lines ===========//
+		.region-guide {
+			position: absolute;
+			left: 0px;
+			right: 0px;
+			top: 0px;
+			bottom: 0px;
+			z-index: -1;
+			.regional-create-guide{
+				position: absolute;
+				left: 0px;
+				right: 0px;
+				top: 0px;
+				bottom: 0px;
+				//horizontal guide line
+				.horizontal-line {
+					position: absolute;
+					background-color: @border;
+					height: 1px;
+					left: 0;
+					right: 0;
+					top: 0;
+				}
+				//vertical guide line
+				.vertical-line {
+					position: absolute;
+					background-color: @border;
+					width: 1px;
+					left: 0;
+					top: 0;
+					bottom: 0;
+				}
+			}
+		}
+		//=========== styling for svg layout ===========//
+		.region-layout {
+			height: 100%;
+			width: 100%;
+			position: relative;
+			background-color: transparent;
+			[data-view-name="Create.Layout"] {
+				height: 100%;
+				width: 100%;
+				svg {
+					position: absolute !important; //fix svg tag styling problem
+					top: 0;
+					left: 0;
+					z-index: 1;
+					.end-point {
+						cursor: pointer;
+						&:hover {
+							fill: @brand-primary;
+						}
+						&.active {
+							fill: @brand-primary;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+//------------------------------- overlay styling -------------------------------//
+.save-overlay,
+.delete-overlay {
+	background-color: transparent;
+	z-index: 999;
+}
+
+.delete-overlay {
+	.modal-title {
+		color: @brand-danger;
+	}
+}
+
+//------------------------------- animation -------------------------------//
+@keyframes flash {
+    0% {
+        background-color: @side-background;
+    }
+    50% {
+        background-color: @brand-primary;
+    }
+    100% {
+        background-color: @side-background;
+    }
+}
+
+.flash {
+    animation-name: flash;
+    animation-duration: 1000ms;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in-out;
+}
