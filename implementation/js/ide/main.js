@@ -55,7 +55,9 @@
 	});
 
 	app.addInitializer(function(){
-		
+		//menu status
+		//use __opened__ as local key to store menu status
+		if(!app.store.get('__opened__')) app.store.set('__opened__', false);
 	});
 	//Note: initializer can return a promise object for async loading, 
 	//add more initializers if you need. e.g `return app.remote() or $.ajax()`.

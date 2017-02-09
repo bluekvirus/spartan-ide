@@ -12,7 +12,7 @@
 			//lock all the interactions
 			this.locked = false;
 			//hide end points or not
-			this.endPointsHidden = false;
+			this.meshed = true;
 		},
 		onTemplateAdded: function(name){
 			this.addTemplateOnMenu(name, true);
@@ -40,7 +40,7 @@
 
 			//show all stored templates
 			_.each(app.store.getAll(), function(item, key){
-				if(key !== 'endPoints' && key !== 'horizontal-line' && key !== 'vertical-line' && key !== 'current'){//only focus on stored object
+				if(key !== 'endPoints' && key !== 'horizontal-line' && key !== 'vertical-line' && key !== 'current' && key !== '__opened__'){//only focus on stored object
 					
 					//actived one should be highlighed
 					if(key === app.store.get('current')){
@@ -53,6 +53,21 @@
 			
 			//focus on this.$el to trigger events
 			this.$el.focus();
+
+			//consult local storage whether side menu used to be opened or not
+			if(app.store.get('__opened__')){
+				var $trigger = this.$el.find('.side-menu-trigger'),
+					$list = this.$el.find('.side-menu-list');
+
+				//flash content
+				this.flashCurrent();
+				//
+				$trigger.toggleClass('active');
+				$list.toggleClass('active');
+
+				//toggle icon
+				$trigger.find('.fa').toggleClass('hidden');
+			}
 
 			//on mouse move use app.coop to show the guide lines
 			this.$el.on('mousemove', _.throttle(function(e){
@@ -125,7 +140,7 @@
 			});
 
 			//click event to show menu
-			this.$el.find('.side-menu-trigger').on('click', function(e){
+			this.$el.find('.side-menu-trigger').on('click', app.throttle(function(e){
 				//prevent default events
 				e.preventDefault();
 
@@ -139,7 +154,11 @@
 
 				//toggle icon
 				$this.find('.fa').toggleClass('hidden');
-			});
+
+				//flip side menu status in the local storage
+				var temp = app.store.get('__opened__');
+				app.store.set('__opened__', !temp);
+			}));
 
 			// //stop hover on side menu being popup, not really working, now use forbiddenClasses array
 			// this.$el.find('[class^="side-menu"]').hover(function(e){
@@ -336,7 +355,7 @@
 				$self.find('.show-point').toggleClass('hidden');
 
 				//real stuff
-				if(!this.endPointsHidden){
+				if(this.meshed){
 					//outer circle
 					_.each($('.end-point'), function(el){
 						var $el = $(el);
@@ -352,6 +371,15 @@
 						var classes = $el.attr('class');
 						$el.attr('class', classes + ' hidden');
 					});
+
+					//lines
+					_.each($('.layout-line'), function(el){
+						var $el = $(el);
+						//
+						var classes = $el.attr('class');
+						$el.attr('class', classes + ' hidden');
+					});
+
 				}else{
 					//outer circle
 					_.each($('.end-point'), function(el){
@@ -368,14 +396,24 @@
 						var classes = $el.attr('class');
 						$el.attr('class', classes.replace('hidden', ''));
 					});
+
+					//lines
+					_.each($('.layout-line'), function(el){
+						var $el = $(el);
+						//
+						var classes = $el.attr('class');
+						$el.attr('class', classes.replace('hidden', ''));
+					});
 				}
-				this.endPointsHidden = !this.endPointsHidden;
+				this.meshed = !this.meshed;
 			}
 		},
 		checkConstrain: function(e){
 			var that = this;
 			//if locked return false
 			if(this.locked) return false;
+			//if no mesh return false
+			if(!this.meshed) return false;
 			//stay inside window, use 5px as a buffer
 			if(e.pageX < 5 || e.pageX > this.$el.width() - 5 || e.pageY < 5 || e.pageY > this.$el.height() - 5)
 				return false;

@@ -23,7 +23,9 @@
 				validate: {
 					required: true,
 					fn: function(val, parentCt){
-						if(val === 'horizontal-line' || val === 'vertical-line' || val === 'endPoints' || val === 'current' || val === 'untitled')
+						if( val === 'horizontal-line' || val === 'vertical-line' || 
+							val === 'endPoints' || val === 'current' || val === 'untitled' ||
+							val === '__opened__')
 							return 'The name "' + val + '" is reserved for system use.';
 					},
 				},

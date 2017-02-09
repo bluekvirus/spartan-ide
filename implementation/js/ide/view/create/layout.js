@@ -88,13 +88,15 @@
 		},
 		drawPath: function(pathStr){
 			//draw path on paper
-			this.paper.path(pathStr).attr({'stroke' : '#DEDEDE', 'stroke-dasharray': '--'});
+			var path = this.paper.path(pathStr).attr({'stroke' : '#DEDEDE', 'stroke-dasharray': '--'});
+			//add a class for mesh and unmesh
+			$(path.node).attr('class', 'layout-line');
 		},
 		drawCircle: function(x, y){
 			//draw circle on paper
 			//inner circle, draw first, so it will be at lower index than outter circle, which has events on it.
 			var inner = this.paper.circle(x, y, this.radius - 2).attr({'stroke-width':'none', 'fill': '#000'});
-			$(inner.node).attr('class', 'end-point-inner' + (this.parentCt.endPointsHidden ? ' hidden' : ''));
+			$(inner.node).attr('class', 'end-point-inner'/* + (this.parentCt.endPointsHidden ? ' hidden' : '')*/);
 			//outer circle
 			var circle = this.paper.circle(x, y, this.radius).attr({'stroke' : '#DEDEDE', 'stroke-width':'2', 'fill': 'rgba(0, 0, 0, 0)'});
 			return circle;
@@ -105,7 +107,7 @@
 
 			var that = this;
 			//jquery2 cannot use addClass on SVG element
-			node.setAttribute('class', 'end-point draggble' + (this.parentCt.endPointsHidden ? ' hidden' : ''));
+			node.setAttribute('class', 'end-point draggble'/* + (this.parentCt.endPointsHidden ? ' hidden' : '')*/);
 			node.setAttribute('point-id', id);
 
 			$node.one('click', function(e){
