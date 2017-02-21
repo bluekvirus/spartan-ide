@@ -20,7 +20,7 @@
 			app._global['vertical-line'] = app._global['vertical-line'] || [];
 			app._global['horizontal-line'] = app._global['horizontal-line'] || [];
 			//setup a tolerance for coordinates matching
-			app._global.tolerance = app._global.tolerance || 0.2;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here(0.2%).*/
+			app._global.tolerance = app._global.tolerance || 0.5;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here(0.5%).*/
 
 			//!!Note: all stored coordinates should be translate into percetage to work with window.resize() event!!
 			//!!Note: all stored corrdinates only keep two digits after dicimal for easier comparison!!

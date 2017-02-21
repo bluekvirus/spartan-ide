@@ -70,7 +70,7 @@
 			}
 
 			//on mouse move use app.coop to show the guide lines
-			this.$el.on('mousemove', _.throttle(function(e){
+			this.$el.on('mousemove', app.throttle(function(e){
 				//prevent default events
 				e.preventDefault();
 
@@ -113,7 +113,7 @@
 
 				}
 
-			}, 25));
+			}, 75));
 
 			//on press shift key switch the direction of guide line
 			this.$el.on('keyup', function(e){
@@ -253,12 +253,33 @@
 					url: '/api/generate',
 					payload: {
 						endPoints: app._global.endPoints,
+						//max length h/v lines are 100 (%).
 						hlines: app._global['horizontal-line'],
-						vlines: app._global['vertical-line']
+						vlines: app._global['vertical-line'],
 					}
 				})
 				.done(function(data){
 					app.notify('Generated!', 'Layout has been generated.', 'ok', {icon: 'fa fa-fort-awesome'});
+					app.view('_Demo', {
+						layout: _.extend(data.layout, {
+							width: 400 * 1.5,
+							height: 300 * 1.5,
+						}), 
+						attributes: {style: 'border:2px solid #FFF;'},
+						onReady: function(){
+							_.each(this.regions, function(def, r){
+								this[r].$el.css('color', '#FFF').text(r.split('-')[2]);
+							}, this);
+						},
+					});
+					app.view({template: [
+						'<div view="_Demo" style="margin-bottom: 1em;"></div>',
+						'<div><button action="close" type="button" class="btn btn-primary btn-lg btn-block">Close</button></div>',
+					], actions: {
+						close: function(){
+							this.close();
+						}
+					}}, true).overlay();
 				})
 				.fail(function(error){
 					app.notify('Error!', 'Generating error.', 'error', {icon: 'fa fa-reddit-alien'});
