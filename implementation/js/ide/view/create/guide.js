@@ -7,7 +7,7 @@
 
 	app.view('Create.Guide', {
 		template: '@view/create/guide.html',
-		coop:['guideline-move', 'guideline-switch', 'guideline-click', 'gen-new-line'],
+		coop:['guideline-move', 'guideline-switch', 'guideline-click', 'gen-new-line', 'line-layout-reset-confirmed'],
 		initialize: function(){
 			this._horizontal = true; //flag indicates that now showing horizontal line or vertical line
 			this._x = 0; //0 - 100 in percentage
@@ -79,6 +79,20 @@
 			this.setupGuideLines(true);
 		},
 		onGuidelineClick: function(){
+			//check whether this click will reset previously generated layout, if yes trigger layout reset event
+			if(this.parentCt.generated)
+				(new (app.get('Create.LayoutResetConfirm'))()).overlay({
+					effect: false,
+					class: 'layout-reset-confirm-overlay create-overlay danger-title'
+				});
+			else
+				this.confirmAdd();
+		},
+		onLineLayoutResetConfirmed: function(){
+			this.coop('layout-resetted');
+			this.confirmAdd();	
+		},
+		confirmAdd: function(){
 			var $horizontal = this.$el.find('.horizontal-line'),
 				$vertical = this.$el.find('.vertical-line');
 			//variables for later use
@@ -86,27 +100,6 @@
 				newStartPoint, newEndPoint,
 				occupied, oldLine,
 				tolerance = app._global.tolerance;
-
-			///TODO: 	!!DONE: Clean up this part into a function!!!!!!
-			///			!!DONE: Make delete is on line
-			///			!!	0). make every point has choices execpt the ones on the frame
-			///			!!	1). check whether a line is deletable
-			///			!!	2). if no one color
-			///			!!	3). if yes, show in one color, remove
-			///			!!DONE: Make drag
-			///			!!DONE: Magnate
-			///			!!DONE: 2em gap
-			///			!!DONE: crosses instead of arrows
-			///			!!DONE: close mechanism for arrow menu
-			///			!!DONE: Clean up code
-			///			!!DONE: Change style
-			///			!!DONE: Side menu
-			///			!!DONE: 	1). use app.store(),
-			///			!!DONE: 	2). align all the segments before generate
-			///			!!DONE: 	3). finish reset all
-			///						4). make it savable to different profiles
-			///						*** finish delete, *** delete an active template? delete the last one? currently active how to deal with?
-
 
 			if(this._horizontal){//horizontal line
 

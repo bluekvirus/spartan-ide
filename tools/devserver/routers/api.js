@@ -13,6 +13,27 @@ module.exports = function(server){
 	var router = server.mount(this);
 	server.secure(router);
 
+	router.get('/getViewList', function(req, res){
+		var views = [],
+			baseSrc = '../../implementation/js/ide/view/';
+		//
+		var paths = fs.walkSync(path.join(baseSrc, 'user')); //walkSync relies on fs-extra 1.x.x. 2.x.x has moved this function to a separate package.
+		//augment paths to view names
+		_.each(paths, function(p, index){
+			//get paths in pieces
+			var temp = p.replace(baseSrc, '').split('/');
+			//get rid of last .js extension
+			temp[temp.length - 1] = temp[temp.length - 1].replace(/.js$/, '');
+			//capitalize first character
+			_.each(temp, function(str, index){
+				temp[index] = str.charAt(0).toUpperCase() + str.slice(1);
+			});
+			//combine them into view name
+			views.push(temp.join('.'));
+		});
+		return res.status(200).json(views);
+	});
+
 	router.post('/generate', function(req, res){
 		
 		//grab the points and lines
@@ -71,9 +92,9 @@ function constructLayout(region, hlines, vlines, counter){
 			}), counter);
 
 			if(subRegionLayout)
-				layout.push([(yLevel - currentTop) + ':#' + _.uniqueId('flex-region-'), subRegionLayout.layout]);
+				layout.push([trimNumber(yLevel - currentTop) + ':#' + _.uniqueId('flex-region-'), subRegionLayout.layout]);
 			else
-				layout.push((yLevel - currentTop) + ':id="' + _.uniqueId('flex-region-') + '" region="gen-h-' + counter.count + '"');
+				layout.push(trimNumber(yLevel - currentTop) + ':id="' + _.uniqueId('flex-region-') + '" region="gen-h-' + counter.count + '"');
 
 			currentTop = yLevel;
 		});
@@ -94,9 +115,9 @@ function constructLayout(region, hlines, vlines, counter){
 			}), counter);
 
 			if(subRegionLayout)
-				layout.push([(xLevel - currentLeft) + ':#' + _.uniqueId('flex-region-'), subRegionLayout.layout]);
+				layout.push([trimNumber(xLevel - currentLeft) + ':#' + _.uniqueId('flex-region-'), subRegionLayout.layout]);
 			else
-				layout.push((xLevel - currentLeft) + ':id="' + _.uniqueId('flex-region-') + '" region="gen-v-' + counter.count + '"');
+				layout.push(trimNumber(xLevel - currentLeft) + ':id="' + _.uniqueId('flex-region-') + '" region="gen-v-' + counter.count + '"');
 
 			currentLeft = xLevel;
 		});
@@ -139,4 +160,8 @@ function followTheLine(next, until, level, lines, direction){
 			return followTheLine(l[direction + '2'], until, level, lines, direction);
 	}
 	return false;
+}
+
+function trimNumber(number){
+	return parseFloat(number.toFixed(2));
 }
