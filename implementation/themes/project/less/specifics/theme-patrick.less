@@ -26,6 +26,10 @@ body,
 		width: 100%;
 		background-color: transparent;
 		position: relative;
+		.layout-bar {
+			flex: 0 0 3px;
+			background-color: @border;
+		}
 		.region-cover {
 			position: absolute;
 			background-color: #fff;
@@ -69,51 +73,119 @@ body,
 			background-color: @background;
 			border: 1px solid @border;
 			box-shadow: 3px 3px 5px @border;
-			.tabs {
-				padding: @grid-gutter-width / 2 @grid-gutter-width / 2 0 @grid-gutter-width / 2;
-				.tab {
+			.view-menu-top-holder {
+				.view-html-toggle-holder {
+					width: 88px;
+					padding: @grid-gutter-width / 2 0 0 @grid-gutter-width / 2;
+					.onoffswitch {
+					    position: relative; width: 100%;
+					    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+					}
+					.onoffswitch-checkbox {
+					    display: none;
+					}
+					.onoffswitch-label {
+					    display: block; 
+					    overflow: hidden; 
+					    cursor: pointer;
+					    border: 2px solid darken(@border, 10%);
+					    border-radius: 20px; 
+					    margin-bottom: 0 !important;
+					    //
+					    box-shadow: 1px 1px 2px darken(@border, 10%);
+					}
+					.onoffswitch-inner {
+					    display: block; width: 200%; margin-left: -100%;
+					    transition: all 0.1s ease-in 0s;
+					}
+					.onoffswitch-inner:before, .onoffswitch-inner:after {
+					    display: block; float: left; width: 50%; padding: 0; height: 25px;  line-height: 25px; 
+					    font-size: 0.9em; color: #fff; font-weight: 600;
+					    box-sizing: border-box;
+					}
+					.onoffswitch-inner:before {
+					    content: "View";
+					    padding-left: @grid-gutter-width;
+					    background-color: @brand-info; color: #fff;
+					}
+					.onoffswitch-inner:after {
+					    content: "Raw";
+					    padding-right: @grid-gutter-width;
+					    background-color: @brand-warning; color: #fff;
+					    text-align: right;
+					}
+					.onoffswitch-switch {
+					    display: block; width: 16px; height: 16px; margin: 6px; margin-bottom: 0 !important;
+					    background: #fff;
+					    position: absolute; top: 0px; bottom: 0;
+					    right: 55px;
+					    border: 2px solid @border; 
+					    border-radius: 20px;
+					    transition: all 0.1s ease-in 0s; 
+					}
+					.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+					    margin-left: 0;
+					}
+					.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+					    right: 0;
+					}
+				}
+				.tabs {
+					padding: @grid-gutter-width / 2 @grid-gutter-width / 2 0 @grid-gutter-width / 2;
 					text-align: center;
-					width: 70px;
-					padding: @grid-gutter-width / 2;
-					border-top: 1px solid @border;
-					>span {
-						font-weight: 600;
-						color: @gray-light;
-					}
-					&.pull-left {
-						border-right: 1px solid @border;
-						&:first-child {
-							border-left: 1px solid @border;
-						}
-					}
-					&.pull-right {
-						border-left: 1px solid @border;
-						&:last-child {
-							border-right: 1px solid @border;
-						}
-					}
-					&.active {
-						background-color: @background;
+					width: 510px;
+					.tab {
+						width: 70px;
+						padding: @grid-gutter-width / 2;
+						border-top: 1px solid @border;
+						display: inline-block;
 						>span {
 							font-weight: 600;
-							color: #333;
+							color: @gray-light;
 						}
-						&.pull-left {
-							border-left: 2px solid @border;
-							border-top: 2px solid @border;
-							border-right: 2px solid @border; 
-
-							&+.pull-left {
-								border-left: none;
+						&.center-tab {
+							border-left: 1px solid @border;
+							&+.center-tab {
+								border-right: 1px solid @border;
 							}
 						}
+						&.pull-left {
+							border-right: 1px solid @border;
+							border-left: 1px solid @border;
+							/* &:first-child {
+								border-left: 1px solid @border;
+							} */
+						}
 						&.pull-right {
-							border-left: 2px solid @border;
-							border-top: 2px solid @border;
-							border-right: 2px solid @border; 
+							border-left: 1px solid @border;
+							&:last-child {
+								border-right: 1px solid @border;
+							}
+						}
+						&.active {
+							background-color: @background;
+							>span {
+								font-weight: 600;
+								color: #333;
+							}
+							&.pull-left,
+							&.center-tab {
+								border-left: 2px solid @border;
+								border-top: 2px solid @border;
+								border-right: 2px solid @border; 
 
-							&+.pull-right {
-								border-right: none;
+								/* &+.pull-left {
+									border-left: none;
+								} */
+							}
+							&.pull-right {
+								border-left: 2px solid @border;
+								border-top: 2px solid @border;
+								border-right: 2px solid @border; 
+
+								&+.pull-right {
+									border-right: none;
+								}
 							}
 						}
 					}
@@ -122,7 +194,9 @@ body,
 			.view-menu-middle-holder {
 				border-top: 2px solid @border;
 				margin-top: -2px;
+				height: 450px;
 				.view-content {
+					height: 100%;
 					.view-menu-input-holder {
 						padding: @grid-gutter-width / 2;
 						height: 50px;
@@ -160,7 +234,7 @@ body,
 					}
 				}
 				.html-content {
-					height: 450px;
+					height: 100%;
 					padding: @grid-gutter-width / 2;
 					textarea {
 						height: 100%;
@@ -168,7 +242,58 @@ body,
 						resize: none;
 					}
 				}
+				.svg-content,
+				.editor-content {
+					height: 100%;
+					padding: @grid-gutter-width / 2;
+					.svg-list,
+					.editor-list {
+						width: 30%;
+						height: 100%;
+						border-right: 1px solid @border;
+						padding-right: @grid-gutter-width / 2;
+						overflow-y: auto;
+						.svg-list-item,
+						.editor-list-item {
+							background-color: #fff;
+							margin-bottom: @grid-gutter-width / 2;
+							padding: @grid-gutter-width / 2;
+							box-shadow: 2px 2px 4px @border;
+							//overflow ellipsis
+							white-space: nowrap; 
+							overflow: hidden;
+							text-overflow: ellipsis;
+							>span {
+								font-size: 0.9em;
+								font-weight: 600;
+							}
+							&.active {
+								color: #fff;
+								background-color: #000;
+							}
+							&.linked {
+								background-color: @brand-success;
+								color: #fff;
+								&.active {
+									color: #fff;
+									background-color: #000;//for overwrite linked
+								}
+							}
+						}
+					}
+					.textarea-holder {
+						width: 70%;
+						height: 100%;
+						padding-left: @grid-gutter-width / 2;
+						textarea {
+							height: 100%;
+							width: 100%;
+							resize: none;
+						}
+					}
+				}
 				.data-content {
+					height: 100%;
 					.data-input-holder {
 						padding: @grid-gutter-width / 2;
 						height: 50px;
@@ -315,6 +440,20 @@ body,
 			.view-menu-button-holder {
 				padding: @grid-gutter-width / 2;
 				border-top: 1px solid @border;
+				.expand-holder {
+					display: inline-block;
+				}
+			}
+			&.expand {
+				//full screen mode
+				position: absolute;
+				left: 0;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				width: 100%;
+				background-color: @background;
+				opacity: 0.85;
 			}
 		}
 		.side-menu-trigger {
@@ -550,6 +689,22 @@ body,
 					top: 0;
 					bottom: 0;
 				}
+				.divide-line-vertical {
+					position: absolute;
+					width: 1px;
+					border-left: 1px dashed @border;
+					top: 0;
+					bottom: 0;
+					left: 0;
+				}
+				.divide-line-horizontal {
+					position: absolute;
+					height: 1px;
+					border-top: 1px dashed @border;
+					left: 0;
+					right: 0;
+					top: 0;
+				}
 			}
 		}
 		//=========== styling for svg layout ===========//
@@ -582,6 +737,11 @@ body,
 }
 
 //------------------------------- overlay styling -------------------------------//
+.overlay {
+	.text-warning {
+		color: @brand-warning !important;
+	}
+}
 .create-overlay {
 	background-color: transparent;
 	z-index: 999;
@@ -590,6 +750,12 @@ body,
 .danger-title {
 	.modal-title {
 		color: @brand-danger;
+	}
+}
+
+.warning-title {
+	.modal-title {
+		color: @brand-warning;
 	}
 }
 

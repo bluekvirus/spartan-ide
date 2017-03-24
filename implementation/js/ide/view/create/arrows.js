@@ -77,7 +77,7 @@
 						}
 					})).overlay({
 						effect: false,
-						class: 'layout-reset-confirm-overlay create-overlay danger-title',
+						class: 'layout-reset-confirm-overlay create-overlay warning-title',
 					});
 				}
 				else
@@ -85,15 +85,27 @@
 			}
 		},
 		onPointLayoutResetConfirmed: function($anchor){
-			this.coop('layout-resetted');
+			//this.coop('layout-resetted');
+			//console.log($anchor);
+			//check whether generated
+			if(this.parentCt.generated){
+				//delete related the assignment in regionView
+			}
+
+			//delete selected line
 			this.confirmDelete($anchor);
+			//update layout, keep as much information as possible
+			this.coop('operate-line-after-generate');
 		},
 		confirmDelete: function($self){
 			if($self.find('i').hasClass('deletable')){//deletable
 				var line = this.lines[$self.data('direction')];
+				//delete line
 				this.deleteLine(line, $self.data('direction'));
 
+				//sync local storage data
 				this.coop('sync-local');
+
 			}else{//NOT deletable
 				app.notify('Cannot Delete', 'This line cannot be deleted!', 'error', {icon: 'fa fa-reddit-alien'});
 			}
@@ -184,6 +196,7 @@
 			//remove current line
 			removeLineFromCollection(line.id, (position === 'up' || position === 'down') ? 'v' : 'h', true);
 
+			//!!!!!!need to do something here
 			app.coop('line-deleted');
 
 			//if point still exists re-color, if not hide
@@ -284,7 +297,7 @@
 
 	function removeAttachedPoint(point, dir){
 		var pre, after, x1, x2, y1, y2, startPoint, endPoint,
-			newLineId = _.uniqueId((dir === 'h') ? 'vertical-' : 'horizontal-');
+			newLineId = _.uniqueId((dir === 'h') ? 'vertical-' + app._global.generation + '-' : 'horizontal-' + app._global.generation + '-');
 		if(dir === 'h'){//deleting horizontal line
 			//get two vertical segments
 			pre = _.find(app._global['vertical-line'], function(vline){ return vline.id ===  point.top;});

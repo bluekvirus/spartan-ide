@@ -16,11 +16,24 @@
 		initialize: function(){},
 		//onShow: function(){},
 		//onDataRendered: function(){},
-		
+		svg: {
+			'test-svg1': function(paper){
+				paper.circle(20, 20, 15);
+			}
+		},
+		editors: {
+			'test-editor': {
+				type: 'number',
+			},
+		},
 		actions: {
 		//	submit: function(){...},
 		//	dosomething: function(){...},
 		//	...
+		},
+
+		onReady: function(){
+			//console.log('templates', this.getTemplate(true));
 		},
 
 	});

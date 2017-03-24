@@ -23,14 +23,13 @@
     "owl.carousel": "*",
     "colorbox": "*",
     "switchery": "*",
-    "ace": "*",
+    "ace-builds": "*",
     "highlightjs": "*",
     "Snap.svg": "*",
     "paper": "*",
     "EaselJS": "*",
     "Chart.js": "*",
     "peity": "*",
-    "d3": "*",
     "c3": "*",
     "topojson": "*",
     "soundmanager": "*",
@@ -47,5 +46,5 @@
     "roboto-fontface": "*",
     "ubuntu-fontface": "*"
   },
-  "updatedOn": "2017-03-03T05:29:59.097Z"
+  "updatedOn": "2017-03-24T01:31:01.263Z"
 }
