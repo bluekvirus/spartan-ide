@@ -166,7 +166,7 @@
 				}
 
 				//check which one is active
-				else if(method === 'html'){
+				if(method === 'html'){
 					content = this.$el.find('#html-editor').val();
 				}
 				else if(method === 'view'){
@@ -476,6 +476,14 @@
         		//change toggle switch
         		this.$el.find('#view-html-switch').prop('checked', true);
 
+        		if(this.activatedView)
+ 	        		//highlight current actived view
+ 	        		_.each(this.$el.find('.view-menu-list .view-menu-list-item'), function(el){
+ 	        			var $el = $(el);
+ 	        			if($el.text() === that.activatedView)
+ 	        				$el.addClass('active');
+ 	        		});
+ 
 			}else{
 				//hide view tab, active html tab
         		this.$el.find('.tabs [tab="html"]').removeClass('hidden').addClass('active');
@@ -559,6 +567,9 @@
 
 						//active view editing tab
 						this.viewRawSwitch(true);
+
+						//set this.activedView
+						this.activatedView = config.content;
 
 					}else if(config.method === 'html'){
 
