@@ -1,0 +1,178 @@
+/**
+ * Theme file for v2
+ * @author: Patrick Zhu
+ */
+
+.region-ide-content {
+	.regional-viewlist {
+		height: 100%;
+		.list-holder {
+			height: 100%;
+			overflow-y: auto;
+			border-right: 1px solid @border;
+			padding: @grid-gutter-width / 2 0;
+			.title {
+				text-align: center;
+				padding: @grid-gutter-width / 2 @grid-gutter-width;
+				>span {
+					font-weight: 600;
+					font-size: 1.7em;
+				}
+			}
+			.view-list-item {
+				padding: @grid-gutter-width / 2 @grid-gutter-width;
+				> span {
+					font-weight: 600;
+				}
+				&:nth-child(even){
+					background-color: @background;
+				}
+			}
+		}
+		.info-holder {
+			overflow-y: auto;
+			padding: @grid-gutter-width;
+			>span {
+				font-size: 1.2em;
+				font-weight: 600;
+			}
+		}
+	}
+
+	.regional-viewedit {
+		.menu-holder {
+			border-right: 3px solid @border;
+			padding: @grid-gutter-width / 2 0;
+			overflow-x: hidden;
+			.view-name {
+				padding: @grid-gutter-width / 2 @grid-gutter-width @grid-gutter-width @grid-gutter-width;
+				text-align: center;
+				border-bottom: 1px solid @border;
+				width: 100%;
+				white-space: nowrap; 
+			    overflow: hidden;
+			    text-overflow: ellipsis; 
+				> span {
+					font-size: 2em;
+					font-weight: 600;
+				}
+			}
+			.layout-edit-switch-holder {
+				padding: @grid-gutter-width;
+				.layout-edit-switch {
+					border: 3px solid @border;
+					height: 40px;
+					padding: 3px;
+					.switch-inner {
+						width: 100%;
+						height: 100%;
+						label {
+							height: 100%;
+							width: 100%;
+							input[type="checkbox"] {
+								display: none;
+							}
+							input[type="checkbox"]:checked + .slider {
+								.inner-slider {
+									background-color: rgba(100, 100, 100, 0.5);
+									left: 126px;
+								}
+								.layout-text {
+									color: #aaa;
+								}
+								.edit-text {
+									color: #000;
+								}
+							}
+							input[type="checkbox"]:not(:checked) + .slider {
+								.inner-slider {
+									background-color: rgba(0, 0, 0, 0.5);
+									left: 2px;
+								}
+								.layout-text {
+									color: #000;
+								}
+								.edit-text {
+									color: #aaa;
+								}
+							}
+							.slider {
+								height: 100%;
+								width: 100%;
+								position: relative;
+								.layout-text,
+								.edit-text {
+									display: inline-block;
+									width: 50%;
+									line-height: 40px - 2 * 3px - 3px - 2px;
+									text-align: center;
+									font-weight: 600;
+									font-size: 0.9em;
+								}
+								.inner-slider {
+									width: 50%;
+									position: absolute;
+									height: 40px - 2 * 3px - 2 * 3px - 2 * 2px;
+									top: 2px;
+									transition: .5s;
+								}
+							}
+						}
+					}
+				}
+			}
+			.export-button-holder {
+				padding: @grid-gutter-width;
+				padding-top: 0;
+				border-bottom: 1px solid @border;
+				.btn {
+					>span {
+						font-weight: 600;
+					}
+				}
+			}
+			.switch-views-holder {
+				padding: @grid-gutter-width;
+				position: relative;
+				.info-tag {
+					position: absolute;
+					left: 0;
+					top:0;
+					background-color: #000;
+					padding: 2px  @grid-gutter-width;
+					line-height: 0.8em;
+					>span {
+						color: #fff;
+						font-weight: 600;
+						font-size: 0.8em;
+					}
+				}
+				.view-list-item {
+					padding: @grid-gutter-width / 2 0;
+					&:first-child {
+						padding-top: @grid-gutter-width;
+					}
+					>span {
+						font-weight: 600;
+						display: inline-block;
+						width: 100%;
+						border: 1px solid @border;
+						padding: @grid-gutter-width;
+						box-shadow: 1px 1px 1px @border;
+						&:hover {
+							background-color: rgba(155, 155, 155, 0.7);
+							color: #000;
+						}
+						&.active {
+							background-color: rgba(0, 0, 0, 0.7);
+							color: #fff;
+						}
+					}
+				}
+			}
+		}
+		.region-view-loading {
+			overflow-y: auto;
+		}
+	}
+}

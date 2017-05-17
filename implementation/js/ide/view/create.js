@@ -227,7 +227,8 @@
 						method: assigned ? assigned.method : 'view',//method
 						content: assigned ? assigned.view : '',
 						editors: assigned ? assigned.editors: {},
-						svg: assigned ? assigned.svg : {}
+						svg: assigned ? assigned.svg : {},
+						data: assigned ? assigned.data : {}
 					});
 
 					//return immediately
