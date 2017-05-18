@@ -2,7 +2,7 @@
   "name": "my.project",
   "private": true,
   "devDependencies": {
-    "stage": "^1.10.1",
+    "stage": "^1.10.2",
     "bootstrap": "~3.x.x",
     "fontawesome": "~4.x.x",
     "open-sans-fontface": "*"
@@ -46,5 +46,5 @@
     "roboto-fontface": "*",
     "ubuntu-fontface": "*"
   },
-  "updatedOn": "2017-03-24T01:31:01.263Z"
+  "updatedOn": "2017-05-18T04:27:47.094Z"
 }

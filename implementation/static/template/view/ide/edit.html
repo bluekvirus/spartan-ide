@@ -1,0 +1,18 @@
+<div class="left-container">
+	<div class="view-edit-menu">
+		<div class="view-name">
+			<span></span>
+		</div>
+		<div class="switch-button-holder">
+			<div class="btn btn-block btn-warning" action="edit-layout"><span><i class="fa fa-table"></i> EDIT VIEW LAYOUT</span></div>
+		</div>
+		<div class="apply-button-holder">
+			<div class="btn btn-block btn-success" action="apply-change"><span><i class="fa fa-check"></i> APPLY CHANGE</span></div>
+		</div>
+		<div class="switch-views-holder">
+			{{#items}}<div class="view-list-item"><span class="text" action="switch-view" activate="single">{{.}}</span></div>{{/items}}
+			<div class="info-tag"><span>switch to ...</span></div>
+		</div>
+	</div>
+</div>
+<div class="right-container" region="content-editor"></div>

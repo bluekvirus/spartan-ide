@@ -8,14 +8,14 @@
 
 	/////////////////setup/////////////////
 	app.setup({
-		template: '@ide.html', //can be undefined if using layout
+		template: '<div region="header"></div><div region="contexts"><h4>Main page for Stage-ide is under construction.</h4></div><div region="footer"></div>', //can be undefined if using layout
 		layout: undefined,
 		contextRegion: 'contexts',
 		curtains: {},
 
 		//Note: Always set navRegion if using app template here, unless you've merged it(the tpl) with index.html;
 		//defaultContext: '_IDE/Create',
-		defaultContext: '_IDE',
+		defaultContext: '_IDE/Views',
 		viewSrcs: 'js/ide', //set this to a folder path to enable view dynamic loading. 
 		//---------------------------------------------------------------------------------------------
 		fullScreen: false, //this will put <body> to be full screen sized (window.innerHeight).
@@ -25,35 +25,6 @@
 		//---------------------------------------------------------------------------------------------
 		baseAjaxURI: '', //modify this to fit your own backend apis. e.g index.php?q= or '/api'
 		timeout: 5 * 60 * 1000 //general communication timeout (ms), e.g when using app.remote()
-	});
-
-	//_IDE view
-	// app.view('_IDE', {
-	// 	attributes: {
-	// 		style: 'height:100%;width:100%;'
-	// 	},
-	// 	template: '<div region="ide-content" style="height:100%;width:100%;">1</div>',
-	// 	navRegion: 'ide-content'
-	// });
-
-	//_IDE view
-	app.context('_IDE', {
-		attributes: {
-			style: 'height:100%;width:100%;'
-		},
-		data: '/api/getViewList',
-		layout: {
-			split: [
-				'300px:.list-holder:"<div class="title"><span class="text">VIEWS</span></div>{{#items}}<div class="view-list-item" action="edit-view"><span class="text">{{.}}</span></div>{{/items}}"',
-				'1:.info-holder:<span>Stage-IDE powered by Stage.js framework. <i class="fa fa-github"></i></span>'
-			],
-			dir: 'v',
-			bars: false
-		},
-		//template: '<div region="ide-content" style="height:100%;width:100%;">IDE</div>',
-		
-		//navRegion: 'ide-content',
-		
 	});
 
 	///////////initializers/////////// - [optional]
