@@ -9,40 +9,37 @@
 	app.view('Layout', {
 
 		template: '@view/ide/layout.html',
-		data: '/api/getViewList',
 		coop: ['navigation-changed'],
 		//[editors]: {...},
 		
 		initialize: function(){},
 		//onShow: function(){},
 		//onDataRendered: function(){},
+		onReady: function(){
+
+		},
 		onNavigationChanged: function(path){
 			var that = this;
 			//
 			this.editingViewName = path.pop();
-			this.$el.find('.view-name span').text(this.editingViewName);
 
-			//highlight current view
-			_.each(this.$el.find('.view-list-item .text'), function(el, index){
-				var $el = $(el);
-
-				if($el.text() === that.editingViewName)
-					$el.addClass('active');
+			app.remote({
+				url: '/api/getViewList',
+				async: false,
+			}).done(function(data){
+				that.show('menu', 'LayoutEditMenu', {
+					data: {
+						items: data,
+						layout: true,
+						method: 'layout',
+						viewName: that.editingViewName
+					},
+				});
 			});
+
+			//
 		},
 		navRegion: 'layout-editor',
-		actions: {
-			'switch-view': function($self){
-				app.navigate('_IDE/Layout/' + $self.text());
-			},
-			'edit-view': function(){
-				app.navigate('_IDE/Edit/' + this.editingViewName);
-			},
-			'apply-change': function(){
-
-			},
-		},
-
 	});
 
 })(Application);

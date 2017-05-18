@@ -20,9 +20,6 @@
 		//navRegion: 'preview',
 		onNavigateTo: function(path){
 
-			console.log(path);
-
-			console.log(this.getRegion('preview'));
 			this.show('preview', path.pop());
 			//this.getRegion('preview').trigger('region:load-view', path);
 		},
@@ -37,5 +34,6 @@
 		},
 
 	});
+
 
 })(Application);

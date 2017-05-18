@@ -1,0 +1,44 @@
+<div class="view-layout-menu {{#unless layout}}hidden{{/unless}}">
+	<div class="view-name">
+		<span>{{viewName}}</span>
+	</div>
+	<!-- <div class="layout-edit-switch-holder">
+		<div class="layout-edit-switch">
+			<div class="switch-inner">
+				<label for="layout-edit-switch">
+					<input type="checkbox" id="layout-edit-switch">
+					<div class="slider">
+						<span class="layout-text">LAYOUT</span
+						><span class="edit-text">EDIT</span>
+						<div class="inner-slider"></div>
+					</div>
+				</label>
+			</div>
+		</div>
+	</div> -->
+	<div class="switch-button-holder">
+		<div class="btn btn-block btn-warning" action="switch-method"><span><i class="fa fa-pencil"></i> EDIT VIEW CONTENT</span></div>
+	</div>
+	<div class="apply-button-holder">
+		<div class="btn btn-block btn-success" action="apply-change"><span><i class="fa fa-check"></i> APPLY CHANGE</span></div>
+	</div>
+	<div class="switch-views-holder">
+		{{#items}}<div class="view-list-item"><span class="text {{#if (../xif3 . ../viewName)}}active{{/if}}" action="switch-view" activate="single">{{.}}</span></div>{{/items}}
+		<div class="info-tag"><span>switch to ...</span></div>
+	</div>
+</div>
+<div class="view-edit-menu {{#unless edit}}hidden{{/unless}}">
+	<div class="view-name">
+		<span>{{viewName}}</span>
+	</div>
+	<div class="switch-button-holder">
+		<div class="btn btn-block btn-warning" action="switch-method"><span><i class="fa fa-table"></i> EDIT VIEW LAYOUT</span></div>
+	</div>
+	<div class="apply-button-holder">
+		<div class="btn btn-block btn-success" action="apply-change"><span><i class="fa fa-check"></i> APPLY CHANGE</span></div>
+	</div>
+	<div class="switch-views-holder">
+		{{#items}}<div class="view-list-item"><span class="text {{#if (../xif3 . ../viewName)}}active{{/if}}" action="switch-view" activate="single">{{.}}</span></div>{{/items}}
+		<div class="info-tag"><span>switch to ...</span></div>
+	</div>
+</div>
