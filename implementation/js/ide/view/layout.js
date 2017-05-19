@@ -9,7 +9,6 @@
 	app.view('Layout', {
 
 		template: '@view/ide/layout.html',
-		coop: ['navigation-changed'],
 		//[editors]: {...},
 		
 		initialize: function(){},
@@ -18,10 +17,10 @@
 		onReady: function(){
 
 		},
-		onNavigationChanged: function(path){
+		onNavigateTo: function(path){
 			var that = this;
-			//
-			this.editingViewName = path.pop();
+			//remind the name for this view
+			this.editingViewName = path.slice().pop();
 
 			app.remote({
 				url: '/api/getViewList',
@@ -35,11 +34,17 @@
 						viewName: that.editingViewName
 					},
 				});
-			});
+				//show the view preview
+				that.show('preview', path.slice().pop());
 
-			//
-		},
-		navRegion: 'layout-editor',
+				//show the mesh grids
+				that.show('mesh', 'Layout.Mesh');
+
+				//show the guide view
+				//that.show('guide', 'Layout.Guide');
+			});
+		}
+		
 	});
 
 })(Application);

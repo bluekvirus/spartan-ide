@@ -28,73 +28,87 @@
 	});
 
 	///////////initializers/////////// - [optional]
+	
 	app.addInitializer(function(){
-		//reload previously stored configuration
-		
-		var endPoints, hlines, vlines, temp, regionView;
 
-		if(app.store.get('current')){//has currently actived template
+		//loading cache to be added later
 
-			//if has current, compare whether temporary is same as current,
-			//if yes, old logic show current
-			//if not, show the temporary
-
-			temp = app.store.get(app.store.get('current'));
-			//make temp.regionView undefined if not exist in order to be compared with cached
-			temp.regionView = temp.regionView || undefined;
-
-			var cached = {};
-			_.each(temp, function(obj, key){
-				cached[key] = app.store.get(key);
-			});
-
-			//deep compare two objects
-			if(!_.isEqual(cached, temp)){
-				app.store.remove('current'); //not equal remove current
-			}
-
-			endPoints = cached.endPoints;
-			hlines = cached['horizontal-line'];
-			vlines = cached['vertical-line'];
-			regionView = cached.regionView;
-
-		}else{//no currently actived template
-			
-			endPoints = app.store.get('endPoints');
-			hlines = app.store.get('horizontal-line');
-			vlines = app.store.get('vertical-line');
-			regionView = app.store.get('regionView');
-		}
-		
-		if(endPoints && hlines && vlines){
-			app._global = app._global || {};
-			app._global.endPoints = endPoints;
-			app._global['horizontal-line'] = hlines;
-			app._global['vertical-line'] = vlines;
-			app._global.regionView = regionView;
-		}
-
-		app.debug('cached..', endPoints, hlines, vlines);
-		app.debug('regionView::store, _global', app.store.get('regionView'), app._global && app._global.regionView);
-	});
-
-	app.addInitializer(function(){
-		//menu status
-		//use __opened__ as local key to store menu status
-		if(!app.store.get('__opened__')) app.store.set('__opened__', false);
-
-		//save generation
-		var gen = app.store.get('generation');
-		if(gen)
-			gen = gen + 1;
-		else
-			gen = 1;
-
+		//create a global object to store points, horizontal lines and vertical lines
 		app._global = app._global || {};
-		app._global.generation = gen;
-		app.store.set('generation', gen);
-
+		app._global.endPoints = app._global.endPoints || {};
+		app._global['vertical-line'] = app._global['vertical-line'] || [];
+		app._global['horizontal-line'] = app._global['horizontal-line'] || [];
+		//setup a tolerance for coordinates matching
+		app._global.tolerance = app._global.tolerance || 0.5;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here(0.5%).*/
 	});
+
+	// app.addInitializer(function(){
+	// 	//reload previously stored configuration
+		
+	// 	var endPoints, hlines, vlines, temp, regionView;
+
+	// 	if(app.store.get('current')){//has currently actived template
+
+	// 		//if has current, compare whether temporary is same as current,
+	// 		//if yes, old logic show current
+	// 		//if not, show the temporary
+
+	// 		temp = app.store.get(app.store.get('current'));
+	// 		//make temp.regionView undefined if not exist in order to be compared with cached
+	// 		temp.regionView = temp.regionView || undefined;
+
+	// 		var cached = {};
+	// 		_.each(temp, function(obj, key){
+	// 			cached[key] = app.store.get(key);
+	// 		});
+
+	// 		//deep compare two objects
+	// 		if(!_.isEqual(cached, temp)){
+	// 			app.store.remove('current'); //not equal remove current
+	// 		}
+
+	// 		endPoints = cached.endPoints;
+	// 		hlines = cached['horizontal-line'];
+	// 		vlines = cached['vertical-line'];
+	// 		regionView = cached.regionView;
+
+	// 	}else{//no currently actived template
+			
+	// 		endPoints = app.store.get('endPoints');
+	// 		hlines = app.store.get('horizontal-line');
+	// 		vlines = app.store.get('vertical-line');
+	// 		regionView = app.store.get('regionView');
+	// 	}
+		
+	// 	if(endPoints && hlines && vlines){
+	// 		app._global = app._global || {};
+	// 		app._global.endPoints = endPoints;
+	// 		app._global['horizontal-line'] = hlines;
+	// 		app._global['vertical-line'] = vlines;
+	// 		app._global.regionView = regionView;
+	// 	}
+
+	// 	app.debug('cached..', endPoints, hlines, vlines);
+	// 	app.debug('regionView::store, _global', app.store.get('regionView'), app._global && app._global.regionView);
+	// });
+
+	// app.addInitializer(function(){
+	// 	//menu status
+	// 	//use __opened__ as local key to store menu status
+	// 	if(!app.store.get('__opened__')) app.store.set('__opened__', false);
+
+	// 	//save generation
+	// 	var gen = app.store.get('generation');
+	// 	if(gen)
+	// 		gen = gen + 1;
+	// 	else
+	// 		gen = 1;
+
+	// 	app._global = app._global || {};
+	// 	app._global.generation = gen;
+	// 	app.store.set('generation', gen);
+
+	// });
 	//Note: initializer can return a promise object for async loading, 
 	//add more initializers if you need. e.g `return app.remote() or $.ajax()`.
 	

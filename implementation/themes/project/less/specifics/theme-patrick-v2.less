@@ -239,8 +239,67 @@
 			}
 			.right-container {
 				flex: 1 1 0;
-				>div {//for the view.$el inside
+				position: relative;
+				.region-preview,
+				.region-guide,
+				.region-mesh {
 					height: 100%;
+					width: 100%;
+					position: absolute;
+					left: 0;
+					right: 0;
+					top: 0;
+					bottom: 0;
+				}
+				//============ styling sheet for preview view ============//
+				.region-preview {
+					z-index: 1;
+				}
+				//============ styling sheet for mesh view ============//
+				.region-mesh {
+					z-index: 2;
+					svg {
+						.horizontal-line,
+						.vertical-line {
+							fill: none;
+							stroke: rgba(155, 155, 155, 0.9);
+						}
+						.end-point {
+							cursor: pointer;
+							&:hover {
+								fill: @brand-primary;
+							}
+							&.active {
+								fill: @brand-primary;
+							}
+						}
+					}
+				}
+				//============ styling sheet for guide view ============//
+				.region-guide {
+					z-index: 3;
+					>div {//for view.$el
+						height: 100%;
+						width: 100%;
+						.horizontal-line {
+							position: absolute;
+							top: 0;
+							left: 0;
+							right: 0;
+							height: 1px;
+							background-color: rgba(155, 155, 155, 0.9);
+							display: none;
+						}
+						.vertical-line {
+							position: absolute;
+							left: 0;
+							top: 0;
+							bottom: 0;
+							width: 1px;
+							background-color: rgba(155, 155, 155, 0.9);
+							display: none;
+						}
+					}
 				}
 			}
 		}
