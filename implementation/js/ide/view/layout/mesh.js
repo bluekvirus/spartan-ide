@@ -87,6 +87,18 @@
 				e.preventDefault();
 				e.stopPropagation();
 
+				//check whether endpoint menu is shown, if yes park horizontal/vertical guide lines
+				if(that.parentCt.endpointMenuShown){
+					//park current guide line
+					if(that.horizontal)
+						that.paper.d3.selectAll('.horizontal-line')
+									.attr('d', 'M0 -5l' + 0 + ' -5');
+					else
+						that.paper.d3.selectAll('.vertical-line')
+									.attr('d', 'M-5 0l-5 ' + 0);
+					return;			
+				}
+
 				var $this = $(this);
 				//set focus to this view
 				$this.focus();
@@ -108,19 +120,20 @@
 				//shift key pressed
 				if(e.which === 16){
 					
-					//park the oppsite line
+					//park current line
 					if(that.horizontal){
 
 						that.paper.d3.selectAll('.horizontal-line')
-									.attr('d', 'M0 -5l' + width + ' -5');
+									.attr('d', 'M0 -5l' + 0 + ' -5');
 
 					}else{
 
 						that.paper.d3.selectAll('.vertical-line')
-									.attr('d', 'M-5 0l-5 ' + height);
+									.attr('d', 'M-5 0l-5 ' + 0);
 
 					}
 						
+					//flip flag
 					that.horizontal = !that.horizontal;
 				}
 				//control key up
@@ -145,7 +158,7 @@
 					x1 = trimNumber(parseInt(pathArr[0].replace('M', '')) / width * 100),
 					x2 = trimNumber(parseInt(pathArr[1].split('L')[1]) / width * 100);
 
-				//add line
+				//add horizontal line
 				that.addLine({
 					x1: x1,
 					x2: x2,
@@ -158,6 +171,20 @@
 				e.preventDefault();
 				e.stopPropagation();
 
+				var $target = $(e.target),
+					pathArr = $target.attr('d').split(' ');
+
+				//get coords in percentage
+				var x = trimNumber(parseInt(pathArr[0].replace('M', '')) / width * 100),
+					y1 = trimNumber(parseInt(pathArr[1].split('L')[0]) / height * 100),
+					y2 = trimNumber(parseInt(pathArr[2]) / height * 100);
+
+				//add vertical line
+				that.addLine({
+					x: x,
+					y1: y1,
+					y2: y2
+				});
 
 			})
 			//click event for delete lines
@@ -166,7 +193,20 @@
 				e.preventDefault();
 				e.stopPropagation();
 
+				//relay this event to parent view as a coop event
+				//that.endpointClick(e);
+				that.coop('endpoint-clicked', e);
+			})
+			//click event on $el
+			.on('click', function(e){
+				//routine
+				e.preventDefault();
+				e.stopPropagation();
 
+				//check if the endpoint menu is shown. if yes, close the menu by using coop event.
+				if(that.parentCt.endpointMenuShown)
+					that.coop('close-endpoint-menu');
+				
 			});
 
 		},
@@ -178,7 +218,7 @@
 
 		//---------------------------------------- helper functions ----------------------------------------//
 		
-		//=============== structure related functions ===============//
+		//====================== structure related functions ======================//
 		//function for setting up guide lines
 		setupGuideLines: function(positions){
 			//get dimension of the canvas
@@ -192,18 +232,28 @@
 
 			if(this.horizontal){//horizontal line
 
-				this.paper.d3.selectAll('.horizontal-line')
-							.attr('d', 'M' + (limits.min / 100 * width) + ' ' + positions.y + 'L' + (limits.max / 100 * width) + ' ' + positions.y);
+				//need to stay out of the 2em of any line
+				if(this.guideLineTooClose(positions))//too close, park the horizontal line
+					this.paper.d3.selectAll('.horizontal-line')
+									.attr('d', 'M0 -5l' + 0 + ' -5');
+				else 
+					this.paper.d3.selectAll('.horizontal-line')
+								.attr('d', 'M' + parseInt(limits.min / 100 * width) + ' ' + positions.y + 'L' + parseInt(limits.max / 100 * width) + ' ' + positions.y);
 
 			}else{//vertical line
 
-				this.paper.d3.selectAll('.vertical-line')
-							.attr('d', 'M' + positions.x + ' ' + (limits.min / 100 * height) + 'L' + positions.x + ' ' + (limits.max / 100 * height));
+				if(this.guideLineTooClose(positions))//too close, park the vertical line
+					this.paper.d3.selectAll('.vertical-line')
+									.attr('d', 'M-5 0l-5 ' + 0);
+				else
+					this.paper.d3.selectAll('.vertical-line')
+							.attr('d', 'M' + positions.x + ' ' + parseInt(limits.min / 100 * height) + 'L' + positions.x + ' ' + parseInt(limits.max / 100 * height));
 
 			}
 
 		},
 
+		//function for setup length/height of the guide line based on mouse position
 		guideLineConstrain: function(positions){
 			var obj = {},
 				that = this;
@@ -243,6 +293,34 @@
 			}
 
 			return obj;
+		},
+
+		//function for checking whether guide line is too close(within 2em) to any existing layout lines
+		guideLineTooClose: function(positions){
+			//keep a 2em gap
+			var horizontal = this.horizontal, //get now doing horizontal line or vertical line
+				em = horizontal ? (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.height() * 100
+								: (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.width() * 100, //get default em and translate it into percentage
+				tooClose = false,
+				yPer = positions.y / this.$el.height() * 100,
+				xPer = positions.x / this.$el.width() * 100;
+
+
+			if(horizontal){//horizontal lines
+				//check
+				_.each(app._global['horizontal-line'], function(hline){
+					if(xPer <= hline.x2 && xPer >= hline.x1 && yPer >= hline.y - 2 * em && yPer <= hline.y + 2 * em)
+						tooClose = true;
+				});
+
+			}else{//vertical lines
+				_.each(app._global['vertical-line'], function(vline){
+					if(yPer <= vline.y2 && yPer >= vline.y1 && xPer >= vline.x - 2 * em && xPer <= vline.x + 2 * em)
+						tooClose = true;
+				});
+			}
+
+			return tooClose;
 		},
 
 		//generate a new line and add it to the global collection
@@ -320,10 +398,10 @@
 				tolerance = app._global.tolerance;
 
 			if(this.horizontal){//horizontal line
-
-				x1 = (coords && coords.x1 === 0) ? 0 : (coords && coords.x1) || trimNumber(parseInt($horizontal.css('left')) / this.$el.width() * 100); //raphael only takes number. therefore parseInt
+				//Caveat: check 0, since 0 is falsy. assign 0.01 to 0. since tolerance is 0.5.
+				x1 = ((coords && coords.x1 === 0) ? 0.01 : (coords && coords.x1)) || trimNumber(parseInt($horizontal.css('left')) / this.$el.width() * 100); //raphael only takes number. therefore parseInt
 				x2 = (coords && coords.x2) ||  trimNumber((parseInt($horizontal.css('left')) + $horizontal.width()) / this.$el.width() * 100);
-				y1 = y2 = (coords && coords.y) || trimNumber(parseInt($horizontal.css('top')) / this.$el.height() * 100);
+				y1 = y2 = ((coords && coords.y === 0) ? 0.01 : (coords && coords.y)) || trimNumber(parseInt($horizontal.css('top')) / this.$el.height() * 100);
 
 				//first check whether there is a point already at those coordinates
 				occupied = this.checkOccupied({x1: x1, y1: y1, x2: x2, y2: y2}, tolerance);
@@ -367,9 +445,9 @@
 				}, newLineId);
 			}
 			else{//vertical line
-
-				x1 = x2 = (coords && coords.x) || trimNumber(parseInt($vertical.css('left')) / this.$el.width() * 100);
-				y1 = (coords && coords.y1) || trimNumber(parseInt($vertical.css('top')) / this.$el.height() * 100);
+				//Caveat: check 0, since 0 is falsy. assign 0.01 to 0. since tolerance is 0.5.
+				x1 = x2 = ((coords && coords.x === 0) ? 0.1 : (coords && coords.x)) || trimNumber(parseInt($vertical.css('left')) / this.$el.width() * 100);
+				y1 = ((coords && coords.y1 === 0) ? 0.1 : (coords && coords.y1)) || trimNumber(parseInt($vertical.css('top')) / this.$el.height() * 100);
 				y2 = (coords && coords.y2) || trimNumber((parseInt($vertical.css('top')) + $vertical.height()) / this.$el.height() * 100);
 
 				//check occupation
@@ -419,19 +497,16 @@
 			//sync local storage!!!!!!!!!!!!!!!!!!!!!!!
 			this.coop('sync-local');
 
-			//coop event to svg view to draw newly added line!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			app.coop('layout-added', {
-				x1: x1,
-				y1: y1,
-				x2: x2,
-				y2: y2,
-				startPoint: newStartPoint,
-				endPoint: newEndPoint,
-				lineId: newLineId
-			});
-
 			//draw line
-			this.drawPath('M' + (x1 / 100 * width) + ' ' + (y1 / 100) * height + 'L' + (x2 / 100 * width) + ' ' + (y2 / 100 * height));
+			this.drawPath({
+				x1: x1, y1: y1, x2: x2, y2: y2
+			}, true);
+
+			//draw points
+			var circle = this.drawCircle(x1, y1, true);
+			this.addPointAttr(circle.node, newStartPoint);
+			circle = this.drawCircle(x2, y2, true);
+			this.addPointAttr(circle.node, newEndPoint);
 		},
 
 		//check whether there is already end points at the position the new line needs to be installed
@@ -623,7 +698,7 @@
 			};
 		},
 
-		//=============== drawing related functions ===============//
+		//====================== drawing related functions ======================//
 		//function to redraw all lines based on global object, mainly used for window resize event
 		redrawAll: function(){
 			var that = this,
@@ -684,12 +759,34 @@
 		},
 
 		//function for drawing path
-		drawPath: function(pathStr){
-			//draw path on paper
-			var path = this.paper.path(pathStr).attr({'stroke' : '#DEDEDE', 'stroke-dasharray': '--'});
-			$(path.node).attr('class', 'layout-line');
+		drawPath: function(path, cal){
+			var p;
+
+			if(!cal)//do not need additional calculation, here path passed in as a string
+				p = this.paper.path(path);
+
+			else //here path passed in as an object({x1, y1, x2, y2}) with coordinates(percetange) in it, need to calculate to px
+				p = this.paper.path('M' + this.calSvgCoord(path.x1, true) + ' ' + this.calSvgCoord(path.y1) + 'L' + this.calSvgCoord(path.x2, true) + ' ' + this.calSvgCoord(path.y2));
+
+			$(p.node).attr('class', 'layout-line');
 		},
-		drawCircle: function(x, y){
+
+		//function for draw circles, cal === true means coordx and coordy are in percentage, which needs to be transferred into pixels
+		drawCircle: function(coordx, coordy, cal){
+			var x, y;
+			
+			if(cal){//need to transfer into px
+
+				x = this.calSvgCoord(coordx, true);
+				y = this.calSvgCoord(coordy);
+
+			}else{
+
+				x = coordx;
+				y = coordy;
+
+			}
+
 			//draw circle on paper
 			//inner circle, draw first, so it will be at lower index than outter circle, which has events on it.
 			var inner = this.paper.circle(x, y, this.radius - 2).attr({'stroke-width':'none', 'fill': '#000'});
@@ -698,6 +795,8 @@
 			var circle = this.paper.circle(x, y, this.radius).attr({'stroke' : '#DEDEDE', 'stroke-width':'2', 'fill': 'rgba(0, 0, 0, 0)'});
 			return circle;
 		},
+
+		//add attributes to endpoints
 		addPointAttr: function(node, id){
 			var $node = $(node),
 				$body = $('body');

@@ -273,6 +273,10 @@
 								fill: @brand-primary;
 							}
 						}
+						.layout-line {
+							stroke : #DEDEDE; 
+							stroke-dasharray: '--';
+						}
 					}
 				}
 				//============ styling sheet for guide view ============//
@@ -301,7 +305,88 @@
 						}
 					}
 				}
+				.end-point-menu {
+					position: absolute;
+					height: 75px;
+					width: 75px;
+					z-index: 3;
+					.indicator {
+						&.up {
+							position: absolute;
+							left: 27px;
+							top: 0;
+							cursor: pointer;
+						}
+						&.down {
+							position: absolute;
+							left: 27px;
+							bottom: -2px;
+							cursor: pointer;
+						}
+						&.left {
+							position: absolute;
+							left: 0;
+							top: 25px;
+							cursor: pointer;
+						}
+						&.right {
+							position: absolute;
+							right: 0px;
+							top: 25px;
+							cursor: pointer;
+						}
+						&.vertical {
+							position: absolute;
+							right: -10px;
+							top: 26px;
+							transform: scale(1, 2);
+						}
+						&.horizontal {
+							position: absolute;
+							bottom: -18px;
+							left: 25px;
+							transform: scale(2, 1);
+						}
+						.text-muted {
+							color: lighten(@gray-light, 30%) !important;
+						}
+					}
+					.close {
+						position: absolute;
+						right: 0;
+						top: 0;
+						cursor: pointer;
+					}
+				}
 			}
 		}
+	}
+}
+
+//---------------------------------- styling sheet for overlay/popover views ----------------------------------//
+.overlay {
+	
+	&.confirm-overlay {
+		background-color: transparent;
+		z-index: 999;
+		.modal-dialog {
+			width: 640px;
+		}
+	}
+
+	&.danger-title {
+		.modal-title {
+			color: @brand-danger;
+		}
+	}
+
+	&.warning-title {
+		.modal-title {
+			color: @brand-warning;
+		}
+	}
+
+	.modal-dialog {
+		margin: 0;
 	}
 }

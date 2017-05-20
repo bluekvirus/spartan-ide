@@ -1,7 +1,7 @@
 ;(function(app){
 
-	app.view('Create.Popovers.LayoutResetConfirm', {
-		template: '@view/create/layout-reset-confirm.html',
+	app.view('Overlay.LayoutResetConfirm', {
+		template: '@view/overlay/layout-reset-confirm.html',
 		actions: {
 			close: function(){
 				this.close();
