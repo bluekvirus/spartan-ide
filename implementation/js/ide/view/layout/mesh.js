@@ -16,6 +16,7 @@
 		attributes: {
 			tabindex: "1" //make this div focusable in order to use keypress event
 		},
+		//coop: [],
 		initialize: function(){
 			//direction indicator
 			this.horizontal = true;
@@ -23,7 +24,7 @@
 			//radius for drawing the end-points
 			this.radius = 8;
 
-			//insert initialize point and lines
+			//insert initial 4 points and 4 lines
 			if(!(_.keys(app._global.endPoints).length)){
 				//add initial four lines to represent the frame
 				//top
@@ -64,8 +65,6 @@
 				temp.top = topRight;
 				temp.bottom = bottomRight;
 			}
-
-
 		},
 		//onShow: function(){},
 		//onDataRendered: function(){},
@@ -78,136 +77,161 @@
 			var width = this.$el.width(),
 				height = this.$el.height();
 
-			//initial draw
-			this.redrawAll();
+			if(!this.get('outline-only')){
+				//initial draw
+				this.redrawAll();
 
-			//mousemove event for show guide lines
-			this.$el.find('svg').on('mousemove', function(e){
-				//routine
-				e.preventDefault();
-				e.stopPropagation();
+				//mousemove event for show guide lines
+				this.$el.find('svg').on('mousemove', function(e){
+					//routine
+					e.preventDefault();
+					//e.stopPropagation(); //keep propgation for dragging layout
+					
+					if(that.dragging){
+						//park current guide line
+						if(that.horizontal)
+							that.paper.d3.selectAll('.horizontal-line')
+										.attr('d', 'M0 -5l' + 0 + ' -5');
+						else
+							that.paper.d3.selectAll('.vertical-line')
+										.attr('d', 'M-5 0l-5 ' + 0);
 
-				//check whether endpoint menu is shown, if yes park horizontal/vertical guide lines
-				if(that.parentCt.endpointMenuShown){
-					//park current guide line
-					if(that.horizontal)
-						that.paper.d3.selectAll('.horizontal-line')
-									.attr('d', 'M0 -5l' + 0 + ' -5');
-					else
-						that.paper.d3.selectAll('.vertical-line')
-									.attr('d', 'M-5 0l-5 ' + 0);
-					return;			
-				}
+						return;
+					}
 
-				var $this = $(this);
-				//set focus to this view
-				$this.focus();
+					//check whether endpoint menu is shown, if yes park horizontal/vertical guide lines
+					if(that.parentCt.endpointMenuShown){
+						//park current guide line
+						if(that.horizontal)
+							that.paper.d3.selectAll('.horizontal-line')
+										.attr('d', 'M0 -5l' + 0 + ' -5');
+						else
+							that.paper.d3.selectAll('.vertical-line')
+										.attr('d', 'M-5 0l-5 ' + 0);
+						return;			
+					}
 
-				//setup guide lines
-				that.setupGuideLines({
-					x: e.offsetX,
-					y: e.offsetY
+					//set focus to this view
+					that.$el.focus();
+
+					//setup guide lines
+					that.setupGuideLines({
+						x: e.offsetX,
+						y: e.offsetY
+					}, e);
+
 				});
 
-			});
+				//keyup event for shift and control
+				//on press shift key switch the direction of guide line
+				this.$el.on('keyup', function(e){
+					//prevent default events
+					e.preventDefault();
 
-			//keyup event for shift and control
-			//on press shift key switch the direction of guide line
-			this.$el.on('keyup', function(e){
-				//prevent default events
-				e.preventDefault();
+					//shift key pressed
+					if(e.which === 16){
+						
+						//park current line
+						if(that.horizontal){
 
-				//shift key pressed
-				if(e.which === 16){
+							that.paper.d3.selectAll('.horizontal-line')
+										.attr('d', 'M0 -5l' + 0 + ' -5');
+
+						}else{
+
+							that.paper.d3.selectAll('.vertical-line')
+										.attr('d', 'M-5 0l-5 ' + 0);
+
+						}
+							
+						//flip flag
+						that.horizontal = !that.horizontal;
+					}
+					//control key up
+					// else if(e.which === 17)
+					// 	that.getViewIn('guide').$el.find('.divide-line-horizontal, .divide-line-vertical').remove();
+
+				});
+
+				//click event, check on target to trigger different actions
+				this.$el
+				//click event for adding a horizontal line
+				.on('click', '.horizontal-line', function(e){
+					//routine
+					e.preventDefault();
+					e.stopPropagation();
+
+					//don't do anything if menu is shown or dragging
+					if(that.dragging || that.parentCt.endpointMenuShown)
+						return;
+
+					var	$target = $(e.target),
+						pathArr = $target.attr('d').split(' ');
+
+					//get coords in percentage
+					var y = trimNumber(parseInt(pathArr[2]) / height * 100),
+						x1 = trimNumber(parseInt(pathArr[0].replace('M', '')) / width * 100),
+						x2 = trimNumber(parseInt(pathArr[1].split('L')[1]) / width * 100);
+
+					//add horizontal line
+					that.addLine({
+						x1: x1,
+						x2: x2,
+						y: y
+					});
+				})
+				//click event for adding a vertical line
+				.on('click', '.vertical-line', function(e){
+					//routine
+					e.preventDefault();
+					e.stopPropagation();
+
+					//don't do anything if menu is shown or dragging
+					if(that.dragging || that.parentCt.endpointMenuShown)
+						return;
+
+					var $target = $(e.target),
+						pathArr = $target.attr('d').split(' ');
+
+					//get coords in percentage
+					var x = trimNumber(parseInt(pathArr[0].replace('M', '')) / width * 100),
+						y1 = trimNumber(parseInt(pathArr[1].split('L')[0]) / height * 100),
+						y2 = trimNumber(parseInt(pathArr[2]) / height * 100);
+
+					//add vertical line
+					that.addLine({
+						x: x,
+						y1: y1,
+						y2: y2
+					});
+
+				})
+				//click event on $el
+				.on('click', function(e){
+					//routine
+					e.preventDefault();
+					e.stopPropagation();
+
+					//check if the endpoint menu is shown. if yes, close the menu by using coop event.
+					if(that.parentCt.endpointMenuShown){
+						that.coop('close-endpoint-menu');
+						return;
+					}
 					
-					//park current line
-					if(that.horizontal){
-
-						that.paper.d3.selectAll('.horizontal-line')
-									.attr('d', 'M0 -5l' + 0 + ' -5');
-
-					}else{
-
-						that.paper.d3.selectAll('.vertical-line')
-									.attr('d', 'M-5 0l-5 ' + 0);
-
+					//
+					if(that.magneted){
+						if(that.horizontal){
+							that.$el.find('.horizontal-line').trigger('click');
+							that.magneted = false;
+						}else{
+							that.$el.find('.vertical-line').trigger('click');
+							that.magneted = false;
+						}
+						return;
 					}
 						
-					//flip flag
-					that.horizontal = !that.horizontal;
-				}
-				//control key up
-				// else if(e.which === 17)
-				// 	that.getViewIn('guide').$el.find('.divide-line-horizontal, .divide-line-vertical').remove();
-
-			});
-
-			//click event, check on target to trigger different actions
-			this.$el
-			//click event for adding a horizontal line
-			.on('click', '.horizontal-line', function(e){
-				//routine
-				e.preventDefault();
-				e.stopPropagation();
-
-				var	$target = $(e.target),
-					pathArr = $target.attr('d').split(' ');
-
-				//get coords in percentage
-				var y = trimNumber(parseInt(pathArr[2]) / height * 100),
-					x1 = trimNumber(parseInt(pathArr[0].replace('M', '')) / width * 100),
-					x2 = trimNumber(parseInt(pathArr[1].split('L')[1]) / width * 100);
-
-				//add horizontal line
-				that.addLine({
-					x1: x1,
-					x2: x2,
-					y: y
 				});
-			})
-			//click event for adding a vertical line
-			.on('click', '.vertical-line', function(e){
-				//routine
-				e.preventDefault();
-				e.stopPropagation();
-
-				var $target = $(e.target),
-					pathArr = $target.attr('d').split(' ');
-
-				//get coords in percentage
-				var x = trimNumber(parseInt(pathArr[0].replace('M', '')) / width * 100),
-					y1 = trimNumber(parseInt(pathArr[1].split('L')[0]) / height * 100),
-					y2 = trimNumber(parseInt(pathArr[2]) / height * 100);
-
-				//add vertical line
-				that.addLine({
-					x: x,
-					y1: y1,
-					y2: y2
-				});
-
-			})
-			//click event for delete lines
-			.on('click', '.end-point', function(e){
-				//routine
-				e.preventDefault();
-				e.stopPropagation();
-
-				//relay this event to parent view as a coop event
-				//that.endpointClick(e);
-				that.coop('endpoint-clicked', e);
-			})
-			//click event on $el
-			.on('click', function(e){
-				//routine
-				e.preventDefault();
-				e.stopPropagation();
-
-				//check if the endpoint menu is shown. if yes, close the menu by using coop event.
-				if(that.parentCt.endpointMenuShown)
-					that.coop('close-endpoint-menu');
-				
-			});
+			}
 
 		},
 		actions: {
@@ -220,7 +244,7 @@
 		
 		//====================== structure related functions ======================//
 		//function for setting up guide lines
-		setupGuideLines: function(positions){
+		setupGuideLines: function(positions, e){
 			//get dimension of the canvas
 			var width = this.$el.width(),
 				height = this.$el.height(),
@@ -228,7 +252,11 @@
 				limits = this.guideLineConstrain({
 					x: (positions.x / width * 100),
 					y: (positions.y / height * 100)
-				});
+				}),
+				magnet = this.guideLineMagnet({
+					x: (positions.x / width * 100),
+					y: (positions.y / height * 100)
+				}, e);
 
 			if(this.horizontal){//horizontal line
 
@@ -236,6 +264,13 @@
 				if(this.guideLineTooClose(positions))//too close, park the horizontal line
 					this.paper.d3.selectAll('.horizontal-line')
 									.attr('d', 'M0 -5l' + 0 + ' -5');
+
+				else if(magnet){
+						this.magneted = true;
+						this.paper.d3.selectAll('.horizontal-line')
+								.attr('d', 'M' + parseInt(limits.min / 100 * width) + ' ' + magnet.y + 'L' + parseInt(limits.max / 100 * width) + ' ' + magnet.y);
+					}
+				
 				else 
 					this.paper.d3.selectAll('.horizontal-line')
 								.attr('d', 'M' + parseInt(limits.min / 100 * width) + ' ' + positions.y + 'L' + parseInt(limits.max / 100 * width) + ' ' + positions.y);
@@ -245,6 +280,13 @@
 				if(this.guideLineTooClose(positions))//too close, park the vertical line
 					this.paper.d3.selectAll('.vertical-line')
 									.attr('d', 'M-5 0l-5 ' + 0);
+
+				else if(magnet){
+					this.magneted = true; //for click event after magnet
+					this.paper.d3.selectAll('.vertical-line')
+							.attr('d', 'M' + magnet.x + ' ' + parseInt(limits.min / 100 * height) + 'L' + magnet.x + ' ' + parseInt(limits.max / 100 * height));
+				}
+
 				else
 					this.paper.d3.selectAll('.vertical-line')
 							.attr('d', 'M' + positions.x + ' ' + parseInt(limits.min / 100 * height) + 'L' + positions.x + ' ' + parseInt(limits.max / 100 * height));
@@ -323,6 +365,36 @@
 			return tooClose;
 		},
 
+		//function to handle magnet effect
+		guideLineMagnet: function(positions, e){
+			//magnet effect within 1em radius to a certain point
+			var x,y, distance,
+				em = this.horizontal ? (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.height() * 100
+								: (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.width() * 100, //get default em and translate it into percentage
+				that = this;
+
+			_.each(app._global.endPoints, function(endPoint, id){
+
+				//calculate distance
+				distance = that.horizontal ? Math.abs(endPoint.y - positions.y) : Math.abs(endPoint.x - positions.x);
+				//if less than 1 em assign new x, y for return
+				if(distance < 1 * em){
+					if(that.horizontal){
+						x = e.offsetX;
+						y = endPoint.y / 100 * that.$el.height();
+					}else{
+						x = endPoint.x / 100 * that.$el.width();
+						y = e.offsetY;
+					}
+				}
+			});
+
+			if(x && y) 
+				return {x: x, y: y};//returns an object differs from return a boolean, though truely.
+			else
+				return false;
+		},
+
 		//generate a new line and add it to the global collection
 		genLine: function(direction, coords, adjcents, preid/*pre-defined id, for easier collorating between end points and lines*/){
 			var obj = {};
@@ -377,9 +449,9 @@
 
 			app._global.endPoints[id] = obj;
 
-			//sync with local storage
+			//sync local storage
+			this.coop('sync-local');
 			
-
 			//return id for easier querying
 			return id;
 		},
@@ -494,19 +566,12 @@
 			app.debug('vertical-line', app._global['vertical-line']);
 			app.debug('end-points', app._global.endPoints);
 			
-			//sync local storage!!!!!!!!!!!!!!!!!!!!!!!
+			//sync local storage
 			this.coop('sync-local');
-
-			//draw line
-			this.drawPath({
-				x1: x1, y1: y1, x2: x2, y2: y2
-			}, true);
-
-			//draw points
-			var circle = this.drawCircle(x1, y1, true);
-			this.addPointAttr(circle.node, newStartPoint);
-			circle = this.drawCircle(x2, y2, true);
-			this.addPointAttr(circle.node, newEndPoint);
+			
+			//need to redrawAll() here to avoid duplicated points
+			//simply draw a new line here does not work
+			this.redrawAll();
 		},
 
 		//check whether there is already end points at the position the new line needs to be installed
@@ -769,6 +834,8 @@
 				p = this.paper.path('M' + this.calSvgCoord(path.x1, true) + ' ' + this.calSvgCoord(path.y1) + 'L' + this.calSvgCoord(path.x2, true) + ' ' + this.calSvgCoord(path.y2));
 
 			$(p.node).attr('class', 'layout-line');
+
+			return p;
 		},
 
 		//function for draw circles, cal === true means coordx and coordy are in percentage, which needs to be transferred into pixels
@@ -798,22 +865,329 @@
 
 		//add attributes to endpoints
 		addPointAttr: function(node, id){
-			var $node = $(node),
-				$body = $('body');
-
 			var that = this;
+			//
+			var $node = $(node),
+				$el = that.$el; //register on $el, not body anymore.
+
 			//jquery2 cannot use addClass on SVG element
 			node.setAttribute('class', 'end-point draggble');
 			node.setAttribute('point-id', id);
 
-			// $node.one('click', function(e){
-			// 	that.clickCallback(e, $node);
-			// });
+			//Caveat: add events here! 
+			//Do not register global event, it will be cleaned after redraw event.
 
-			// $node.one('mousedown', function(e){
-			// 	that.mousedownCallback(e, $node, $body);
-			// });
+			$node.one('click', function(e){
+				that.endpointClickCallback(e, $node);
+			});
+
+			$node.one('mousedown', function(e){
+				that.mousedownCallback(e, $node, $el);
+			});
 		},
+
+		//function handles click event on endpoints
+		endpointClickCallback: function(e){
+			var that = this;
+
+			//routine
+			e.preventDefault();
+			e.stopPropagation();
+
+			that.coop('endpoint-clicked', e);
+
+			$(e.target)
+			.one('click', function(ev){
+				that.endpointClickCallback(ev);
+			})
+			.one('mousedown', function(ev){
+				//callback function
+				that.mousedownCallback(ev, $(ev.target), that.$el);
+			});
+		},
+
+		//function handles mousedown on endpoints
+		mousedownCallback: function(e, $node, $body){
+
+			//routine
+			e.preventDefault();
+			//e.stopPropagation();
+
+			//save original point object
+			var $point = $(e.target);
+			
+			var that = this,
+				id = $node.attr('point-id');
+
+			//set dragging flag true
+			this.dragging = true;
+
+			var constrains = this.checkDraggingConstrain(id),
+				originalCoords = {
+					x: app._global.endPoints[id].x,
+					y: app._global.endPoints[id].y
+				};
+
+			//check whether if the nodes are on the frame
+			if(
+				originalCoords.x < 0 + app._global.tolerance || originalCoords.x > 100 - app._global.tolerance ||
+				originalCoords.y < 0 + app._global.tolerance || originalCoords.y > 100 - app._global.tolerance
+			){
+				//send notification
+				app.notify('Cannot be Operated', 'End points on outter frame cannot be operated! Choose inside end points inside!', 'error', {icon: 'fa fa-reddit-alien'});
+				//set dragging false
+				this.dragging = false;
+				//return
+				return;
+			}
+
+			//use body as the mousemove view port
+			var updateLayoutSVG = function(e){
+				//check constrains
+				var hPer = e.offsetX / that.$el.width() * 100,
+					vPer = e.offsetY / that.$el.height() * 100;
+
+				//totally inside boundary
+				if(hPer > constrains.limits.xmin && hPer < constrains.limits.xmax && vPer > constrains.limits.ymin && vPer < constrains.limits.ymax){
+					//update all related lines and end points
+					that.updateRelated(constrains.hlines, constrains.vlines, constrains.endPoints, e, $node.attr('point-id'), originalCoords, {x: true, y: true});
+				}
+				//only x inside boundary
+				else if(hPer > constrains.limits.xmin && hPer < constrains.limits.xmax && (vPer < constrains.limits.ymin || vPer > constrains.limits.ymax)){
+					//update all related lines and end points
+					that.updateRelated(constrains.hlines, constrains.vlines, constrains.endPoints, e, $node.attr('point-id'), originalCoords, {x: true, y: false});
+				}
+				//only y inside boundary
+				else if((hPer < constrains.limits.xmin || hPer > constrains.limits.xmax) && vPer > constrains.limits.ymin && vPer < constrains.limits.ymax){
+					//update all related lines and end points
+					that.updateRelated(constrains.hlines, constrains.vlines, constrains.endPoints, e, $node.attr('point-id'), originalCoords, {x: false, y: true});
+				}
+			};
+			
+			//!!trigger coop event to update generated view
+			var updateGeneratedViewLayout = app.debounce(function(){
+				//trigger coop event to re-generate layout and views
+				that.coop('layout-adjusted', $point);
+			});
+			
+			$body
+			.on('mousemove', function(e){
+				//prevent default
+				e.preventDefault();
+
+				//unbind original click event and mousedown event,
+				//unbind click until mousemove to avoid mousedown and click event conflict
+				$node.unbind('click').unbind('mousedown');
+
+				updateLayoutSVG(e);
+				//updateGeneratedViewLayout();
+				
+			})
+			.one('mouseup', function(e){
+				//routine
+				e.preventDefault();
+				e.stopPropagation();
+
+				//unbind mousemove event on body
+				$body.unbind('mousemove');
+				//reset dragging flag to false
+				that.dragging = false;
+				//mouseup has a bit delay. use defer to register click and mousedown event on node again
+				_.defer(function(){
+					//click
+					$node.one('click', function(event){
+						that.endpointClickCallback(event, $node);
+					});
+					//mousedown
+					$node.one('mousedown', function(event){
+						that.mousedownCallback(event, $node, $body);
+					});
+				});
+			});
+		},
+
+		//function check mouse dragging constrain on endpoints
+		checkDraggingConstrain: function(id/*point id*/){
+			//fetch the point
+			var point = app._global.endPoints[id],
+				directions = ['left', 'right', 'top', 'bottom'],
+				vem = (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.height() * 100,
+				hem = (parseFloat(getComputedStyle(document.body).fontSize)) / this.$el.width() * 100,
+				temp;
+
+			var limits = {
+				xmin : 2 * hem, xmax: 100 - 2 * hem, ymin: 2 * vem, ymax: 100 - 2 * vem
+			};//store all the limits
+
+			var extensions = {
+				left: 0, right: 0, top: 0, bottom: 0,
+				hlines: [],//store all the horizontal lines controlled by this point
+				vlines: [],//store all the vertical lines controlled by this point
+				endPoints: []//store all the end points controlled by this point
+			};
+			
+			//check the extension limit of each direction
+			_.each(directions, function(direction){
+				var orientation = (direction === 'left' || direction === 'right') ? 'h' : 'v', tempLine;
+
+				temp = point;
+				if(!_.contains(extensions.endPoints, temp.id))
+					extensions.endPoints.push(temp.id);//store the point
+
+				//trace down the last point in this direction
+				while(temp[direction]){
+					//fetch next line
+					tempLine = _.find(app._global[(orientation === 'h') ? 'horizontal-line' : 'vertical-line'], function(line){ return line.id === temp[direction] });
+					//store line walked through
+					(orientation === 'h') ? extensions.hlines.push(tempLine.id) : extensions.vlines.push(tempLine.id);
+					//get next point
+					temp = app._global.endPoints[tempLine[direction]];
+					//store next point
+					extensions.endPoints.push(temp.id);
+				}
+
+				switch(direction){
+					case 'left':
+						extensions.left = temp.x;
+					break;
+					case 'right':
+						extensions.right = temp.x;
+					break;
+					case 'top':
+						extensions.top = temp.y;
+					break;
+					case 'bottom':
+						extensions.bottom = temp.y;
+					break;
+				}
+			});
+
+			//now we have extension limits, check with horizontal and vertical collections to setup the real limit
+			//horizontal
+			_.each(app._global['horizontal-line'], function(hline){
+				if(
+					!_.contains(extensions.hlines, hline.id) &&
+					(
+						(hline.x1 < (extensions.right + app._global.tolerance) && hline.x1 > (extensions.left - app._global.tolerance)) ||
+						(hline.x2 < (extensions.right  + app._global.tolerance) && hline.x2 > (extensions.left - app._global.tolerance))
+					)
+				){
+					if(hline.y <= (point.y + app._global.tolerance)){//ymin
+						temp = hline.y + 2 * vem;
+						if(temp > limits.ymin)
+							limits.ymin = temp;
+					}
+
+					else if(hline.y >= (point.y - app._global.tolerance)){//ymax
+						temp = hline.y - 2 * vem;
+						if(temp < limits.ymax)
+							limits.ymax = temp;
+					}
+				}
+			});
+
+			//vertical
+			_.each(app._global['vertical-line'], function(vline){
+				if(	
+					!_.contains(extensions.vlines, vline.id) &&
+					(
+						(vline.y1 < (extensions.bottom + app._global.tolerance) && vline.y1 > (extensions.top - app._global.tolerance)) ||
+						(vline.y2 < (extensions.bottom + app._global.tolerance) && vline.y2 > (extensions.top - app._global.tolerance))
+					)
+
+				){
+					if(vline.x <= (point.x + app._global.tolerance)){//xmin
+						temp = vline.x + 2 * hem;
+						if(temp > limits.xmin)
+							limits.xmin = temp;
+					}
+
+					else if(vline.x >= (point.x - app._global.tolerance)){//xmax
+						temp = vline.x - 2 * hem;
+						if(temp < limits.xmax)
+							limits.xmax = temp;
+					}
+				}
+			});
+
+			return {
+				limits: limits,
+				hlines: extensions.hlines,
+				vlines: extensions.vlines,
+				endPoints: extensions.endPoints
+			};
+		},
+
+		//update related lines and points when dragging an endpoint
+		updateRelated: function(hlines, vlines, points, event, anchorId, originalCoords, direction){
+			var height = this.$el.height(),
+				width = this.$el.width();
+
+			//update horizontal lines
+			if(direction.y)
+				_.each(hlines, function(id){
+					var line = _.find(app._global['horizontal-line'], function(hline){ return hline.id === id; }),
+						yCoord = trimNumber(event.offsetY / height * 100);
+					//update line itself
+					line.y = yCoord;
+					//update its end points
+					//left
+					app._global.endPoints[line.left].y = yCoord;
+					//right
+					app._global.endPoints[line.right].y = yCoord;
+				});
+
+			//update vertical lines
+			if(direction.x)
+				_.each(vlines, function(id){
+					var line = _.find(app._global['vertical-line'], function(vline){ return vline.id === id; }),
+						xCoord = trimNumber(event.offsetX / width * 100);
+					//update line tiself
+					line.x = xCoord;
+					//update its end points
+					//top
+					app._global.endPoints[line.top].x = xCoord;
+					//bottom
+					app._global.endPoints[line.bottom].x = xCoord;
+				});
+
+			//update length of lines that connected to the related points
+			_.each(points, function(pointId){
+				var point = app._global.endPoints[pointId],
+					line;
+				//top line
+				if(point.top){
+					line = _.find(app._global['vertical-line'], function(vline){ return vline.id === point.top; });
+					line.y2 = point.y;
+				}
+
+				//bottom line
+				if(point.bottom){
+					line = _.find(app._global['vertical-line'], function(vline){ return vline.id === point.bottom; });
+					line.y1 = point.y;
+				}
+
+				//left line
+				if(point.left){
+					line = _.find(app._global['horizontal-line'], function(hline){ return hline.id === point.left; });
+					line.x2 = point.x;
+				}
+
+				if(point.right){
+					line = _.find(app._global['horizontal-line'], function(hline){ return hline.id === point.right; });
+					line.x1 = point.x;
+				}
+
+			});
+
+			//update points in the local storage
+			this.coop('sync-local');
+
+			//redraw all the lines
+			this.redrawAll();
+		},
+
+		//---------------------------------------- functions to handle coop event ----------------------------------------//
 
 	});
 

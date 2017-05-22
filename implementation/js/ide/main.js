@@ -31,15 +31,30 @@
 	
 	app.addInitializer(function(){
 
-		//loading cache to be added later
-
-		//create a global object to store points, horizontal lines and vertical lines
+		//***cache loading now at mesh.js, since every view has its own cached layout***//
 		app._global = app._global || {};
-		app._global.endPoints = app._global.endPoints || {};
-		app._global['vertical-line'] = app._global['vertical-line'] || [];
-		app._global['horizontal-line'] = app._global['horizontal-line'] || [];
 		//setup a tolerance for coordinates matching
 		app._global.tolerance = app._global.tolerance || 0.5;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here(0.5%).*/
+
+		//initialize __layouts__
+		var layouts = app.store.get('__layouts__');
+		if(!layouts)
+			app.store.set('__layouts__', {});
+
+		//initialize __current__
+		var current = app.store.get('__current__');
+		if(!current)
+			app.store.set('__current__', {});
+
+		//generation to keep every element has a truly unique id.
+		var gen = app.store.get('generation');
+		if(gen)
+			gen = gen + 1;
+		else
+			gen = 1;
+		app._global.generation = gen;
+		app.store.remove('generation');
+		app.store.set('generation', gen);
 	});
 
 	// app.addInitializer(function(){
@@ -96,13 +111,6 @@
 	// 	//menu status
 	// 	//use __opened__ as local key to store menu status
 	// 	if(!app.store.get('__opened__')) app.store.set('__opened__', false);
-
-	// 	//save generation
-	// 	var gen = app.store.get('generation');
-	// 	if(gen)
-	// 		gen = gen + 1;
-	// 	else
-	// 		gen = 1;
 
 	// 	app._global = app._global || {};
 	// 	app._global.generation = gen;

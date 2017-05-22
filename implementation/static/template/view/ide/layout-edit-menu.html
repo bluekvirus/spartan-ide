@@ -17,10 +17,13 @@
 		</div>
 	</div> -->
 	<div class="switch-button-holder">
-		<div class="btn btn-block btn-warning" action="switch-method"><span><i class="fa fa-pencil"></i> EDIT VIEW CONTENT</span></div>
+		<div class="btn btn-block btn-white" action="add-new"><span><i class="fa fa-plus"></i> ADD NEW VIEW</span></div>
+	</div>
+	<div class="switch-button-holder">
+		<div class="btn btn-block btn-white" action="switch-method"><span><i class="fa fa-pencil"></i> EDIT VIEW CONTENT</span></div>
 	</div>
 	<div class="apply-button-holder">
-		<div class="btn btn-block btn-success" action="apply-change"><span><i class="fa fa-check"></i> APPLY CHANGE</span></div>
+		<div class="btn btn-block btn-white" action="save-layout"><span><i class="fa fa-floppy-o"></i> SAVE LAYOUT</span></div>
 	</div>
 	<div class="switch-views-holder">
 		{{#items}}<div class="view-list-item"><span class="text {{#if (../xif3 . ../viewName)}}active{{/if}}" action="switch-view" activate="single">{{.}}</span></div>{{/items}}

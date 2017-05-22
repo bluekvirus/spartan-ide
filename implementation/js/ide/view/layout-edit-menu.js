@@ -6,11 +6,16 @@
 			'switch-view': function($self){
 				app.navigate('_IDE/' + this.get('method') + '/' + $self.text());
 			},
+			'add-new': function(){
+				app.get('Overlay.AddNewView').create().overlay({
+					effect: false,
+				});
+			},
 			'switch-method': function(){
 				app.navigate('_IDE/' + ((this.get('method') === 'layout') ? 'Edit' : 'Layout') + '/' + this.get('viewName'));
 			},
-			'apply-change': function(){
-
+			'save-layout': function(){
+				this.coop('save-layout');
 			},
 		},
 		templateHelpers: {

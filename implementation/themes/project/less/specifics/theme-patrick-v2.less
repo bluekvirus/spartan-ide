@@ -4,6 +4,10 @@
  */
 
 @left-menu-width: 300px;
+//temprary force all h2 with no margin
+h2 {
+	margin: 0 !important;
+}
 
 .context-ide {
 	height: 100%;
@@ -254,6 +258,9 @@
 				//============ styling sheet for preview view ============//
 				.region-preview {
 					z-index: 1;
+					>div {
+						height: 100%;
+					}
 				}
 				//============ styling sheet for mesh view ============//
 				.region-mesh {
@@ -275,7 +282,11 @@
 						}
 						.layout-line {
 							stroke : #DEDEDE; 
-							stroke-dasharray: '--';
+							stroke-dasharray: 5;
+						}
+						.region-outline {
+							stroke : #000; 
+							stroke-dasharray: 12;	
 						}
 					}
 				}
@@ -388,5 +399,9 @@
 
 	.modal-dialog {
 		margin: 0;
+	}
+
+	label.control-label {
+		//text-align: left;
 	}
 }

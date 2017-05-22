@@ -2,6 +2,7 @@
 
 	app.view('Overlay.LayoutResetConfirm', {
 		template: '@view/overlay/layout-reset-confirm.html',
+		overlay: true,
 		actions: {
 			close: function(){
 				this.close();
