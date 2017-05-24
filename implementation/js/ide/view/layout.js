@@ -11,7 +11,8 @@
 		template: '@view/ide/layout.html',
 		//[editors]: {...},
 		coop: [
-			'point-layout-reset-confirmed' //user confirm to delete a line attaches to a certain point
+			'point-layout-reset-confirmed', //user confirm to delete a line attaches to a certain point
+			'delete-local-view', //remove a view from local storage
 		],
 		initialize: function(){
 			//indicate whether endpoint menu is current being shown or not
@@ -19,6 +20,9 @@
 
 			//indicate whether it is outline only
 			this.outlineOnly = false;
+
+			//indicate whether current view has been edited
+			this.modified = false;
 		},
 		onReady: function(){
 
@@ -26,75 +30,122 @@
 		onNavigateTo: function(path){
 			var that = this;
 			//remind the name for this view
-			this.editingViewName = path.slice().pop();
+			if(path)
+				this.editingViewName = path.slice().pop();
+			else
+				this.editingViewName = '';
 
 			app.remote({
 				url: '/api/getViewList',
 				async: false,
 			}).done(function(data){
+				//locally stored configurations
+				var layouts = app.store.get('__layouts__'),
+				//stored configuration for current view
+					current = app.store.get('__current__');
+
+				if(path && !layouts[that.editingViewName])//add newly created view to the collection
+					layouts[that.editingViewName] = {
+						layout: ['1'],
+					};
+
+				//trim data, to show view list both for local stored layouts and remote layouts
+				var viewList = data.slice();
+				_.each(viewList, function(viewName, index){
+					viewList[index] = {
+						name: viewName,
+						source: 'remote'
+					};
+				});
+				_.each(layouts, function(cfg, viewName){
+					//not contain in the list, pre-pend to the list
+					if(!_.contains(data, viewName)){
+						viewList.unshift({
+							name: viewName,
+							source: 'local'
+						});
+					}
+				});
+
+				//add locally saved to view to viewList
 				that.show('menu', 'LayoutEditMenu', {
 					data: {
-						items: data,
+						items: viewList,
 						layout: true,
-						method: 'layout',
+						method: 'Layout',
 						viewName: that.editingViewName
 					},
 				});
 
-				//check if loading view is from backend
-				if(_.contains(data, that.editingViewName)){
-					//initialize app._global
-					that.initializeGlobal({});
+				if(path){
+					//check whether __current__ is pointing to the loading view,
+					//if not rewrite __current__ based on stored data
+					if(current.viewName !== that.editingViewName){
+						//clear __current__ in cache
+						app.store.remove('__current__');
 
-					//flip the outlineOnly flag
-					that.outlineOnly = true;
+						//overwrite current
+						current = app.store.set('__current__', layouts[that.editingViewName] || {viewName: that.editingViewName});
+					}
+					
+					//check if loading view is from backend
+					if(_.contains(data, that.editingViewName)){
 
-					//show mesh only for first layer region outlines
-					that.show('mesh', 'Layout.Mesh', {
-						data: {
-							'outline-only': true
-						}
-					}).once('ready', function(){
-						//dipict first layer regions
-						that.show('preview', that.editingViewName).once('ready', function(){
-							that.genLayoutFromTemplate(that.getViewIn('preview'));
+						//initialize app._global
+						that.initializeGlobal({});
+
+						//flip the outlineOnly flag
+						that.outlineOnly = true;
+
+						//show mesh only for first layer region outlines
+						that.show('mesh', 'Layout.Mesh', {
+							data: {
+								'outline-only': true
+							}
+						}).once('ready', function(){
+							//dipict first layer regions
+							that.show('preview', that.editingViewName).once('ready', function(){
+								that.genLayoutFromTemplate(that.getViewIn('preview'), that.getViewIn('preview').$el);
+							});
 						});
-					});
-					
-				}else {
-					//show the view preview first, in order to pick up html and size
-					that.show('preview', that.editingViewName);
-
-					//checkout local storage for the loading view
-					/**
-					 * check whether viewName in __current__ is same as loading view
-					 * 		if yes, honor current	
-					 * 	 	if not, clean __current__ and honor loading view config in __layouts__ if exists
-					 */
-					
-					var layouts = app.store.get('__layouts__'),
-						current = app.store.get('__current__');
-					
-					if(current.viewName === that.editingViewName){
+						
+					}else {
+						//checkout local storage for the loading view
 						//honor __current__
 						that.initializeGlobal(current);
-					}else{
+
 						//honor __layouts__
 						if(layouts[that.editingViewName]){
-							//clear __current__ in cache
-							app.store.remove('__current__');
-							app.store.set('__current__', {});
-							//honor config inside __layouts__
-							that.initializeGlobal(layouts[that.editingViewName]);
+							//show the view preview first, in order to pick up html and size
+							that.show('preview', app.view({
+									layout: layouts[that.editingViewName].layout
+								}))
+								.once('ready', function(){
+									that.genLayoutFromTemplate(that.getViewIn('preview'), that.getViewIn('preview').$el);
+								}); //!later on show saved configs
 						}
 						else{
-							//initialize app._global
-							that.initializeGlobal({});
+							//initialize an object for the new view in __layouts__
+							layouts[that.editingViewName] = {};
+							//sync __layouts__ with local storage
+							app.store.remove('__layouts__');
+							app.store.set('__layouts__', _.deepClone(layouts));
+							//show a new blank view
+							that.show('preview', app.view({
+								template: 'NO TEMPLATE TBD',
+							}));
 						}
-					}
 
-					//show the mesh grids
-					that.show('mesh', 'Layout.Mesh');
+						//show the mesh grids
+						that.show('mesh', 'Layout.Mesh');
+					}	
+				}else{
+					//close preview and mesh view if no path is given
+					if(that.getViewIn('mesh'))
+						that.getViewIn('mesh').close();
+
+					if(that.getViewIn('preview'))
+						that.getViewIn('preview').close();
 				}
 			});
 		},
@@ -139,6 +190,13 @@
 
 			//sync local storage data
 			this.syncLocal();
+
+			//re-generate layout
+			this.onLayoutConfigChanged();
+
+			//setup dirty-bit since point has been deleted
+			if(!this.modified)
+				this.setDirtyBit(true);
 		},
 
 		//function to handle local storage syncing
@@ -147,19 +205,72 @@
 		},
 
 		//function to handle saving current view layout configurations into cache
-		onSaveLayout: function(){
-			//stored object`
-			var stored = app.store.get('__layouts__');
+		onSaveLayout: function(obj){
+			//cache
+			var layouts = app.store.get('__layouts__');
 
-			//modified stored[that.editingViewName]
-			stored[this.editingViewName] = app._global;
+			//modified layouts[this.editingViewName]
+			layouts[this.editingViewName] = _.deepClone(app.store.get('__current__'));//_.extend({viewName: this.editingViewName, layout: app.store.get('__current__')}, app._global);
 
 			//save it to cache with a deep copy, avoid werid issue
-			app.store.set('__layouts__', _.deepClone(stored));
+			app.store.set('__layouts__', _.deepClone(layouts));
+
+			//once layout saved flip the dirty bit
+			if(this.modified)
+				this.setDirtyBit(false);
 
 			//show notification
 			app.notify('Success!', 'Layout configuration has been saved.', 'ok', {icon: 'fa fa-fort-awesome'});
 
+			//save from switching context, need to honor the switching
+			if(obj)
+				app.navigate('_IDE/' + obj.method + '/' + obj.next);
+
+		},
+
+		//on layout config changed, re-generate layout immedieately
+		onLayoutConfigChanged: function(){
+			//on closing generate layout if this is local view
+			var temp = this.generateLayout(),
+				that = this;
+
+			//once layout changed flip the dirty bit
+			if(!this.modified)
+				this.setDirtyBit(true);
+
+			//save the newly generated layout as a template for local view
+			this
+			.show('preview', app.view({
+				layout: _.extend({bars: false}, temp.layout)
+			}))
+			.once('ready', function(){
+				//update current
+				var current = app.store.get('__current__');
+				current.layout = _.extend({bars: false}, temp.layout);
+				//current.template = that.getViewIn('preview').parentRegion.$el.html();
+				
+				//sync local storage
+				app.store.set('__current__', _.deepClone(current));
+
+				//add new marker
+				that.genLayoutFromTemplate(that.getViewIn('preview'), that.getViewIn('preview').$el);
+
+			});
+		},
+
+		//function to handle local view remove
+		onDeleteLocalView: function(viewName){
+			var layouts = app.store.get('__layouts__');
+
+			//remove stored view
+			delete layouts[viewName];
+
+			//sync to local storage
+			app.store.remove('__layouts__');
+			app.store.set('__layouts__', _.deepClone(layouts));
+
+			//navigate to a view
+			app.navigate('_IDE/Layout/');
 		},
 
 		//========================================== helper functions ==========================================//
@@ -174,25 +285,40 @@
 
 		//function to sync __current__ local storage
 		syncLocal: function(){//alias for the coop function, to be used in this view
-			var current = {
+			var current = _.extend(app.store.get('__current__'), {
 				endPoints: app._global.endPoints,
 				'horizontal-line': app._global['horizontal-line'],
 				'vertical-line': app._global['vertical-line'],
 				viewName: this.editingViewName //keep a reference for later comparison on loading
-			};
+			});
 			
-			//remove old
+			//remove old for a clean setup
 			app.store.remove('__current__');
 
-			//save current
+			//save current, with a duplicated object not a reference
 			app.store.set('__current__', _.deepClone(current));
 		},
 
-		//function to generate initial regions from a backend loaded view
-		genLayoutFromTemplate: function(viewInstance){
+		//function to setup the dirty-bit for the saving button
+		setDirtyBit: function(modified){
+			if(modified){
+				this.modified = true;
+				this.$el.find('.view-layout-menu .dirty-bit').removeClass('hidden');
+			}else{
+				this.modified = false;
+				this.$el.find('.view-layout-menu .dirty-bit').addClass('hidden');
+			}
+		},
+
+		//function to depict first layer regions
+		genLayoutFromTemplate: function(viewInstance, $preview){
 			var previewLeft = viewInstance.$el.offset().left,
 				previewTop = viewInstance.$el.offset().top,
 				that = this;
+
+			//remove all the size marker
+			if($preview)
+				$preview.find('.size-marker').remove();
 
 			//get all first layer regions
 			_.each(viewInstance.$el.find('div.region'), function(el, index){
@@ -217,15 +343,115 @@
 					left = $el.offset().left - previewLeft;
 					height = $el.height();
 					width = $el.width();
+					
+					if($preview){
+						var previewHeight = $preview.height(),
+							previewWidth = $preview.width();
 
-					//draw a dashed path surrounding current div
-					that.getViewIn('mesh').drawPath('M' + left + ' ' + top + 'l' + width + ' 0l0 ' + height + 'l' + (-width) + ' 0l0 ' + - (height))
-											.attr('class', 'region-outline');
+						var markerBottom = previewHeight - height - top,
+							markerLeft = left;
+						
+						//insert marker into preview view, but at the position of left corner of every region
+						$preview.append('<div class="size-marker" style="bottom:' + markerBottom + 'px;left:' + markerLeft + 'px;">W: '+ width +' H: ' + height + '</div>');
+					}
 
-				}	
+					if(!$preview)
+						//draw a dashed path surrounding current div
+						that.getViewIn('mesh').drawPath('M' + left + ' ' + top + 'l' + width + ' 0l0 ' + height + 'l' + (-width) + ' 0l0 ' + - (height))
+												.attr('class', 'region-outline');
+
+				}
+			});
+		},
+
+		//function for generating layout
+		generateLayout: function(adjusting, overlay){
+			var x = [], y = [], that = this, returnData;
+			//generate a list of x and y coordinates from end points
+			_.each(app._global.endPoints, function(endPoint, pid){
+				var flag = false;
+				if(!_.contains(x, endPoint.x)){//not contained in the x 
+					if(!that.checkContained(x, endPoint, 'x')){//adjust the coordinate if necessary
+						x.push(endPoint.x);
+						//sort
+						x = _.sortBy(x, function(num){ return num;});
+					}
+				}
+
+				if(!_.contains(y, endPoint.y)){//y
+					if(!that.checkContained(y, endPoint, 'y')){
+						y.push(endPoint.y);
+						//sort
+						y = _.sortBy(y, function(num){ return num;});
+					}
+				}
 			});
 
-			
+			//augment horizontal lines and vertical lines based on coordiates extracted from end points
+			//horizontal
+			_.each(app._global['horizontal-line'], function(hline){
+				//left anchor
+				that.checkContained(x, hline, 'x1');
+				//right anchor
+				that.checkContained(x, hline, 'x2');
+				//y
+				that.checkContained(y, hline, 'y');
+			});
+
+			//vertical
+			_.each(app._global['vertical-line'], function(vline){
+				//top anchor
+				that.checkContained(y, vline, 'y1');
+				//bottom anchor
+				that.checkContained(y, vline, 'y2');
+				//x
+				that.checkContained(x, vline, 'x');
+			});
+
+			//acquire remote api for generating layout
+			app.remote({
+				url: '/api/generate',
+				async: false,
+				payload: {
+					endPoints: app._global.endPoints,
+					//max length h/v lines are 100 (%).
+					hlines: app._global['horizontal-line'],
+					vlines: app._global['vertical-line'],
+				}
+			})
+			.done(function(data){
+				//assign return data
+				returnData = data;
+			})
+			.fail(function(error){
+				app.notify('Error!', 'Generating error.', 'error', {icon: 'fa fa-reddit-alien'});
+			});
+
+			//debug log
+			app.debug('x array', x, 'y array', y);
+			app.debug('endPoints exported from generate action', app._global.endPoints);
+			app.debug('h-lines exported from generate action', app._global['horizontal-line']);
+			app.debug('v-lines exported from generate action', app._global['vertical-line']);
+
+			return returnData;
+		},
+
+		//function to align points within a certain margin of error(app._global.tolerance)
+		checkContained: function(arr, obj, key){
+			var flag = false;
+			//check whether in the margin of error
+			//if yes, correct it
+			_.each(arr, function(single){
+				if(
+					(single === 0 && obj[key] <= app._global.tolerance) ||//tolerance is 0.02 need to magnify it 100 times
+					(single === 100 && obj[key] >= 100 - app._global.tolerance) ||
+					(obj[key] >= (single - app._global.tolerance) && obj[key] <= (single + app._global.tolerance))
+				){
+					obj[key] = single;
+						flag = true;
+				}
+			});
+			return flag;
 		},
 
 		//========================================== functions for endpoint clicking ==========================================//

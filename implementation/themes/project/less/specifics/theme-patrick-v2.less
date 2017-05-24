@@ -38,17 +38,27 @@ h2 {
 						> span {
 							font-weight: 600;
 						}
+						.edit-holder,
+						.indicator-holder {
+							padding: 0 @grid-gutter-width / 2;
+							visibility: hidden;
+						}
 						.edit-holder {
 							position: relative;
-							display: none;
 							z-index: 1;
+							padding-right: 0;
+						}
+						&.active {
+							.indicator-holder {
+								visibility: visible;
+							}
 						}
 						&:nth-child(even){
 							background-color: @background;
 						}
 						&:hover {
 							.edit-holder {
-								display: inherit;
+								visibility: visible;
 							}
 						}
 					}
@@ -101,9 +111,9 @@ h2 {
 						position: relative;
 						width: 100%;
 						.view-name {
-							padding: @grid-gutter-width / 2 @grid-gutter-width @grid-gutter-width @grid-gutter-width;
+							padding: @grid-gutter-width / 2 @grid-gutter-width 0 @grid-gutter-width;
 							text-align: center;
-							border-bottom: 1px solid @border;
+							//border-bottom: 1px solid @border;
 							width: 100%;
 							white-space: nowrap; 
 						    overflow: hidden;
@@ -116,7 +126,7 @@ h2 {
 						.layout-edit-switch-holder {
 							padding: @grid-gutter-width;
 							.layout-edit-switch {
-								border: 3px solid @border;
+								border: 1px solid #adadad;
 								height: 40px;
 								padding: 3px;
 								.switch-inner {
@@ -160,7 +170,7 @@ h2 {
 											.edit-text {
 												display: inline-block;
 												width: 50%;
-												line-height: 40px - 2 * 3px - 3px - 2px;
+												line-height: 40px - 2 * 3px - 2px;
 												text-align: center;
 												font-weight: 600;
 												font-size: 0.9em;
@@ -168,7 +178,7 @@ h2 {
 											.inner-slider {
 												width: 50%;
 												position: absolute;
-												height: 40px - 2 * 3px - 2 * 3px - 2 * 2px;
+												height: 40px - 2 * 3px - 2 * 3px;
 												top: 2px;
 												transition: .5s;
 											}
@@ -180,17 +190,24 @@ h2 {
 						.apply-button-holder,
 						.switch-button-holder {
 							padding: @grid-gutter-width;
+							position: relative;
 							&.switch-button-holder {
 								padding-bottom: @grid-gutter-width / 2;
 							}
 							&.apply-button-holder {
-								padding-top: @grid-gutter-width / 2;
+								//padding-top: @grid-gutter-width / 2;
+								border-top: 1px solid @border;
 								border-bottom: 1px solid @border;
 							}
 							.btn {
 								>span {
 									font-weight: 600;
 								}
+							}
+							.dirty-bit {
+								position: absolute;
+								right: @grid-gutter-width * 2;
+								top: @grid-gutter-width;
 							}
 						}
 						.switch-views-holder {
@@ -220,10 +237,8 @@ h2 {
 								&:first-child {
 									padding-top: @grid-gutter-width;
 								}
-								>span {
+								>div {
 									font-weight: 600;
-									display: inline-block;
-									width: 100%;
 									border: 1px solid @border;
 									padding: @grid-gutter-width;
 									box-shadow: 1px 1px 1px @border;
@@ -234,6 +249,13 @@ h2 {
 									&.active {
 										background-color: rgba(0, 0, 0, 0.7);
 										color: #fff;
+										.delete-holder {
+											position: relative;
+											z-index: 2; //for higher z-index than view-list-item
+											>i {
+												color: #fff;
+											}
+										}
 									}
 								}
 							}
@@ -244,6 +266,39 @@ h2 {
 			.right-container {
 				flex: 1 1 0;
 				position: relative;
+				.context-menu {
+					position: absolute;
+					top: 0;
+					left: 0;
+					z-index: 49;
+					width: 300px;
+					background-color: #fff;
+					border: 2px solid @border;
+					padding: @grid-gutter-width / 2;
+					.info {
+						padding: @grid-gutter-width / 2;
+						.text {
+							font-weight: 600;
+						}
+					}
+					.context-menu-item {
+						padding: @grid-gutter-width / 2;
+						>span {
+							//font-weight: 600;
+						}
+						&:nth-child(even) {
+							background-color: @background;
+						}
+						&:hover {
+							background-color: #999;
+						}
+					}
+					// .close-holder {
+					// 	position: absolute;
+					// 	top: @grid-gutter-width / 4;
+					// 	right: @grid-gutter-width / 2;
+					// }
+				}
 				.region-preview,
 				.region-guide,
 				.region-mesh {
@@ -254,6 +309,39 @@ h2 {
 					right: 0;
 					top: 0;
 					bottom: 0;
+					.size-marker {
+						background: rgba(0, 0, 0, 0.4);
+						color: #fff;
+						position: absolute;
+						padding: 0 @grid-gutter-width / 4;
+						font-weight: 600;
+						font-size: 0.7em;
+					}
+				}
+				//============ styling sheet for content-editor view ============//
+				.region-content-editor {
+					height: 100%;
+					position: relative;
+					>div {
+						height: 100%;
+						.first-layer-region {
+							border: 1px dashed #777;
+							&:hover {
+								border: 1px solid @brand-info;
+							}
+							&.active {
+								border: 2px solid @brand-primary;
+							}
+						}
+						.size-marker {
+							background: rgba(0, 0, 0, 0.4);
+							color: #fff;
+							position: absolute;
+							padding: 0 @grid-gutter-width / 4;
+							font-weight: 600;
+							font-size: 0.7em;
+						}
+					}
 				}
 				//============ styling sheet for preview view ============//
 				.region-preview {
@@ -403,5 +491,204 @@ h2 {
 
 	label.control-label {
 		//text-align: left;
+	}
+
+	&.focused-editing-overlay {
+		background-color: rgba(0, 0, 0, 0.7);
+		z-index: 999;
+		.overlay-inner {
+			height: 100%;
+			.overlay-content-ct {
+				height: 100%;
+				width: 100%;
+				display: block !important;
+				.focused-editing-view {
+					display: flex;
+					height: 100%;
+					//padding: @grid-gutter-width / 2;
+					.theme-container {
+						flex: 0 0 300px;
+						color: #fff;
+						padding: @grid-gutter-width / 2 @grid-gutter-width;
+						.info-text {
+							padding: @grid-gutter-width / 2 0;
+							>span {
+								font-weight: 600;
+								font-size: 1.6em;
+							}
+						}
+						.theme-list-item {
+							padding: @grid-gutter-width / 2 0;
+							margin: @grid-gutter-width 0;
+							>span {
+								font-weight: 600;
+							}
+							&.primary {
+								margin-top: @grid-gutter-width / 2;
+								background-color: @brand-primary;
+							}
+							&.info {
+								background-color: @brand-info;
+							}
+							&.success {
+								background-color: @brand-success;
+							}
+							&.warning {
+								background-color: @brand-warning;
+							}
+							&.danger {
+								background-color: @brand-danger;
+							}
+						}
+					}
+					.tabs-container {
+						flex: 1 1 0;
+						padding: @grid-gutter-width;
+
+						.tabs {
+							color: #fff;
+							.tab {
+								width: 100px;
+								text-align: center;
+								border-top: 1px solid #ccc;
+								border-left: 1px solid #ccc;
+								padding: @grid-gutter-width / 2 0;
+								&:last-child {
+									border-right: 1px solid #ccc;
+								}
+								&.active {
+									border-top: 3px solid #ccc;
+									border-left: 3px solid #ccc;
+									border-right: 3px solid #ccc;
+									+.tab {
+										border-left: none;
+									}
+									background-color: rgb(75, 75, 75);
+								}
+								
+								>span {
+									font-weight: 600;
+								}
+							}
+						}
+						.region-tabs {
+							border-top: 3px solid #ccc;
+							margin-top: -3px;
+							text-align: left;//overcome overlay's text-center
+							height: 100%;
+							color: #fff;
+							>div {
+								height: 100%;
+								//style sheet for data config
+								.region-tab-data {
+									height: 100%;
+									overflow-y: auto;
+									>div {
+										height: 100%;
+										padding: @grid-gutter-width 0;
+										.url-editor {
+											padding: @grid-gutter-width 0 0 0;
+											position: relative;
+											display: none;
+											.form-group {
+												margin-bottom: 0;
+											}
+											label.control-label {
+												//text-align: left;
+											}
+											.btn-holder {
+												position: absolute;
+												right: @grid-gutter-width;
+												top: @grid-gutter-width + 6px;
+												.btn {
+													>span {
+														font-weight: 600;
+														padding: 0 @grid-gutter-width / 2;
+													}
+												}
+											}
+										}
+										.data-editor {
+											padding: @grid-gutter-width 0 0 0;
+											textarea {
+												resize: vertical;
+												height: 400px;
+											}
+										}
+										.switch-holder {
+											width: 300px;
+											.remote-switch {
+												border: 1px solid #adadad;
+												height: 40px;
+												padding: 3px;
+												.switch-inner {
+													width: 100%;
+													height: 100%;
+													label {
+														height: 100%;
+														width: 100%;
+														input[type="checkbox"] {
+															display: none;
+														}
+														//initial state(unchecked)
+														input[type="checkbox"]:not(:checked) + .slider {
+															.inner-slider {
+																background-color: @gray-light;
+																left: 2px;
+															}
+															.local-text {
+																color: #fff;
+															}
+															.remote-text {
+																color: #aaa;
+															}
+														}
+														input[type="checkbox"]:checked + .slider {
+															.inner-slider {
+																background-color: @brand-primary;
+																left: 143px;
+															}
+															.local-text {
+																color: #aaa;
+															}
+															.remote-text {
+																color: #fff;
+															}
+														}
+														.slider {
+															height: 100%;
+															width: 100%;
+															position: relative;
+															.local-text,
+															.remote-text {
+																display: inline-block;
+																width: 50%;
+																line-height: 40px - 2 * 3px - 2px;
+																text-align: center;
+																font-weight: 600;
+																font-size: 0.9em;
+																position: relative;
+																z-index: 3;
+															}
+															.inner-slider {
+																width: 50%;
+																position: absolute;
+																height: 40px - 2 * 3px - 2 * 3px;
+																top: 2px;
+																transition: .5s;
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 }

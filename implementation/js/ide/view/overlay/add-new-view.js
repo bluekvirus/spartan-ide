@@ -6,7 +6,7 @@
 		editors: {
 			'view-name': {
 				layout: {
-					label: 'col-md-2 text-left',
+					label: 'col-md-2',
 					field: 'col-md-10',
 				},
 				type: 'text',
@@ -21,7 +21,13 @@
 				this.close();
 			},
 			add: function(){
-				this.validate(true);
+				//valid name, then navigate to layout editing view
+				if(!this.validate(true)){
+					app.navigate('_IDE/Layout/' + this.get('view-name'));
+				}
+
+				//close the overlay
+				this.close();
 			},
 		}
 	});

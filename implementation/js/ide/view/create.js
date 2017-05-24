@@ -412,7 +412,7 @@
 				.done(function(data){
 					var _Demo = app.view(/*'_Demo', */{
 						layout: _.extend(data.layout, {
-							bars: 'layout-bar',
+							bars: false,
 						})
 					});
 					that.show('generate-view', _Demo);
@@ -965,28 +965,6 @@
 		},
 	});
 
-	//trim number only leave two digits after decimal point
-	function trimNumber(number){
-		return parseFloat(number.toFixed(2));
-	}
-
-	function checkContained(arr, obj, key){
-		var flag = false;
-		//check whether in the margin of error
-		//if yes, correct it
-		_.each(arr, function(single){
-			if(
-				(single === 0 && obj[key] <= app._global.tolerance) ||//tolerance is 0.02 need to magnify it 100 times
-				(single === 100 && obj[key] >= 100 - app._global.tolerance) ||
-				(obj[key] >= (single - app._global.tolerance) && obj[key] <= (single + app._global.tolerance))
-			){
-				obj[key] = single;
-					flag = true;
-			}
-		});
-		return flag;
-	}
-
 	function syncAssignment(regionView, coords){
 		regionView.top = coords.top;
 		regionView.left = coords.left;
@@ -994,61 +972,7 @@
 		regionView.bottom = coords.bottom;
 	}
 
-	function getBoundingPoints(el, boundingRect, width, height, options){
-		//return obj
-		var temp = {};
-
-		//calcualte position in percentage
-		var top = trimNumber(boundingRect.top / height * 100), //transfer it into percentage
-			left = trimNumber(boundingRect.left / width * 100),
-			bottom = trimNumber(boundingRect.bottom / height * 100),
-			right = trimNumber(boundingRect.right / width * 100),
-			regionName = el ? $(el).attr('region') : ''; //region name for later reference
-
-		//find points corresponding to 4 corners
-		_.each(app._global.endPoints, function(point, id){
-			//top left
-			if(
-				(point.x >= left - app._global.tolerance && point.x <= left + app._global.tolerance) &&
-				(point.y >= top - app._global.tolerance && point.y <= top + app._global.tolerance)
-			){
-				temp.topLeft = id;
-			}
-
-			//top right
-			else if(
-				(point.x >= right - app._global.tolerance && point.x <= right + app._global.tolerance) &&
-				(point.y >= top - app._global.tolerance && point.y <= top + app._global.tolerance)
-			){
-				temp.topRight = id;
-			}
-
-			//bottom left
-			else if(
-				(point.x >= left - app._global.tolerance && point.x <= left + app._global.tolerance) &&
-				(point.y >= bottom - app._global.tolerance && point.y <= bottom + app._global.tolerance)
-			){
-				temp.bottomLeft = id;
-			}
-
-			//bottom right
-			else if(
-				(point.x >= right - app._global.tolerance && point.x <= right + app._global.tolerance) &&
-				(point.y >= bottom - app._global.tolerance && point.y <= bottom + app._global.tolerance)
-			){
-				temp.bottomRight = id;
-			}			
-		});
-		
-		//for app._global.regions
-		if(regionName) temp.regionName = regionName;
-
-		//for app._global.regionView
-		if(options)
-			temp = _.extend(temp, options);
-		
-		return temp;
-	}
+	
 
 
 

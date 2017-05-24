@@ -457,7 +457,7 @@
 		},
 
 		//onclick with horizontal/vertical guide, adda a newline based 
-		addLine: function(coords){
+		addLine: function(coords, initial){
 			var $horizontal = this.$el.find('.horizontal-line'),
 				$vertical = this.$el.find('.vertical-line'),
 				width = this.$el.width(),
@@ -568,6 +568,10 @@
 			
 			//sync local storage
 			this.coop('sync-local');
+
+			//layout config changed, re-generate layout
+			//if(!initial)
+				this.coop('layout-config-changed');
 			
 			//need to redrawAll() here to avoid duplicated points
 			//simply draw a new line here does not work
@@ -967,7 +971,7 @@
 			//!!trigger coop event to update generated view
 			var updateGeneratedViewLayout = app.debounce(function(){
 				//trigger coop event to re-generate layout and views
-				that.coop('layout-adjusted', $point);
+				that.coop('layout-config-changed', $point);
 			});
 			
 			$body
@@ -980,7 +984,7 @@
 				$node.unbind('click').unbind('mousedown');
 
 				updateLayoutSVG(e);
-				//updateGeneratedViewLayout();
+				updateGeneratedViewLayout();
 				
 			})
 			.one('mouseup', function(e){

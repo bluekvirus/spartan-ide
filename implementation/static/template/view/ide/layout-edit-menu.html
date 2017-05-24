@@ -1,11 +1,11 @@
 <div class="view-layout-menu {{#unless layout}}hidden{{/unless}}">
 	<div class="view-name">
-		<span>{{viewName}}</span>
+		{{#if viewName}}<span>{{viewName}}</span>{{else}}<span>choose to edit</span>{{/if}}
 	</div>
-	<!-- <div class="layout-edit-switch-holder">
+	<div class="layout-edit-switch-holder">
 		<div class="layout-edit-switch">
 			<div class="switch-inner">
-				<label for="layout-edit-switch">
+				<label for="layout-edit-switch" action="switch-method">
 					<input type="checkbox" id="layout-edit-switch">
 					<div class="slider">
 						<span class="layout-text">LAYOUT</span
@@ -15,18 +15,32 @@
 				</label>
 			</div>
 		</div>
+	</div>
+	<!-- <div class="switch-button-holder">
+		<div class="btn btn-block btn-default" action="add-new"><span><i class="fa fa-plus"></i> ADD NEW VIEW</span></div>
 	</div> -->
-	<div class="switch-button-holder">
-		<div class="btn btn-block btn-white" action="add-new"><span><i class="fa fa-plus"></i> ADD NEW VIEW</span></div>
-	</div>
-	<div class="switch-button-holder">
-		<div class="btn btn-block btn-white" action="switch-method"><span><i class="fa fa-pencil"></i> EDIT VIEW CONTENT</span></div>
-	</div>
+	<!-- <div class="switch-button-holder">
+		<div class="btn btn-block btn-default" action="switch-method"><span><i class="fa fa-pencil"></i> EDIT VIEW CONTENT</span></div>
+	</div> -->
 	<div class="apply-button-holder">
-		<div class="btn btn-block btn-white" action="save-layout"><span><i class="fa fa-floppy-o"></i> SAVE LAYOUT</span></div>
+		<div class="btn btn-block btn-default" action="save-layout"><span><i class="fa fa-floppy-o"></i> SAVE LAYOUT</span></div>
+		<div class="dirty-bit hidden"><i class="fa fa-circle"></i></div>
 	</div>
 	<div class="switch-views-holder">
-		{{#items}}<div class="view-list-item"><span class="text {{#if (../xif3 . ../viewName)}}active{{/if}}" action="switch-view" activate="single">{{.}}</span></div>{{/items}}
+		{{#items}}
+			<div class="view-list-item">
+				<div class="{{#if (../xif3 name ../viewName)}}active{{/if}}" action="switch-view" activate="single">
+					{{#if (../xif3 source "remote")}}<i class="fa fa-cloud"></i>{{/if}}
+					{{#if (../xif3 source "local")}}<i class="fa fa-database"></i>{{/if}}
+					<span class="text">{{name}}</span>
+					{{#if (../xif3 source "local")}}
+						<div class="delete-holder pull-right">
+							<i class="fa fa-lg fa-close" action="delete-local-view" data-name="{{name}}"></i>
+						</div>
+					{{/if}}
+				</div>
+			</div>
+		{{/items}}
 		<div class="info-tag"><span>switch to ...</span></div>
 	</div>
 </div>
@@ -34,14 +48,36 @@
 	<div class="view-name">
 		<span>{{viewName}}</span>
 	</div>
-	<div class="switch-button-holder">
-		<div class="btn btn-block btn-warning" action="switch-method"><span><i class="fa fa-table"></i> EDIT VIEW LAYOUT</span></div>
+	<div class="layout-edit-switch-holder">
+		<div class="layout-edit-switch">
+			<div class="switch-inner">
+				<label for="layout-edit-switch" action="switch-method">
+					<input type="checkbox" id="layout-edit-switch" checked>
+					<div class="slider">
+						<span class="layout-text">LAYOUT</span
+						><span class="edit-text">EDIT</span>
+						<div class="inner-slider"></div>
+					</div>
+				</label>
+			</div>
+		</div>
 	</div>
+	<!-- <div class="switch-button-holder">
+		<div class="btn btn-block btn-default" action="switch-method"><span><i class="fa fa-table"></i> EDIT VIEW LAYOUT</span></div>
+	</div> -->
 	<div class="apply-button-holder">
-		<div class="btn btn-block btn-success" action="apply-change"><span><i class="fa fa-check"></i> APPLY CHANGE</span></div>
+		<div class="btn btn-block btn-default" action="apply-change"><span><i class="fa fa-check"></i> SAVE</span></div>
 	</div>
 	<div class="switch-views-holder">
-		{{#items}}<div class="view-list-item"><span class="text {{#if (../xif3 . ../viewName)}}active{{/if}}" action="switch-view" activate="single">{{.}}</span></div>{{/items}}
+		{{#items}}
+			<div class="view-list-item">
+				<div class="{{#if (../xif3 name ../viewName)}}active{{/if}}" action="switch-view" activate="single">
+					{{#if (../xif3 source "remote")}}<i class="fa fa-cloud"></i>{{/if}}
+					{{#if (../xif3 source "local")}}<i class="fa fa-database"></i>{{/if}}
+					<span class="text">{{name}}</span>
+				</div>
+			</div>
+		{{/items}}
 		<div class="info-tag"><span>switch to ...</span></div>
 	</div>
 </div>
