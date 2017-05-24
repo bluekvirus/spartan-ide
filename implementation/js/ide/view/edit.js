@@ -46,8 +46,12 @@
 				}
 				//local
 				else{
-					//honor __current__
-					that.initializeGlobal(current);
+					//!!bug when there is no path provided
+					//check whether it is newly added view, a view can only be newed at layout view
+					if(!layouts[that.editingViewName]){
+						app.navigate('_IDE/Layout/' + that.editingViewName);
+						return;
+					}
 
 					that
 					.show('content-editor', app.view({
@@ -185,6 +189,9 @@
 				//routine
 				e.preventDefault();
 				e.stopPropagation();
+
+				//close the context menu
+				that.$el.find('.context-menu').addClass('hidden');
 
 				//load the focused edit view, clone a copy of $el and pass it to the focused editing view
 				app.get('Overlay.FocusedEditing')

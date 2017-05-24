@@ -344,7 +344,7 @@
 					height = $el.height();
 					width = $el.width();
 					
-					if($preview){
+					//if($preview){
 						var previewHeight = $preview.height(),
 							previewWidth = $preview.width();
 
@@ -353,9 +353,9 @@
 						
 						//insert marker into preview view, but at the position of left corner of every region
 						$preview.append('<div class="size-marker" style="bottom:' + markerBottom + 'px;left:' + markerLeft + 'px;">W: '+ width +' H: ' + height + '</div>');
-					}
+					//}
 
-					if(!$preview)
+					//if(!$preview)
 						//draw a dashed path surrounding current div
 						that.getViewIn('mesh').drawPath('M' + left + ' ' + top + 'l' + width + ' 0l0 ' + height + 'l' + (-width) + ' 0l0 ' + - (height))
 												.attr('class', 'region-outline');
