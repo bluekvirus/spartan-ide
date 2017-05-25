@@ -97,6 +97,9 @@ h2 {
 		.regional-edit {
 			height: 100%;
 			display: flex;
+			&.viewport-blur {
+				filter: blur(3px);
+			}
 			.left-container {
 				flex: 0 0 @left-menu-width;
 				border-right: 1px solid @border;
@@ -321,9 +324,11 @@ h2 {
 				//============ styling sheet for content-editor view ============//
 				.region-content-editor {
 					height: 100%;
+					width: 100%;
 					position: relative;
 					>div {
 						height: 100%;
+						width: 100%;
 						.first-layer-region {
 							border: 1px dashed #777;
 							&:hover {
@@ -331,6 +336,15 @@ h2 {
 							}
 							&.active {
 								border: 1px solid @brand-primary;
+							}
+							&.editing {
+								background: repeating-linear-gradient(
+									-45deg,
+									#fff,
+									#fff 20px,
+									#ddd 20px,
+									#ddd 40px
+								);
 							}
 						}
 						.size-marker {
@@ -494,7 +508,7 @@ h2 {
 	}
 
 	&.focused-editing-overlay {
-		background-color: rgba(0, 0, 0, 0.7);
+		background-color: rgba(255, 255, 255, 0.7);
 		z-index: 999;
 		.overlay-inner {
 			height: 100%;
@@ -508,7 +522,6 @@ h2 {
 					//padding: @grid-gutter-width / 2;
 					.theme-container {
 						flex: 0 0 300px;
-						color: #fff;
 						padding: @grid-gutter-width / 2 @grid-gutter-width;
 						.info-text {
 							padding: @grid-gutter-width / 2 0;
@@ -518,6 +531,7 @@ h2 {
 							}
 						}
 						.theme-list-item {
+							color: #fff;
 							padding: @grid-gutter-width / 2 0;
 							margin: @grid-gutter-width 0;
 							>span {
@@ -544,26 +558,41 @@ h2 {
 					.tabs-container {
 						flex: 1 1 0;
 						padding: @grid-gutter-width;
-
+						position: relative;
+						.buttons-holder {
+							position: absolute;
+							right: @grid-gutter-width;
+							top: @grid-gutter-width * 3 / 2;
+							>span {
+								padding: 0 @grid-gutter-width / 2;
+								font-weight: 600;
+								>i {
+									
+								}
+								&.save-container {
+									//color: #fff;
+								}
+							}
+						}
 						.tabs {
-							color: #fff;
+							
 							.tab {
 								width: 100px;
 								text-align: center;
-								border-top: 1px solid #ccc;
-								border-left: 1px solid #ccc;
+								border-top: 1px solid @border;
+								border-left: 1px solid @border;
 								padding: @grid-gutter-width / 2 0;
 								&:last-child {
-									border-right: 1px solid #ccc;
+									border-right: 1px solid @border;
 								}
 								&.active {
-									border-top: 3px solid #ccc;
-									border-left: 3px solid #ccc;
-									border-right: 3px solid #ccc;
+									border-top: 3px solid @border;
+									border-left: 3px solid @border;
+									border-right: 3px solid @border;
 									+.tab {
 										border-left: none;
 									}
-									background-color: rgb(75, 75, 75);
+									background-color: #fff;
 								}
 								
 								>span {
@@ -576,16 +605,20 @@ h2 {
 							margin-top: -3px;
 							text-align: left;//overcome overlay's text-center
 							height: 100%;
-							color: #fff;
 							>div {
 								height: 100%;
+								//style sheet for view config
+								.region-tab-view {
+									//background-color: rgba(155, 155, 155, 0.5);
+									height: 100%;
+								}
 								//style sheet for data config
 								.region-tab-data {
 									height: 100%;
 									overflow-y: auto;
 									>div {
 										height: 100%;
-										padding: @grid-gutter-width 0;
+										padding: @grid-gutter-width;
 										.url-editor {
 											padding: @grid-gutter-width 0 0 0;
 											position: relative;
@@ -618,7 +651,7 @@ h2 {
 										.switch-holder {
 											width: 300px;
 											.remote-switch {
-												border: 1px solid #adadad;
+												border: 1px solid #000;
 												height: 40px;
 												padding: 3px;
 												.switch-inner {
@@ -691,4 +724,24 @@ h2 {
 			}
 		}
 	}
+}
+
+//---------------------------------- styling sheet for popovers/overlays ----------------------------------//
+.context-menu-view-popover {
+	overflow-y: auto;
+	.context-menu-view-popover-item {
+		padding: @grid-gutter-width / 2;
+		>span {
+			font-weight: 600;
+		}
+		&:nth-child(even) {
+			background-color: @background;
+		}
+	}
+}
+
+[id^="flex-region-"] {
+	overflow-x: auto !important;
+	overflow-y: auto !important;
+	//flex-basis: 100% !important;
 }

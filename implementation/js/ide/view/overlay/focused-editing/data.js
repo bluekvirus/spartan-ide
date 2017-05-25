@@ -34,12 +34,12 @@
 			});
 		},
 		editors: {
-			_global:{
-				layout: {
-					label: 'col-md-1',
-					field: 'col-md-11',
-				},
-			},
+			// _global:{
+			// 	layout: {
+			// 		label: 'col-md-1',
+			// 		field: 'col-md-11',
+			// 	},
+			// },
 			url: {
 				type: 'text',
 				label: 'URL',

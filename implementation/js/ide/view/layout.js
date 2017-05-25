@@ -44,10 +44,21 @@
 				//stored configuration for current view
 					current = app.store.get('__current__');
 
-				if(path && !layouts[that.editingViewName])//add newly created view to the collection
-					layouts[that.editingViewName] = {
-						layout: ['1'],
-					};
+				if(path && !layouts[that.editingViewName] && !_.contains(data, that.editingViewName)){
+					app.get('Overlay.CreateNewView')
+						.create({
+							data: {
+								viewName: that.editingViewName
+							}
+						})
+						.overlay({
+							effect: false
+						});
+					return;
+				}//add newly created view to the collection
+					// layouts[that.editingViewName] = {
+					// 	layout: ['1'],
+					// };
 
 				//trim data, to show view list both for local stored layouts and remote layouts
 				var viewList = data.slice();
@@ -344,18 +355,16 @@
 					height = $el.height();
 					width = $el.width();
 					
-					//if($preview){
-						var previewHeight = $preview.height(),
-							previewWidth = $preview.width();
+					var previewHeight = $preview.height(),
+						previewWidth = $preview.width();
 
-						var markerBottom = previewHeight - height - top,
-							markerLeft = left;
-						
-						//insert marker into preview view, but at the position of left corner of every region
-						$preview.append('<div class="size-marker" style="bottom:' + markerBottom + 'px;left:' + markerLeft + 'px;">W: '+ width +' H: ' + height + '</div>');
-					//}
-
-					//if(!$preview)
+					var markerBottom = previewHeight - height - top,
+						markerLeft = left;
+					
+					//insert marker into preview view, but at the position of left corner of every region
+					$preview.append('<div class="size-marker" style="bottom:' + markerBottom + 'px;left:' + markerLeft + 'px;">W: '+ width +' H: ' + height + '</div>');
+					
+					if(that.outlineOnly)
 						//draw a dashed path surrounding current div
 						that.getViewIn('mesh').drawPath('M' + left + ' ' + top + 'l' + width + ' 0l0 ' + height + 'l' + (-width) + ' 0l0 ' + - (height))
 												.attr('class', 'region-outline');
