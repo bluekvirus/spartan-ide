@@ -541,8 +541,8 @@ h2 {
 							}
 							.circle-holder {
 								.circle {
-									height: 24px;
-									width: 24px;
+									height: 20px;
+									width: 20px;
 									border-radius: 50%;
 								}
 
@@ -566,11 +566,21 @@ h2 {
 										//color: @brand-info;
 									}
 								}
+								.circle-holder {
+									.circle {
+										background-color: @brand-info;
+									}
+								}
 							}
 							&.success {
 								.color-name {
 									>span {
 										//color: @brand-success;
+									}
+								}
+								.circle-holder {
+									.circle {
+										background-color: @brand-success;
 									}
 								}
 							}
@@ -580,11 +590,21 @@ h2 {
 										//color: @brand-warning;
 									}
 								}
+								.circle-holder {
+									.circle {
+										background-color: @brand-warning;
+									}
+								}
 							}
 							&.danger {
 								.color-name {
 									>span {
 										//color: @brand-danger;
+									}
+								}
+								.circle-holder {
+									.circle {
+										background-color: @brand-danger;
 									}
 								}
 							}
@@ -667,7 +687,7 @@ h2 {
 											.btn-holder {
 												position: absolute;
 												right: @grid-gutter-width;
-												top: @grid-gutter-width + 6px;
+												top: 45px;
 												.btn {
 													>span {
 														font-weight: 600;

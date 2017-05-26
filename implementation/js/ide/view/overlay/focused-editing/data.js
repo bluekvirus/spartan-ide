@@ -55,7 +55,7 @@
 		actions: {
 			'fetch-remote': function(){
 				var that = this;
-
+				console.log('url', this.get('url'));
 				app.remote({
 					url: this.get('url'),
 				})

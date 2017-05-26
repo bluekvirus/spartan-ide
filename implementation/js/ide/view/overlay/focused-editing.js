@@ -23,12 +23,37 @@
 		},
 		actions: {
 			'close-builder': function(){
-				
+				//close focused-editing view
 				this.close();
 			},
 			'save-builder': function(){
-				
+				//get builder view
+				var builder = app.locate('Overlay.FocusedEditing.Builder').view, template;
+
+				if(builder)
+					 template = builder.extractTemplate();
+
+
+				//get data if any
+				var dataTab = this.getViewIn('tabs').getViewIn('tab-Data'), dataContent;
+
+				if(dataTab){//!!for now just fetch what is in the data editor
+					dataContent = dataTab.get('data-content') || {};
+				}
+
+				//create a view
+				var Result = app.view({
+					template: template,
+					data: dataContent
+				});
+
+				//spray
+				app.spray(this.get('$element'), Result);
+
+
+				//!!need to consult with zahra
 				this.close();
+				
 			},
 			'get-color': function($self, e){
 				console.log('TBD'); //show copy the color name to the clipboard
