@@ -110,10 +110,6 @@
 				var type = $self.data('type'),
 					that = this;
 
-				//action only prevent default, does not stop propagationation
-				//we need to separate click on the menu and click on the bigger context
-				//e.stopPropagation();
-
 				//check which menu has been clicked
 				switch(type){
 					case 'view':
@@ -395,11 +391,10 @@
 						$clone.css({
 							top: newTop,
 							left: newLeft
-						}).one(app.ADE, function(){
-							if($(this).data('moved')) return;
+						}).anyone(app.ADE, function(){
+							console.log('!!', arguments);
 							that.$el.toggleClass('viewport-blur', true);
 							ctForClone.trigger('view:append-clone');
-							console.log('!!');
 	            		});
 
 						//add a highlight class to the region currently editing

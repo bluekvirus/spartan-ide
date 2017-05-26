@@ -5,8 +5,9 @@
  * @updated 2017.03.15 (Patrick Zhu +view export)
  */
 var _ = require('underscore'),
-path = require('path'),
-fs = require('fs-extra');
+	path = require('path'),
+	fs = require('fs-extra'),
+	less = require('less');
 
 //prettifier, https://www.npmjs.com/package/js-prettify
 var beautify_js = require('js-beautify').js, // also available under "js" export 
@@ -23,6 +24,25 @@ module.exports = function(server){
 	router.get('/getViewList', function(req, res){
 		var views = getViewList();
 		return res.status(200).json(views);
+	});
+
+	router.post('/less', function(req, res) {
+	    var root = path.join(__dirname, '..', '..', '..', 'implementation', 'themes', req.body.theme);
+	    var lessFile = '@import (reference) "main.less";' + req.body.less;
+	    console.log('lessfile is', lessFile);
+	    less.render(lessFile, {
+	            paths: [path.join(root, 'less'), path.join(root), path.join(root, '..'), path.join(root, '..', '..', 'bower_components')],
+	            plugins: [require('less-plugin-glob')]
+	        },
+	        function(error, output) {
+	            //if error, print error and return
+	            if (error) {
+	                console.log('LESS compile error\n', error);
+	                return;
+	            }
+	            //console.log(output.css);
+	            return res.status(200).json({ msg: output.css });
+	        });
 	});
 
 	router.post('/generate', function(req, res){

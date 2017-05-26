@@ -30,6 +30,9 @@
 				
 				this.close();
 			},
+			'get-color': function($self, e){
+				console.log('TBD'); //show copy the color name to the clipboard
+			},
 		},
 		onClose: function(){
 			app.coop('view-edit-menu-closed', {

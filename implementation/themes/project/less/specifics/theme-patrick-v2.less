@@ -531,27 +531,62 @@ h2 {
 							}
 						}
 						.theme-list-item {
-							color: #fff;
+							//color: #fff;
 							padding: @grid-gutter-width / 2 0;
 							margin: @grid-gutter-width 0;
-							>span {
-								font-weight: 600;
+							.color-name {
+								>span {
+									font-weight: 600;
+								}
+							}
+							.circle-holder {
+								.circle {
+									height: 24px;
+									width: 24px;
+									border-radius: 50%;
+								}
+
 							}
 							&.primary {
 								margin-top: @grid-gutter-width / 2;
-								background-color: @brand-primary;
+								.color-name {
+									>span {
+										//color: @brand-primary;
+									}
+								}
+								.circle-holder {
+									.circle {
+										background-color: @brand-primary;
+									}
+								}
 							}
 							&.info {
-								background-color: @brand-info;
+								.color-name {
+									>span {
+										//color: @brand-info;
+									}
+								}
 							}
 							&.success {
-								background-color: @brand-success;
+								.color-name {
+									>span {
+										//color: @brand-success;
+									}
+								}
 							}
 							&.warning {
-								background-color: @brand-warning;
+								.color-name {
+									>span {
+										//color: @brand-warning;
+									}
+								}
 							}
 							&.danger {
-								background-color: @brand-danger;
+								.color-name {
+									>span {
+										//color: @brand-danger;
+									}
+								}
 							}
 						}
 					}
@@ -740,8 +775,8 @@ h2 {
 	}
 }
 
-[id^="flex-region-"] {
-	overflow-x: auto !important;
-	overflow-y: auto !important;
-	//flex-basis: 100% !important;
-}
+// [id^="flex-region-"] {
+// 	overflow-x: auto !important;
+// 	overflow-y: auto !important;
+// 	//flex-basis: 100% !important;
+// }

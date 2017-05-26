@@ -28,7 +28,47 @@
 			//$clone.css('top', newTop);
 			//append
 			this.$el.append($clone);
-			$clone.data('moved', true);
+
+			//register builder loading event
+			this.registerEditingEvents($clone);
+		},
+		registerEditingEvents: function($el){
+			var that = this;
+			//right click to load builder
+			$el.on('contextmenu', function(e){
+				e.preventDefault();
+				e.stopPropagation();
+
+				//cache name = currently editing view + region name
+				var cacheName = window.location.hash.split('/').pop() + '-' + $el.attr('region');
+
+				//create the builder view
+				var builder = app.get('Overlay.FocusedEditing.Builder')
+					.create({
+						data: {
+			              "name" : cacheName
+			             }
+					});
+
+				//setup default cache
+				app.store.set(cacheName, app.store.get(cacheName) || {
+				    'groups': [{
+				        'template': '',
+				        'data': '',
+				        'less': '',
+				        'css_container': {
+				            'flex-grow': '0',
+				            'flex-shrink': '1',
+				            'flex-basis': '100%',
+				        }
+				    }, ],
+				    'strings': [],
+				    'direction': ''
+				});
+
+				//spray the builder view onto the region
+          		that.spray($el, builder);
+			});
 		},
 		actions: {
 		//	submit: function(){...},
