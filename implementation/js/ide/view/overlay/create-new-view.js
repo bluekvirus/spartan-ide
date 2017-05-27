@@ -16,7 +16,7 @@
 				};
 				app.store.set('__layouts__', _.deepClone(layouts));
 				//app.navigate('_IDE/Layout/' + this.get('viewName'));
-				window.location.reload(true);
+				window.location.reload();
 				this.close();
 			},
 		}

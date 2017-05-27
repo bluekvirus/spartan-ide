@@ -201,6 +201,15 @@
 			obj.$element.removeClass('editing');
 
 			this.$el.toggleClass('viewport-blur', false);
+
+			if(obj.saved){
+				//clean element
+				obj.$element.empty();
+
+				//spary the view here to make the parentCt edit
+				this.spray(obj.$element, obj.spraying);
+			}
+				
 		},
 
 		//========================================== helper functions ==========================================//
@@ -348,6 +357,11 @@
 				return;
 			}
 
+			//click event from children should be trigger until find the first-layer-region
+			while(!$el.hasClass('first-layer-region')){
+				$el = $el.parent();
+			}
+
 			//hide elements in side menu
 			this.$el.find('.view-edit-menu').css({
 				visibility: 'hidden'
@@ -393,7 +407,7 @@
 							left: newLeft
 						}).anyone(app.ADE, function(){
 							console.log('!!', arguments);
-							that.$el.toggleClass('viewport-blur', true);
+							//that.$el.toggleClass('viewport-blur', true);
 							ctForClone.trigger('view:append-clone');
 	            		});
 
@@ -414,6 +428,11 @@
 			//routine
 			e.preventDefault();
 			e.stopPropagation();
+
+			//click event from children should be trigger until find the first-layer-region
+			while(!$el.hasClass('first-layer-region')){
+				$el = $el.parent();
+			}
 
 			this.contextmenuShown = true;
 

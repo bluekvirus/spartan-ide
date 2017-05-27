@@ -545,7 +545,9 @@ h2 {
 									width: 20px;
 									border-radius: 50%;
 								}
-
+							}
+							&:nth-child(odd) {
+								background-color: @background;
 							}
 							&.primary {
 								margin-top: @grid-gutter-width / 2;
@@ -644,10 +646,10 @@ h2 {
 									border-top: 3px solid @border;
 									border-left: 3px solid @border;
 									border-right: 3px solid @border;
+									background-color: #f0f0f0;
 									+.tab {
 										border-left: none;
 									}
-									background-color: #fff;
 								}
 								
 								>span {
@@ -666,6 +668,9 @@ h2 {
 								.region-tab-view {
 									//background-color: rgba(155, 155, 155, 0.5);
 									height: 100%;
+									>div {
+										height: 100%;
+									}
 								}
 								//style sheet for data config
 								.region-tab-data {

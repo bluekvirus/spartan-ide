@@ -38,16 +38,14 @@
 			$el.on('contextmenu', function(e){
 				e.preventDefault();
 				e.stopPropagation();
-
+				console.log('contextmenu',$el.empty());
 				//cache name = currently editing view + region name
 				var cacheName = window.location.hash.split('/').pop() + '-' + $el.attr('region');
 
 				//create the builder view
 				var builder = app.get('Overlay.FocusedEditing.Builder')
 					.create({
-						data: {
-			              "name" : cacheName
-			             }
+						cacheName : cacheName
 					});
 
 				//setup default cache
@@ -65,6 +63,8 @@
 				    'strings': [],
 				    'direction': ''
 				});
+
+				that.get('$element').empty();
 
 				//spray the builder view onto the region
           		that.spray($el, builder);
