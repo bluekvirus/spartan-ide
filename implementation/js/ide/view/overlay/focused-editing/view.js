@@ -14,9 +14,37 @@
 		//coop: ['e', 'e'],
 		//[editors]: {...},
 		
-		initialize: function(){},
+		initialize: function(){
+			//indicate whether builder has been shown
+			this.builderShown = false;			
+		},
 		//onShow: function(){},
 		//onDataRendered: function(){},
+		onReady: function(){
+			// var that = this;
+			
+			// //move the element to the center save the original height and width
+			// var $el = this.get('$element'),
+			// 	height = $el.height(),
+			// 	width = $el.width();
+			// //detach the element from DOM and add transition property
+			// $el.css({transition: '.5s', position: 'absolute', height: height, width: width}).detach();
+			// //reattach the element to the DOM to this view with new css
+			// var tabsHeight = this.parentCt.$el.find('.tabs-container .tabs').height(),
+			// 	parentHeight = this.parentCt.$el.height(),
+			// 	tabsWidth = this.parentCt.$el.find('.tabs-container .tabs').height(),
+			// 	parentWidth = this.parentCt.$el.height(),
+			// 	newTop = (parentHeight - tabsHeight - $el.height()) / 2,
+			// 	newLeft = (parentWidth - tabsWidth - $el.width()) / 2;
+
+			// $el.appendTo(this.$el).css({
+			// 	top: newTop,
+			// 	left: newLeft
+			// });
+
+			// //register right-click event
+			// this.registerEditingEvents($el);
+		},
 		onAppendClone: function(){
 			var $clone = this.get('$clone');
 
@@ -38,20 +66,19 @@
 			$el.on('contextmenu', function(e){
 				e.preventDefault();
 				e.stopPropagation();
-				console.log('contextmenu',$el.empty());
+
 				//cache name = currently editing view + region name
-				var cacheName = window.location.hash.split('/').pop() + '-' + $el.attr('region');
+				var cacheName = that.get('cacheName');
 
 				//create the builder view
 				var builder = app.get('Overlay.FocusedEditing.Builder')
 					.create({
 						cacheName : cacheName
 					});
-
 				//setup default cache
 				app.store.set(cacheName, app.store.get(cacheName) || {
 				    'groups': [{
-				        'template': '',
+				        'template': that.get('template'),
 				        'data': '',
 				        'less': '',
 				        'css_container': {
@@ -64,10 +91,11 @@
 				    'direction': ''
 				});
 
-				that.get('$element').empty();
-
 				//spray the builder view onto the region
           		that.spray($el, builder);
+
+          		//flip flag
+          		that.builderShown = true;
 			});
 		},
 		actions: {

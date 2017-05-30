@@ -103,6 +103,26 @@
 
 		},
 		actions: {
+			'export-region': function(){
+				var Temp = app.view({
+					template: this.contextMenuTrigger.html() + '<div class="close-holder" style="position:fixed;right:2em;top:1em;" action="close-preview"><i class="fa fa-2x fa-close"></i></div>',
+					actions: {
+						'close-preview': function(){
+							this.close();
+						},
+					},
+					//need to put data here later
+				});
+
+				Temp.create().overlay({
+					effect: false,
+					background: 'rgba(255, 255, 255, 0.7)'
+				});
+
+				//close context menu
+				this.closeContextMenu();
+
+			},
 			'close-context-menu': function(){
 				this.closeContextMenu();
 			},
@@ -202,13 +222,16 @@
 
 			this.$el.toggleClass('viewport-blur', false);
 
-			if(obj.saved){
-				//clean element
-				obj.$element.empty();
+			//spary the view here to make the parentCt edit
+			this.spray(obj.$element, obj.spraying);
 
-				//spary the view here to make the parentCt edit
-				this.spray(obj.$element, obj.spraying);
-			}
+			// if(obj.saved){
+			// 	//clean element
+			// 	obj.$element.empty();
+
+			// 	//spary the view here to make the parentCt edit
+			// 	this.spray(obj.$element, obj.spraying);
+			// }
 				
 		},
 
@@ -243,9 +266,10 @@
 						.on('render', function(){
 							//add a fake class to this.$el in order to find first layer regions
 							this.$el.addClass('fake-outmost-region');
-							that.firstLayers = that.setupFirstLayer(this);
 						})
 						.on('ready', function(){
+							//mark first layers
+							that.firstLayers = that.setupFirstLayer(this);
 							//mark the region size at the left bottom of every first layer region
 							that.markFirstLayer();
 						});
@@ -267,9 +291,10 @@
 							.on('render', function(){
 								//add a fake class to this.$el in order to find first layer regions
 								this.$el.addClass('fake-outmost-region');
-								that.firstLayers = that.setupFirstLayer(this);
 							})
 							.on('ready', function(){
+								//mark first layers
+								that.firstLayers = that.setupFirstLayer(this);
 								//mark the region size at the left bottom of every first layer region
 								that.markFirstLayer();
 							});
@@ -289,7 +314,8 @@
 			
 			//get all first layer regions
 			_.each(viewInstance.$el.find('div[region]'), function(el, index){
-				var $el = $(el), $parent = $el.parent(), firstLayer = true;
+				var $el = $(el), $parent = $el.parent(), firstLayer = true, cacheName,
+					savedConfigs = app.store.get('__savedConfigs') || {};
 
 				//trace every div with region tags, to see if any of its parents has class region
 				//if yes, then it is NOT a first layer region.
@@ -310,12 +336,20 @@
 					//add a class for giving border
 					$el.addClass('first-layer-region');
 
+					//check whether there is a config stored in the localstorage
+					cacheName = window.location.hash.split('/').pop() + '-' + $el.attr('region');
+
+					if(savedConfigs[cacheName]){//spray if exists
+						that.spray($el, app.view({
+							template: savedConfigs[cacheName].template,
+							data: savedConfigs[cacheName].data
+						}));
+					}
+
 					//keep a copy for later reference
 					firstLayers.push($el);
 				}
 			});
-
-			//
 
 			//return all qualified el's
 			return firstLayers;
@@ -376,7 +410,9 @@
 				top = $el.offset().top - $editor.offset().top,
 				left = $el.offset().left - $editor.offset().left,
 				height = $el.height(),
-				width = $el.width();
+				width = $el.width(),
+				cacheName = window.location.hash.split('/').pop() + '-' + $el.attr('region'),
+				savedConfigs = app.store.get('__savedConfigs') && app.store.get('__savedConfigs')[cacheName];
 
 			//calculate new positions
 			var newTop = ($editor.height() - height) / 2,
@@ -390,7 +426,7 @@
 				left: left,
 				height: height,
 				width: width,
-				border: '1px solid #000',
+				border: '1px dashed #000',
 				transition: '.5s',
 			}).appendTo(this.$el.find('.region-content-editor'));
 
@@ -399,20 +435,22 @@
 				.create({
 					data: {
 						$element: $el,
-						$clone: $clone
+						$clone: $clone,
+						cacheName: cacheName,
+						template: savedConfigs ? savedConfigs.template : $el.html(),
+						dataContent: savedConfigs ? savedConfigs.data : {}
 					},
 					onMoveCloneToCenter: function(ctForClone){
 						$clone.css({
 							top: newTop,
 							left: newLeft
 						}).anyone(app.ADE, function(){
-							console.log('!!', arguments);
-							//that.$el.toggleClass('viewport-blur', true);
+							that.$el.addClass('viewport-blur');
 							ctForClone.trigger('view:append-clone');
-	            		});
 
-						//add a highlight class to the region currently editing
-						$el.addClass('editing');
+							//empty the content and add a highlight class to the region currently editing
+							$el.addClass('editing').empty();
+	            		});
 					}
 				})
 				.overlay({

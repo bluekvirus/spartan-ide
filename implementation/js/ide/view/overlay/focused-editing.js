@@ -17,7 +17,8 @@
 			this.activate('single', 0);
 		},
 		onItemActivated: function($item){
-			var tabId = $item.attr('tabId');
+			var tabId = $item.attr('tabId'),
+				that = this;
 			//separate View view from others
 			if(tabId === 'View')
 				this.tab('tabs', app.get('Overlay.FocusedEditing.' + tabId).create({
@@ -34,6 +35,14 @@
 				this.close();
 			},
 			'save-builder': function(){
+				//only save if builder has been shown
+				if(!this.getViewIn('tabs').getViewIn('tab-View').builderShown){
+					//notify
+					app.notify('No changes has been made.', 'You have not made any changes.', 'info');
+
+					return;
+				}
+
 				//get builder view
 				var builder, template, dataTab, dataContent,
 					builderFlag = true, dataFlag = true;
@@ -75,9 +84,17 @@
 										template: template,
 										data: dataContent || {}
 									});
-				}
-					
 
+					//save the extracted template and data to cache for future use
+					var savedConfigs = app.store.get('__savedConfigs') || {};
+					savedConfigs[this.get('cacheName')] = {
+						template: template,
+						data: dataContent || {}
+					};
+
+					app.store.set('__savedConfigs', _.deepClone(savedConfigs));
+
+				}
 				// //!!need to consult with zahra
 				//this.close();
 			},
@@ -86,14 +103,35 @@
 			},
 		},
 		onClose: function(){
+
+			//fetch cache if there is nothing configured
+			if(!this.spraying){
+				var savedConfigs = app.store.get('__savedConfigs');
+				//go fetch what has been stored in the cache, if not configured
+				var stored = savedConfigs && savedConfigs[this.get('cacheName')];
+
+				if(stored){
+					this.spraying = app.view({
+										template: stored.template,
+										data: stored.data
+									});
+				}
+				else{
+					this.spraying = app.view({
+										template: this.get('template'),
+										data: this.get('dataContent')
+									});
+				}
+			}
+
 			app.coop('view-edit-menu-closed', {
-				saved: this.saved,
 				$element: this.get('$element'),
 				spraying: this.spraying
 			});
 
 			//reset the flag
 			this.saved = false;
+			this.spraying = false;
 		},
 	});
 
