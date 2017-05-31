@@ -32,7 +32,7 @@
                         less: '',
                         css_container: {
                             position: 'absolute',
-                            //-40 ~ 3em for the height
+                            //-40 ~ 3em for the initial height
                             top: e.pageY - this.$el.offset().top - 40,
                             left: parseInt((e.pageX - this.$el.offset().left) / this.$el.width() * 100) + '%',
                             width: '6em',
@@ -45,16 +45,20 @@
                     string.stringNumber = stringNumber;
                     var stringsDiv = this.getRegion('string').$el;
                     stringsDiv.append('<div id="' + stringId + '"></div>');
-                    var newString = new StringView({ data: string });
-                    this.spray($('#' + stringId), newString);
+                    var newString = new StringView({
+                        data: string
+                    });
+                    this.spray(('#' + stringId), newString);
                     allGroups.strings.push(string);
                     app.store.set(cacheName, allGroups);
                 } else {
-                    var groupNumber = $(e.currentTarget).parent().parent().parent().css('order'),
+                    var groupNumber = $(e.currentTarget).parent().css('order'),
                         currentGroup = allGroups.groups[groupNumber];
                     currentGroup.name = cacheName;
                     currentGroup.groupNumber = groupNumber;
-                    (new PopOver({
+                    //!!added by patrick
+                    app.coop('builder-group-config', {
+                        dataSource: $(e.currentTarget).parent().data('view'),
                         data: {
                             type: 'group',
                             html: currentGroup.template,
@@ -63,7 +67,19 @@
                             less: currentGroup.less,
                             obj: currentGroup
                         }
-                    })).popover($(e.currentTarget), { placement: 'top', bond: this, style: { width: '600px' } });
+                    });
+
+                    // (new PopOver({
+                    //     dataSource: $(e.currentTarget).parent().data('view'),
+                    //     data: {
+                    //         type: 'group',
+                    //         html: currentGroup.template,
+                    //         data: currentGroup.data,
+                    //         css_container: currentGroup.css_container,
+                    //         less: currentGroup.less,
+                    //         obj: currentGroup
+                    //     }
+                    // })).popover($(e.currentTarget), { placement: 'top', bond: $(e.currentTarget), style: { width: '600px' } });
                 }
             }
         },
@@ -80,8 +96,10 @@
                 group.groupNumber = groupNumber;
                 var groupsDiv = self.getRegion('group').$el;
                 groupsDiv.append('<div id="' + id + '"></div>');
-                var newGroup = new Group({ data: group });
-                self.spray($('#' + id), newGroup);
+                var newGroup = new Group({
+                    data: group
+                });
+                self.spray(('#' + id), newGroup);
                 if (currentDirection === 'v') {
                     if (allGroups.groups.length > 1) {
                         newGroup.$el.find('.drag-left').addClass('hide');
@@ -107,8 +125,10 @@
                 string.stringNumber = stringNumber;
                 var stringsDiv = self.getRegion('string').$el;
                 stringsDiv.append('<div id="' + stringId + '"></div>');
-                var newString = new StringView({ data: string });
-                self.spray($('#' + stringId), newString);
+                var newString = new StringView({
+                    data: string
+                });
+                self.spray(('#' + stringId), newString);
                 stringNumber = stringNumber + 1;
             });
         },
@@ -188,7 +208,7 @@
     var StringView = app.view('StringView', {
         template: [
             '<div class="ui-draggable-item drag-string-left"></div>',
-            '<div action-click="edit-string" region="string-container">{{{template}}}</div>',
+            '<div action-click="update-string" region="string-container">{{{template}}}</div>',
             '<div class="ui-draggable-item drag-string-right"></div>',
         ],
         dnd: {
@@ -197,8 +217,9 @@
             }
         },
         actions: {
-            'edit-string': function($btn, e) {
+            'update-string': function($btn, e) {
                 (new PopOver({
+                    dataSource: this,
                     data: {
                         type: 'string',
                         html: this.get('template'),
@@ -224,51 +245,24 @@
         },
         onDragStop: function(event, ui) {
             var viewAndRegion = this.get('name'),
-                allGroups = app.store.get(viewAndRegion);
+                allGroups = app.store.get(viewAndRegion),
+                newString = this.get();
+            newString.css_container.top = this.$el.parent().css('top');
+            newString.css_container.left = this.$el.parent().css('left');
             allGroups.strings[this.get('stringNumber')].css_container.top = this.$el.parent().css('top');
             allGroups.strings[this.get('stringNumber')].css_container.left = this.$el.parent().css('left');
+            this.set(newString);
             app.store.set(viewAndRegion, allGroups);
-            var options = {
-                newGroups: allGroups.groups,
-                newStrings: allGroups.strings,
-                direction: allGroups.direction,
-                name: this.get('name')
-            };
-            var cssId = viewAndRegion + '-' + this.get('stringNumber') + '-string-css';
-            $('#' + cssId).remove();
-            app.coop('update-data', options);
         },
         onReady: function() {
             var viewAndRegion = this.get('name'),
-                uniqueId = viewAndRegion + '-' + this.get('stringNumber');
-            if (this.get('less')) {
-                var theme = $('head link[rel="stylesheet"]').attr('href').split('/')[1],
-                    less = '#' + uniqueId + '-string-id {' + this.get('less') + '}',
-                    self = this;
-                if (self.flag === undefined) {
-                    self.flag = true;
-                }
-                self.lock('string-container', self.flag, 'fa fa-spinner fa-spin fa-3x');
-                self.flag = !self.flag;
-                app.remote({
-                    url: 'api/less',
-                    payload: {
-                        less: less,
-                        theme: theme
-                    }
-                }).done(function(data) {
-                    self.lock('string-container', self.flag, 'fa fa-spinner fa-spin fa-3x');
-                    var uniqueCSS = uniqueId + '-string-css';
-                    $('#' + uniqueCSS).remove();
-                    $('head').append('<style id="' + uniqueCSS + '">' + data.msg + '</style>');
-                });
-            } else {
-                var uniqueCSS = uniqueId + '-css';
-                $('#' + uniqueCSS).remove();
-            }
+                uniqueId = viewAndRegion + '-' + this.get('stringNumber') + '-string',
+                appliedContent = applyGroupContent(this.get('template'), this.parentCt.options.dataSource.get(this.get('data')));
+            this.$el.find('[region="string-container"]').html(appliedContent);
+            compileLess(uniqueId, this, 'string-container');
             if (this.get('css_container')) {
-                $('#' + uniqueId + '-string-id').css(this.get('css_container'));
-                if (typeof this.get('stringNumber') !== 'undefined' && this.get('template')) {
+                $('#' + uniqueId + '-id').css(this.get('css_container'));
+                if (this.get('template')) {
                     this.$el.parent().css({ 'height': '', 'width': '', 'background-color': '' });
                     var allGroups = app.store.get(viewAndRegion);
                     delete allGroups.strings[this.get('stringNumber')].css_container.height;
@@ -280,9 +274,40 @@
         }
     });
 
+    applyGroupContent = function(template, data) {
+        var theCompiledTemplate = Handlebars.compile(template),
+            appliedContent = theCompiledTemplate(data);
+        return appliedContent;
+    };
+
+    compileLess = function(id, reference, lockRegion) {
+        var cssId = id + '-css';
+        var flag = true;
+        if (reference.get('less')) {
+            var theme = $('head link[rel="stylesheet"]').attr('href').split('/')[1],
+                lessContent = '#' + id + '-id {' + reference.get('less') + '}';
+            reference.lock(lockRegion, flag, 'fa fa-spinner fa-spin fa-3x');
+            flag = !flag;
+            app.remote({
+                url: 'api/less',
+                payload: {
+                    less: lessContent,
+                    theme: theme
+                }
+            }).done(function(data) {
+                reference.lock(lockRegion, flag, 'fa fa-spinner fa-spin fa-3x');
+                $('#' + cssId).remove();
+                $('head').append('<style id="' + cssId + '">' + data.msg + '</style>');
+                flag = true;
+            });
+        } else {
+            $('#' + cssId).remove();
+        }
+    };
+
     var Group = app.view('Group', {
         template: [
-            '<div region="content"></div>',
+            '<div region="view-lock" action="update-group"></div>',
             '<div class="ui-draggable-item drag-top"></div>',
             '<div class="ui-draggable-item drag-left"></div>',
             '<div class="ui-draggable-item drag-right"></div>',
@@ -292,6 +317,9 @@
             drag: {
                 helper: 'original'
             }
+        },
+        actions: {
+            _bubble: true,
         },
         heightFlag: true,
         widthFlag: true,
@@ -577,30 +605,19 @@
                 direction: allGroups.direction,
                 name: this.get('name')
             };
-            app.store.set(viewAndRegion, allGroups);
+
             var cssId = viewAndRegion + '-' + groupNumber + '-css';
             $('#' + cssId).remove();
             app.coop('update-data', options);
+
+            //Update cache
+            app.store.set(viewAndRegion, allGroups);
         },
         onReady: function() {
-            var theTemplateScript = this.get('template'),
-                inputData = this.get('data'),
-                //TODO: get the data here
-                preCompiledTemplateScript;
-            if (Array.isArray(inputData)) {
-                preCompiledTemplateScript = '{{#each .}}' + theTemplateScript + '{{/each}}';
-            } else {
-                preCompiledTemplateScript = theTemplateScript;
-            }
-            var theTemplate = Handlebars.compile(preCompiledTemplateScript),
-                theCompiledHTML = theTemplate(inputData),
-                contentData = {
-                    element: theCompiledHTML,
-                    obj: this.get()
-                };
-            this.show('content', Content, {
-                data: contentData
-            });
+            var template = this.get('template'),
+                data = this.get('data'),
+                appliedContent = applyGroupContent(template, this.parentCt.options.dataSource.get(data));
+            this.$el.find('[region="view-lock"]').html(appliedContent);
             this.$el.css({
                 'order': this.get('groupNumber'),
             });
@@ -608,47 +625,12 @@
             this.$el.find('.drag-bottom').css('left', '50%', 'important');
             this.$el.find('.drag-left').css('top', '50%', 'important');
             this.$el.find('.drag-right').css('top', '50%', 'important');
-        }
-    });
 
-    var Content = app.view({
-        template: [
-            '<div region="view-lock" action="update-group">{{{element}}}</div>',
-        ],
-        actions: {
-            _bubble: true,
-        },
-        onReady: function() {
-            var viewAndRegion = this.get('obj').name,
-                uniqueId = viewAndRegion + '-' + this.get('obj').groupNumber;
-            if (this.get('obj').less) {
-                this.$el.attr('id', uniqueId);
-                var theme = $('head link[rel="stylesheet"]').attr('href').split('/')[1],
-                    less = '#' + uniqueId + '-id {' + this.get('obj').less + '}',
-                    self = this;
-                if (self.flag === undefined) {
-                    self.flag = true;
-                }
-                self.lock('view-lock', self.flag, 'fa fa-spinner fa-spin fa-3x');
-                self.flag = !self.flag;
-                app.remote({
-                    url: 'api/less',
-                    payload: {
-                        less: less,
-                        theme: theme
-                    }
-                }).done(function(data) {
-                    self.lock('view-lock', self.flag, 'fa fa-spinner fa-spin fa-3x');
-                    var uniqueCSS = uniqueId + '-css';
-                    $('#' + uniqueCSS).remove();
-                    $('head').append('<style id="' + uniqueCSS + '">' + data.msg + '</style>');
-                });
-            } else {
-                var uniqueCSS = uniqueId + '-css';
-                $('#' + uniqueCSS).remove();
-            }
-            if (this.get('obj').css_container) {
-                $('#' + uniqueId + '-id').css(this.get('obj').css_container);
+            var viewAndRegion = this.get('name'),
+                uniqueId = viewAndRegion + '-' + this.get('groupNumber');
+            compileLess(uniqueId, this, 'view-lock');
+            if (this.get('css_container')) {
+                $('#' + uniqueId + '-id').css(this.get('css_container'));
             }
         }
     });
@@ -709,36 +691,56 @@
                             data: this.getEditor('data').getVal(),
                             less: this.getViewIn('tabs').$el.find('[region="tab-less"] [editor="code"] textarea').val(),
                             css_container: obj.css_container
-                        };
+                        },
+                        baseId, uniqueId;
                     var allGroups = app.store.get(viewAndRegion),
-                        editedSObj = {
-                            template: this.getViewIn('tabs').$el.find('[region="tab-html"] [editor="code"] textarea').val(),
-                            data: this.getEditor('data').getVal(),
-                            less: this.getViewIn('tabs').$el.find('[region="tab-less"] [editor="code"] textarea').val(),
-                            css_container: obj.css_container
-                        };
+                        currentBuilder = this.options.dataSource.parentCt;
+
                     if (this.get('type') === 'group') {
                         var editRegionGroups = allGroups.groups,
                             groupNumber = obj.groupNumber;
+                        baseId = viewAndRegion + '-' + groupNumber;
+                        uniqueId = baseId + '-id';
                         editRegionGroups[groupNumber] = editedObj;
                         allGroups.groups = editRegionGroups;
+
+                        editedObj.name = viewAndRegion;
+                        editedObj.groupNumber = groupNumber;
+
+                        //Close the popover
+                        this.close();
+
+                        //Reload the Group view with the new data
+                        this.options.dataSource.set(editedObj);
                     } else if (this.get('type') === 'string') {
                         var editRegionStrings = allGroups.strings,
                             stringNumber = obj.stringNumber;
+                        baseId = viewAndRegion + '-' + stringNumber + '-string';
+                        uniqueId = baseId + '-id';
                         editRegionStrings[stringNumber] = editedObj;
                         allGroups.strings = editRegionStrings;
+
+                        //Update css_container in the cache
+                        if (editedObj.css_container) {
+                            if (editedObj.template) {
+                                currentBuilder.$el.find('#' + uniqueId).css({ 'height': '', 'width': '', 'background-color': '' });
+                                delete allGroups.strings[stringNumber].css_container.height;
+                                delete allGroups.strings[stringNumber].css_container.width;
+                                delete allGroups.strings[stringNumber].css_container['background-color'];
+                            }
+                        }
+                        editedObj.name = viewAndRegion;
+                        editedObj.stringNumber = stringNumber;
+
+                        //Close the popover
+                        this.close();
+
+                        //Update the String view with the new data
+                        this.options.dataSource.set(editedObj);
                     }
-                    var options = {
-                        newGroups: allGroups.groups,
-                        newStrings: allGroups.strings,
-                        direction: allGroups.direction,
-                        name: obj.name
-                    };
+                    //Update cache
                     app.store.set(viewAndRegion, allGroups);
-                    this.close();
-                    app.coop('update-data', options);
                 } else {
-                    console.log('heeerE?');
                     //TODO: Why this is undefined?
                     //console.log('tabs, ', this.getViewIn('tabs').$el.getViewIn('tab-html'));
                     //this.getViewIn('tabs').getViewIn('tab-html').getEditor('code').validate(true);
@@ -749,7 +751,6 @@
                 this.close();
             },
             delete: function() {
-                //TODO: change the height of surronding elements
                 var obj = this.get('obj'),
                     viewAndRegion = obj.name,
                     groupNumber = obj.groupNumber,
@@ -806,10 +807,15 @@
                         name: viewAndRegion
                     };
                     app.store.set(viewAndRegion, cacheData);
-                    var stringCssId = viewAndRegion + '-' + groupNumber + '-string-css';
-                    $('#' + stringCssId).remove();
+                    var stringCssId = viewAndRegion + '-' + stringNumber + '-string-css',
+                        stringId = viewAndRegion + '-' + stringNumber + '-string-id';
+
+                    //Close the popover
                     this.close();
-                    app.coop('update-data', stringOptions);
+
+                    //Remove the string from the screen
+                    $('#' + stringCssId).remove();
+                    $('#' + stringId).remove();
                 }
             }
         },

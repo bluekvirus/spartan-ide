@@ -3,6 +3,9 @@
 	app.view('Overlay.FocusedEditing', {
 		className: 'focused-editing-view clearfix',
 		template: '@view/overlay/focused-editing.html',
+		coop: [
+			'builder-group-config', //sliding out group config for builder
+		],
 		initialize: function(){
 			//moving flag
 			this.onMoveCloneToCenter = this.options.onMoveCloneToCenter;
@@ -132,6 +135,10 @@
 			//reset the flag
 			this.saved = false;
 			this.spraying = false;
+		},
+		onBuilderGroupConfig: function(obj){
+			console.log('im here');
+			this.$el.find('.clip-editing-holder').toggleClass('active');
 		},
 	});
 

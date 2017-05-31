@@ -68,12 +68,13 @@
 				e.stopPropagation();
 
 				//cache name = currently editing view + region name
-				var cacheName = that.get('cacheName');
+				var cacheName = _.string.slugify(that.get('cacheName'));
 
 				//create the builder view
 				var builder = app.get('Overlay.FocusedEditing.Builder')
 					.create({
-						cacheName : cacheName
+						cacheName : cacheName,
+						dataSource: that //temporary placeholder
 					});
 				//setup default cache
 				app.store.set(cacheName, app.store.get(cacheName) || {
