@@ -18,6 +18,9 @@
 		},
 		onReady: function(){
 			this.activate('single', 0);
+
+			//show group-editor
+			this.show('group-editor', 'Overlay.FocusedEditing.GroupEditor');
 		},
 		onItemActivated: function($item){
 			var tabId = $item.attr('tabId'),
@@ -137,8 +140,14 @@
 			this.spraying = false;
 		},
 		onBuilderGroupConfig: function(obj){
-			console.log('im here');
-			this.$el.find('.clip-editing-holder').toggleClass('active');
+			//----set the data for editing view----//
+			//replace the data.data object with data.datakey
+			obj.data.datakey = obj.data.data;
+			delete obj.data.data;
+			//setup the data for the group editor view
+			this.getViewIn('group-editor').set(obj.data);
+			
+			this.$el.find('.clip-editing-holder').addClass('active');
 		},
 	});
 

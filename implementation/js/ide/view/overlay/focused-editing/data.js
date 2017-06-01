@@ -14,7 +14,9 @@
 		//coop: ['e', 'e'],
 		//[editors]: {...},
 		
-		initialize: function(){},
+		initialize: function(){
+			this.dataSourceForView = app.model();
+		},
 		//onShow: function(){},
 		//onDataRendered: function(){},
 		onReady: function(){
@@ -32,6 +34,16 @@
 					that.$el.find('.url-editor').slideUp( "fast" );//.addClass('hidden');
 				}
 			});
+		},
+		onEditorChanged: function(name, editor){
+			if(name === 'data-content'){
+				try{
+					var data = JSON.parse(editor.getVal());
+					this.dataSourceForView.clear().set(data);
+				} catch(e){
+					app.notify('PARSE ERROR', 'Data is not a valid JSON format.', 'danger');
+				}
+			}
 		},
 		editors: {
 			// _global:{
@@ -55,15 +67,16 @@
 		actions: {
 			'fetch-remote': function(){
 				var that = this;
-				console.log('url', this.get('url'));
+				
 				app.remote({
 					url: this.get('url'),
 				})
 				.done(function(data){
-					that.getEditor('data-content').setVal(JSON.stringify(data, null,'\t'));
+					that.getEditor('data-content').setVal(JSON.stringify(data, null,'\t'), true);
 				})
 				.fail(function(){
-					that.getEditor('data-content').setVal('fetch error');
+					//that.getEditor('data-content').setVal('fetch error');
+					app.notify('FETCH ERROR', 'Cannot fetch data from given url. ' + arguments[0], 'danger');
 				});
 			}
 		},

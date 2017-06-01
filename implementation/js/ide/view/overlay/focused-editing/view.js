@@ -11,7 +11,7 @@
 
 		template: '@view/overlay/focused-editing/view.html',
 		//data: 'url', {} or [],
-		//coop: ['e', 'e'],
+		//coop: ['group-updated',],
 		//[editors]: {...},
 		
 		initialize: function(){
@@ -53,7 +53,7 @@
 				parentHeight = this.parentCt.$el.height(),
 				newTop = (parentHeight - tabsHeight - $clone.height()) / 2;
 			//reset top	
-			//$clone.css('top', newTop);
+			$clone.css('top', newTop);
 			//append
 			this.$el.append($clone);
 
@@ -70,11 +70,20 @@
 				//cache name = currently editing view + region name
 				var cacheName = _.string.slugify(that.get('cacheName'));
 
+				//check whether data view has been show or not?
+				var dataView;
+
+				try{
+					dataView = that.parentCt.getViewFromTab('Data');
+				}catch(event){
+					console.warn('You have not configed any data.' + event);
+				}
+
 				//create the builder view
 				var builder = app.get('Overlay.FocusedEditing.Builder')
 					.create({
 						cacheName : cacheName,
-						dataSource: that //temporary placeholder
+						dataSource: dataView ? dataView.dataSourceForView : app.model(), //temporary placeholder,
 					});
 				//setup default cache
 				app.store.set(cacheName, app.store.get(cacheName) || {

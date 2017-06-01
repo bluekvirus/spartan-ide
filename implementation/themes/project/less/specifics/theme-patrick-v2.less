@@ -635,7 +635,7 @@ h2 {
 							position: absolute;
 							left: 0;
 							right: 1px;
-							bottom: -48%;
+							bottom: -49%;
 							transition: 0.3s;
 							border: 1px solid @border;
 							box-shadow: -3px -3px 3px @border;
@@ -644,6 +644,78 @@ h2 {
 							z-index: 50;
 							&.active {
 								bottom: 0;
+							}
+							.regional-overlay-focusedediting-groupeditor {//editor view
+								position: absolute;
+								padding: @grid-gutter-width;
+								left: 0;
+								right: 0;
+								top: 0;
+								bottom: 0; //height: 100%;
+								.edit-tabs {
+									height: 30px; //fixed height, easier for control height for region="tabs"
+									.tab {
+										height: 100%;
+										width: 70px;
+										line-height: 29px;
+										text-align: center;
+										border-top: 1px solid #333;
+										border-left: 1px solid #333;
+										position: relative;
+										z-index: 1;
+										&:last-child {
+											border-right: 1px solid #333;
+										}
+										&.active {
+											color: @brand-primary;
+											background-color: rgb(184, 184, 184);
+										}
+									}
+								}
+								.tab-contents {
+									position: absolute;
+									top: 29px + @grid-gutter-width;
+									bottom: 85px + @grid-gutter-width;
+									left: @grid-gutter-width;
+									right: @grid-gutter-width;
+									border-top: 1px solid #333;
+									padding: @grid-gutter-width 0;
+									text-align: left;
+									.form-group.editor.editor-basic {
+										label+div {
+											position: absolute;
+											top: 40px;
+											bottom: 15px;
+											left: 0;
+											right: 0;
+											textarea {
+												height: 100%;
+												resize: none;
+												background-color: rgba(255, 255, 255, 0.8);
+											}
+										}
+									}
+								}
+								.datakey-editor-holder {
+									position: absolute;
+									height: 35px;
+									bottom: 50px + @grid-gutter-width;
+									left: @grid-gutter-width;
+									right: @grid-gutter-width;
+									label.control-label {
+										text-align: left;
+									}
+									input {
+										background-color: rgba(255, 255, 255, 0.8);
+									}
+								}
+								.edit-buttons-holder {
+									position: absolute;
+									bottom: @grid-gutter-width;
+									left: @grid-gutter-width;
+									right: @grid-gutter-width;
+									height: 35px;
+								}
 							}
 						}
 						.tabs {

@@ -4,7 +4,7 @@
             '<div region="string"></div>',
             '<div action="update-group" region="group"></div>',
         ],
-        coop: ['update-data'],
+        coop: ['update-data', 'group-updated', 'group-deleted'],
         onUpdateData: function(options) {
             var cacheName = this.options.cacheName,
                 nameArray = cacheName.split('-');
@@ -56,16 +56,18 @@
                         currentGroup = allGroups.groups[groupNumber];
                     currentGroup.name = cacheName;
                     currentGroup.groupNumber = groupNumber;
-                    //!!added by patrick
+
+                    //added by patrick for sliding up configuration
                     app.coop('builder-group-config', {
-                        dataSource: $(e.currentTarget).parent().data('view'),
+                        dataSource: this.get('data-source'),//$(e.currentTarget).parent().data('view'),
                         data: {
                             type: 'group',
                             html: currentGroup.template,
                             data: currentGroup.data,
                             css_container: currentGroup.css_container,
                             less: currentGroup.less,
-                            obj: currentGroup
+                            obj: currentGroup,
+                            builder: this
                         }
                     });
 
@@ -202,7 +204,113 @@
                 stringNumber += 1;
             });
             return allLess;
-        }
+        },
+        //------------------------------------------- coop events -------------------------------------------//
+        //function to handle updating group event
+        onGroupUpdated: function(obj, editedObj){
+            //call helper function
+            this.updateGroup(obj, editedObj);
+        },
+        //function to handle deleting group event
+        onGroupDeleted: function(obj, type){
+            //call helper function
+            this.deleteGroup(obj, type);
+        },
+
+        //------------------------------------------- helper functions -------------------------------------------//
+        //function to update group contents
+        updateGroup: function(obj, editedObj){
+            //HTML field is not empty
+            var viewAndRegion = obj.name,
+                baseId, uniqueId;
+            var allGroups = app.store.get(viewAndRegion);
+
+            if (editedObj.type === 'group') {
+                //
+            } else if (editedObj.type === 'string') {
+                //need to find css here, it has a builder handle, so it's easier to do it here
+                //Update css_container in the cache
+                if (editedObj.css_container) {
+                    if (editedObj.template) {
+                        this.$el.find('#' + uniqueId).css({ 'height': '', 'width': '', 'background-color': '' });
+                        delete allGroups.strings[editedObj.stringNumber].css_container.height;
+                        delete allGroups.strings[editedObj.stringNumber].css_container.width;
+                        delete allGroups.strings[editedObj.stringNumber].css_container['background-color'];
+                    }
+                }
+            }else {
+                //wrong type
+            }
+
+            //update the view with new data
+            this.set(editedObj);
+        },
+
+        //function to delete a group
+        deleteGroup: function(obj, type){
+            var viewAndRegion = obj.name,
+                groupNumber = obj.groupNumber,
+                stringNumber = obj.stringNumber,
+                cacheData = app.store.get(viewAndRegion),
+                deleteGroups = cacheData.groups,
+                deleteStrings = cacheData.strings;
+            //check what type of delete
+            if (type === 'group') {
+                var groupId = viewAndRegion + '-' + groupNumber + '-id',
+                    basis = $('#' + groupId).css('flex-basis');
+
+                if (parseInt(groupNumber) === 0) {
+                    if (cacheData.groups.length > 1) {
+                        var next = viewAndRegion + '-' + (parseInt(groupNumber) + 1) + '-id',
+                            nextBasis = parseInt($('#' + next).css('flex-basis')) + parseInt(basis);
+                        deleteGroups[(parseInt(groupNumber) + 1)].css_container = {
+                            'flex-grow': '0',
+                            'flex-shrink': '1',
+                            'flex-basis': nextBasis + '%',
+                        };
+                    }
+                } else {
+                    var prev = viewAndRegion + '-' + (parseInt(groupNumber) - 1) + '-id',
+                        prevBasis = parseInt($('#' + prev).css('flex-basis')) + parseInt(basis);
+                    deleteGroups[(parseInt(groupNumber) - 1)].css_container = {
+                        'flex-grow': '0',
+                        'flex-shrink': '1',
+                        'flex-basis': prevBasis + '%',
+                    };
+                }
+                deleteGroups.splice(groupNumber, 1);
+                cacheData.groups = deleteGroups;
+                var options = {
+                    newGroups: cacheData.groups,
+                    newStrings: cacheData.strings,
+                    direction: cacheData.direction,
+                    name: viewAndRegion
+                };
+                if (cacheData.groups.length > 0) {
+                    app.store.set(viewAndRegion, cacheData);
+                    var cssId = viewAndRegion + '-' + groupNumber + '-css';
+                    $('#' + cssId).remove();
+                    app.coop('update-data', options);
+                } 
+
+            } else {//type === 'string'
+                deleteStrings.splice(stringNumber, 1);
+                cacheData.strings = deleteStrings;
+                var stringOptions = {
+                    newGroups: cacheData.groups,
+                    newStrings: cacheData.strings,
+                    direction: cacheData.direction,
+                    name: viewAndRegion
+                };
+                app.store.set(viewAndRegion, cacheData);
+                var stringCssId = viewAndRegion + '-' + stringNumber + '-string-css',
+                    stringId = viewAndRegion + '-' + stringNumber + '-string-id';
+
+                //Remove the string from the screen
+                $('#' + stringCssId).remove();
+                $('#' + stringId).remove();
+            }
+        },
     });
 
     var StringView = app.view('StringView', {
@@ -218,17 +326,31 @@
         },
         actions: {
             'update-string': function($btn, e) {
-                (new PopOver({
-                    dataSource: this,
+                // (new PopOver({
+                //     dataSource: this,
+                //     data: {
+                //         type: 'string',
+                //         html: this.get('template'),
+                //         data: this.get('data'),
+                //         css_container: this.get('css_container'),
+                //         less: this.get('less'),
+                //         obj: this.get()
+                //     }
+                // })).popover($btn, { placement: 'top', bond: this, style: { width: '600px' } });
+
+                //added by patrick for sliding up edit
+                app.coop('builder-group-config', {
+                    dataSource: $(e.currentTarget).parent().data('view'),
                     data: {
                         type: 'string',
                         html: this.get('template'),
                         data: this.get('data'),
                         css_container: this.get('css_container'),
                         less: this.get('less'),
-                        obj: this.get()
+                        obj: this.get(),
+                        builder: this.parentCt
                     }
-                })).popover($btn, { placement: 'top', bond: this, style: { width: '600px' } });
+                });
             }
         },
         flagX: false,

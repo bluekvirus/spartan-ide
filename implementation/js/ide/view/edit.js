@@ -438,7 +438,7 @@
 						$clone: $clone,
 						cacheName: cacheName,
 						template: savedConfigs ? savedConfigs.template : $el.html(),
-						dataContent: savedConfigs ? savedConfigs.data : {}
+						dataContent: savedConfigs ? savedConfigs.data : {},
 					},
 					onMoveCloneToCenter: function(ctForClone){
 						$clone.css({
