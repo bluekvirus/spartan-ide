@@ -1,12 +1,12 @@
 ;(function(app) {
     app.view('Overlay.FocusedEditing.Builder', {
         template: [
-            '<div region="hanger-groups"></div>',
-            '<div region="stack-groups" action="update-group"></div>',
+            '<div region="string"></div>',
+            '<div action="update-group" region="group"></div>',
         ],
         coop: ['update-data', 'group-updated', 'group-deleted'],
         onUpdateData: function(options) {
-            var cacheName = options.name,
+            var cacheName = this.options.cacheName,
                 nameArray = cacheName.split('-');
             nameArray.shift();
             var region = nameArray.join('-');
@@ -14,8 +14,8 @@
                 this.set({
                     name: options.name,
                     direction: options.direction,
-                    stackGroups: options.newStackGroups,
-                    hangerGroups: options.newHangerGroups
+                    groups: options.newGroups,
+                    strings: options.newStrings
                 });
             }
         },
@@ -24,10 +24,9 @@
                 var cacheName = this.options.cacheName,
                     allGroups = app.store.get(cacheName);
                 if (e.shiftKey) {
-                    //Add a Hanger group
-                    var hangerNumber = allGroups.hangerGroups.length,
-                        hangerGroupId = cacheName + '-' + hangerNumber + '-hanger-id';
-                    var hangerGroup = {
+                    var stringNumber = allGroups.strings.length,
+                        stringId = cacheName + '-' + stringNumber + '-string-id';
+                    var string = {
                         template: '',
                         data: '',
                         less: '',
@@ -42,55 +41,47 @@
                             'border-bottom': '2px dotted black'
                         }
                     };
-
-                    //Update the cache
-                    allGroups.hangerGroups.push(hangerGroup);
-                    app.store.set(cacheName, allGroups);
-
-                    //Spray the new hanger
-                    hangerGroup.name = cacheName;
-                    hangerGroup.hangerNumber = hangerNumber;
-                    var hangerGroupsDiv = this.getRegion('hanger-groups').$el;
-                    hangerGroupsDiv.append('<div id="' + hangerGroupId + '"></div>');
-                    var newHangerGroup = new HangerGroup({
-                        dataSource: this,
-                        data: hangerGroup
+                    string.name = cacheName;
+                    string.stringNumber = stringNumber;
+                    var stringsDiv = this.getRegion('string').$el;
+                    stringsDiv.append('<div id="' + stringId + '"></div>');
+                    var newString = new StringView({
+                        data: string
                     });
-                    this.spray(('#' + hangerGroupId), newHangerGroup);
+                    this.spray(('#' + stringId), newString);
+                    allGroups.strings.push(string);
+                    app.store.set(cacheName, allGroups);
                 } else {
-                    //Edit a stack group
-                    var region = $(e.currentTarget),
-                        stackNumber = region.parent().css('order'),
-                        currentStackGroup = allGroups.stackGroups[stackNumber];
-                    currentStackGroup.name = cacheName;
-                    currentStackGroup.stackNumber = stackNumber;
+                    var groupNumber = $(e.currentTarget).parent().css('order'),
+                        currentGroup = allGroups.groups[groupNumber];
+                    currentGroup.name = cacheName;
+                    currentGroup.groupNumber = groupNumber;
 
                     //added by patrick for sliding up configuration
                     app.coop('builder-group-config', {
-                        dataSource: region.parent().data('view'),//$(e.currentTarget).parent().data('view'),
+                        dataSource: this.get('data-source'),//$(e.currentTarget).parent().data('view'),
                         data: {
-                            type: 'stack',
-                            html: currentStackGroup.template,
-                            data: currentStackGroup.data,
-                            css_container: currentStackGroup.css_container,
-                            less: currentStackGroup.less,
-                            obj: currentStackGroup,
+                            type: 'group',
+                            html: currentGroup.template,
+                            data: currentGroup.data,
+                            css_container: currentGroup.css_container,
+                            less: currentGroup.less,
+                            obj: currentGroup,
                             builder: this
                         }
                     });
 
-                    //comment out for sliding out editing view
                     // (new PopOver({
-                    //     dataSource: region.parent().data('view'),
+                    //     dataSource: $(e.currentTarget).parent().data('view'),
                     //     data: {
-                    //         type: 'stack',
-                    //         html: currentStackGroup.template,
-                    //         data: currentStackGroup.data,
-                    //         css_container: currentStackGroup.css_container,
-                    //         less: currentStackGroup.less,
-                    //         obj: currentStackGroup
+                    //         type: 'group',
+                    //         html: currentGroup.template,
+                    //         data: currentGroup.data,
+                    //         css_container: currentGroup.css_container,
+                    //         less: currentGroup.less,
+                    //         obj: currentGroup
                     //     }
-                    // })).popover(region, { placement: 'top', bond: region, style: { width: '600px' } });
+                    // })).popover($(e.currentTarget), { placement: 'top', bond: $(e.currentTarget), style: { width: '600px' } });
                 }
             }
         },
@@ -99,54 +90,48 @@
                 cacheName = this.options.cacheName,
                 allGroups = app.store.get(cacheName),
                 currentDirection = allGroups.direction,
-                stackNumber = 0,
-                hangerNumber = 0;
-
-            //Spray stack groups on the stack-groups region
-            _.each(allGroups.stackGroups, function(stackGroup) {
-                stackGroup.name = cacheName;
-                var id = cacheName + '-' + stackNumber + '-id';
-                stackGroup.stackNumber = stackNumber;
-                var stackGroupsDiv = self.getRegion('stack-groups').$el;
-                stackGroupsDiv.append('<div id="' + id + '"></div>');
-                var newStackGroup = new StackGroup({
-                    dataSource: self,
-                    data: stackGroup
+                groupNumber = 0,
+                stringNumber = 0;
+            _.each(allGroups.groups, function(group) {
+                group.name = cacheName;
+                var id = cacheName + '-' + groupNumber + '-id';
+                group.groupNumber = groupNumber;
+                var groupsDiv = self.getRegion('group').$el;
+                groupsDiv.append('<div id="' + id + '"></div>');
+                var newGroup = new Group({
+                    data: group
                 });
-                self.spray(('#' + id), newStackGroup);
+                self.spray(('#' + id), newGroup);
                 if (currentDirection === 'v') {
-                    if (allGroups.stackGroups.length > 1) {
-                        newStackGroup.$el.find('.drag-left').addClass('hide');
-                        newStackGroup.$el.find('.drag-right').addClass('hide');
-                        stackGroupsDiv.css({
+                    if (allGroups.groups.length > 1) {
+                        newGroup.$el.find('.drag-left').addClass('hide');
+                        newGroup.$el.find('.drag-right').addClass('hide');
+                        groupsDiv.css({
                             'flex-direction': 'column',
                         });
                     }
                 } else if (currentDirection === 'h') {
-                    if (allGroups.stackGroups.length > 1) {
-                        newStackGroup.$el.find('.drag-top').addClass('hide');
-                        newStackGroup.$el.find('.drag-bottom').addClass('hide');
-                        stackGroupsDiv.css({
+                    if (allGroups.groups.length > 1) {
+                        newGroup.$el.find('.drag-top').addClass('hide');
+                        newGroup.$el.find('.drag-bottom').addClass('hide');
+                        groupsDiv.css({
                             'flex-direction': 'row',
                         });
                     }
                 }
-                stackNumber = stackNumber + 1;
+                groupNumber = groupNumber + 1;
             });
-
-            //Spray hanger groups on the hanger-group region
-            _.each(allGroups.hangerGroups, function(hangerGroup) {
-                var hangerGroupId = cacheName + '-' + hangerNumber + '-hanger-id';
-                hangerGroup.name = cacheName;
-                hangerGroup.hangerNumber = hangerNumber;
-                var hangerGroupsDiv = self.getRegion('hanger-groups').$el;
-                hangerGroupsDiv.append('<div id="' + hangerGroupId + '"></div>');
-                var newHangerGroup = new HangerGroup({
-                    dataSource: self,
-                    data: hangerGroup
+            _.each(allGroups.strings, function(string) {
+                var stringId = cacheName + '-' + stringNumber + '-string-id';
+                string.name = cacheName;
+                string.stringNumber = stringNumber;
+                var stringsDiv = self.getRegion('string').$el;
+                stringsDiv.append('<div id="' + stringId + '"></div>');
+                var newString = new StringView({
+                    data: string
                 });
-                self.spray(('#' + hangerGroupId), newHangerGroup);
-                hangerNumber = hangerNumber + 1;
+                self.spray(('#' + stringId), newString);
+                stringNumber = stringNumber + 1;
             });
         },
         onClose: function() {
@@ -155,9 +140,9 @@
         extractTemplate: function() {
             var builderName = this.options.cacheName,
                 groups = app.store.get(builderName),
-                stacks = groups.stackGroups,
-                hangerGroups = groups.hangerGroups,
-                hangerNumber = 0,
+                stacks = groups.groups,
+                strings = groups.strings,
+                stringNumber = 0,
                 stackNumber = 0,
                 allTemplate = $('<div></div>'),
                 direction = '';
@@ -166,8 +151,8 @@
             } else if (groups.direction == 'v') {
                 direction = 'flex-direction: column;';
             }
-            allTemplate.append('<div region="hanger-groups"></div>');
-            allTemplate.append('<div region="stack-groups" style="' + direction + '"></div>');
+            allTemplate.append('<div region="string"></div>');
+            allTemplate.append('<div region="group" style="' + direction + '"></div>');
             _.each(stacks, function(stack) {
                 if (stack.template) {
                     var stackId = builderName + '-' + stackNumber + '-id',
@@ -176,30 +161,30 @@
                     if (stack.data) {
                         stackDiv = '{{#' + stack.data + '}}' + $(stackDiv).get(0).outerHTML + '{{/' + stack.data + '}}';
                     }
-                    allTemplate.find('[region="stack-groups"]').append(stackDiv);
+                    allTemplate.find('[region="group"]').append(stackDiv);
                 }
                 stackNumber += 1;
             });
-            _.each(hangerGroups, function(hangerGroup) {
-                if (hangerGroup.template) {
-                    var hangerGroupId = builderName + '-' + hangerNumber + '-hanger-id',
-                        style = $('#' + hangerGroupId).attr('style'),
-                        hangerGroupDiv = '<div id ="' + hangerGroupId + '" style="' + style + '">' + hangerGroup.template + '</div>';
-                    if (hangerGroup.data) {
-                        hangerGroupDiv = '{{#' + hangerGroup.data + '}}' + $(hangerGroupDiv).get(0).outerHTML + '{{/' + hangerGroup.data + '}}';
+            _.each(strings, function(string) {
+                if (string.template) {
+                    var stringId = builderName + '-' + stringNumber + '-string-id',
+                        style = $('#' + stringId).attr('style'),
+                        stringDiv = '<div id ="' + stringId + '" style="' + style + '">' + string.template + '</div>';
+                    if (string.data) {
+                        stringDiv = '{{#' + string.data + '}}' + $(stringDiv).get(0).outerHTML + '{{/' + string.data + '}}';
                     }
-                    allTemplate.find('[region="hanger-groups"]').append(hangerGroupDiv);
+                    allTemplate.find('[region="string"]').append(stringDiv);
                 }
-                hangerNumber += 1;
+                stringNumber += 1;
             });
             return allTemplate.html();
         },
         extractLess: function() {
             var builderName = this.options.cacheName,
                 groups = app.store.get(builderName),
-                stacks = groups.stackGroups,
-                hangerGroups = groups.hangerGroups,
-                hangerNumber = 0,
+                stacks = groups.groups,
+                strings = groups.strings,
+                stringNumber = 0,
                 stackNumber = 0,
                 allLess = '';
             _.each(stacks, function(stack) {
@@ -210,22 +195,21 @@
                 }
                 stackNumber += 1;
             });
-            _.each(hangerGroups, function(hangerGroup) {
-                if (hangerGroup.less) {
-                    var cssId = builderName + '-' + hangerNumber + '-hanger-css',
-                        currentLess = '#' + cssId + '{' + hangerGroup.less + '}';
+            _.each(strings, function(string) {
+                if (string.less) {
+                    var cssId = builderName + '-' + stringNumber + '-string-css',
+                        currentLess = '#' + cssId + '{' + string.less + '}';
                     allLess += currentLess;
                 }
-                hangerNumber += 1;
+                stringNumber += 1;
             });
             return allLess;
         },
-
         //------------------------------------------- coop events -------------------------------------------//
         //function to handle updating group event
-        onGroupUpdated: function(obj, editedObj, dataSource){
+        onGroupUpdated: function(obj, editedObj){
             //call helper function
-            this.updateGroup(obj, editedObj, dataSource);
+            this.updateGroup(obj, editedObj);
         },
         //function to handle deleting group event
         onGroupDeleted: function(obj, type){
@@ -235,91 +219,92 @@
 
         //------------------------------------------- helper functions -------------------------------------------//
         //function to update group contents
-        updateGroup: function(obj, editedObj, dataSource){
+        updateGroup: function(obj, editedObj){
             //HTML field is not empty
             var viewAndRegion = obj.name,
                 baseId, uniqueId;
             var allGroups = app.store.get(viewAndRegion);
 
-            if (editedObj.type === 'stack') {
-            } else if (editedObj.type === 'hanger') {
+            if (editedObj.type === 'group') {
+                //
+            } else if (editedObj.type === 'string') {
                 //need to find css here, it has a builder handle, so it's easier to do it here
                 //Update css_container in the cache
                 if (editedObj.css_container) {
                     if (editedObj.template) {
                         this.$el.find('#' + uniqueId).css({ 'height': '', 'width': '', 'background-color': '' });
-                        delete allGroups.hangerGroups[editedObj.hangerNumber].css_container.height;
-                        delete allGroups.hangerGroups[editedObj.hangerNumber].css_container.width;
-                        delete allGroups.hangerGroups[editedObj.hangerNumber].css_container['background-color'];
+                        delete allGroups.strings[editedObj.stringNumber].css_container.height;
+                        delete allGroups.strings[editedObj.stringNumber].css_container.width;
+                        delete allGroups.strings[editedObj.stringNumber].css_container['background-color'];
                     }
                 }
             }else {
                 //wrong type
             }
-                            
-            //Reload the Stack group with the new data
-            dataSource.set(editedObj);
+
+            //update the view with new data
+            this.set(editedObj);
         },
 
         //function to delete a group
         deleteGroup: function(obj, type){
             var viewAndRegion = obj.name,
-                stackNumber = obj.stackNumber,
-                hangerNumber = obj.hangerNumber,
+                groupNumber = obj.groupNumber,
+                stringNumber = obj.stringNumber,
                 cacheData = app.store.get(viewAndRegion),
-                deleteGroups = cacheData.stackGroups,
-                deleteStrings = cacheData.hangerGroups;
+                deleteGroups = cacheData.groups,
+                deleteStrings = cacheData.strings;
             //check what type of delete
-            if (type === 'stack') {
-                var groupId = viewAndRegion + '-' + stackNumber + '-id',
+            if (type === 'group') {
+                var groupId = viewAndRegion + '-' + groupNumber + '-id',
                     basis = $('#' + groupId).css('flex-basis');
 
-                if (parseInt(stackNumber) === 0) {
-                    if (cacheData.stackGroups.length > 1) {
-                        var next = viewAndRegion + '-' + (parseInt(stackNumber) + 1) + '-id',
+                if (parseInt(groupNumber) === 0) {
+                    if (cacheData.groups.length > 1) {
+                        var next = viewAndRegion + '-' + (parseInt(groupNumber) + 1) + '-id',
                             nextBasis = parseInt($('#' + next).css('flex-basis')) + parseInt(basis);
-                        deleteGroups[(parseInt(stackNumber) + 1)].css_container = {
+                        deleteGroups[(parseInt(groupNumber) + 1)].css_container = {
                             'flex-grow': '0',
                             'flex-shrink': '1',
                             'flex-basis': nextBasis + '%',
                         };
                     }
                 } else {
-                    var prev = viewAndRegion + '-' + (parseInt(stackNumber) - 1) + '-id',
+                    var prev = viewAndRegion + '-' + (parseInt(groupNumber) - 1) + '-id',
                         prevBasis = parseInt($('#' + prev).css('flex-basis')) + parseInt(basis);
-                    deleteGroups[(parseInt(stackNumber) - 1)].css_container = {
+                    deleteGroups[(parseInt(groupNumber) - 1)].css_container = {
                         'flex-grow': '0',
                         'flex-shrink': '1',
                         'flex-basis': prevBasis + '%',
                     };
                 }
-                deleteGroups.splice(stackNumber, 1);
-                cacheData.stackGroups = deleteGroups;
+                deleteGroups.splice(groupNumber, 1);
+                cacheData.groups = deleteGroups;
                 var options = {
-                    newStackGroups: cacheData.stackGroups,
-                    newHangerGroups: cacheData.strings,
+                    newGroups: cacheData.groups,
+                    newStrings: cacheData.strings,
                     direction: cacheData.direction,
                     name: viewAndRegion
                 };
-                if (cacheData.stackGroups.length > 0) {
+                if (cacheData.groups.length > 0) {
                     app.store.set(viewAndRegion, cacheData);
-                    var cssId = viewAndRegion + '-' + stackNumber + '-css';
+                    var cssId = viewAndRegion + '-' + groupNumber + '-css';
                     $('#' + cssId).remove();
                     app.coop('update-data', options);
                 } 
 
-            } else {//type === 'hanger'
-                deleteStrings.splice(hangerNumber, 1);
-                cacheData.hangerGroups = deleteStrings;
+            } else {//type === 'string'
+                deleteStrings.splice(stringNumber, 1);
+                cacheData.strings = deleteStrings;
                 var stringOptions = {
-                    newStackGroups: cacheData.stackGroups,
-                    newHangerGroups: cacheData.hangerGroups,
+                    newGroups: cacheData.groups,
+                    newStrings: cacheData.strings,
                     direction: cacheData.direction,
                     name: viewAndRegion
                 };
                 app.store.set(viewAndRegion, cacheData);
-                var stringCssId = viewAndRegion + '-' + hangerNumber + '-string-css',
-                    stringId = viewAndRegion + '-' + hangerNumber + '-string-id';
+                var stringCssId = viewAndRegion + '-' + stringNumber + '-string-css',
+                    stringId = viewAndRegion + '-' + stringNumber + '-string-id';
 
                 //Remove the string from the screen
                 $('#' + stringCssId).remove();
@@ -328,11 +313,11 @@
         },
     });
 
-    var HangerGroup = app.view('HangerGroup', {
+    var StringView = app.view('StringView', {
         template: [
-            '<div class="ui-draggable-item drag-hanger-left"></div>',
-            '<div action-click="update-hanger" region="hanger-container"></div>',
-            '<div class="ui-draggable-item drag-hanger-right"></div>',
+            '<div class="ui-draggable-item drag-string-left"></div>',
+            '<div action-click="update-string" region="string-container">{{{template}}}</div>',
+            '<div class="ui-draggable-item drag-string-right"></div>',
         ],
         dnd: {
             drag: {
@@ -340,13 +325,24 @@
             }
         },
         actions: {
-            'update-hanger': function($btn, e) {
-                
+            'update-string': function($btn, e) {
+                // (new PopOver({
+                //     dataSource: this,
+                //     data: {
+                //         type: 'string',
+                //         html: this.get('template'),
+                //         data: this.get('data'),
+                //         css_container: this.get('css_container'),
+                //         less: this.get('less'),
+                //         obj: this.get()
+                //     }
+                // })).popover($btn, { placement: 'top', bond: this, style: { width: '600px' } });
+
                 //added by patrick for sliding up edit
                 app.coop('builder-group-config', {
-                    dataSource: this,
+                    dataSource: $(e.currentTarget).parent().data('view'),
                     data: {
-                        type: 'hanger',
+                        type: 'string',
                         html: this.get('template'),
                         data: this.get('data'),
                         css_container: this.get('css_container'),
@@ -355,19 +351,6 @@
                         builder: this.parentCt
                     }
                 });
-
-                //comment out for sliding out editing view
-                // (new PopOver({
-                //     dataSource: this,
-                //     data: {
-                //         type: 'hanger',
-                //         html: this.get('template'),
-                //         data: this.get('data'),
-                //         css_container: this.get('css_container'),
-                //         less: this.get('less'),
-                //         obj: this.get()
-                //     }
-                // })).popover($btn, { placement: 'top', bond: this, style: { width: '600px' } });
             }
         },
         flagX: false,
@@ -385,33 +368,28 @@
         onDragStop: function(event, ui) {
             var viewAndRegion = this.get('name'),
                 allGroups = app.store.get(viewAndRegion),
-                newHangerGroup = this.get();
-            newHangerGroup.css_container.top = this.$el.parent().css('top');
-            newHangerGroup.css_container.left = this.$el.parent().css('left');
-            allGroups.hangerGroups[this.get('hangerNumber')].css_container.top = this.$el.parent().css('top');
-            allGroups.hangerGroups[this.get('hangerNumber')].css_container.left = this.$el.parent().css('left');
-            this.set(newHangerGroup);
+                newString = this.get();
+            newString.css_container.top = this.$el.parent().css('top');
+            newString.css_container.left = this.$el.parent().css('left');
+            allGroups.strings[this.get('stringNumber')].css_container.top = this.$el.parent().css('top');
+            allGroups.strings[this.get('stringNumber')].css_container.left = this.$el.parent().css('left');
+            this.set(newString);
             app.store.set(viewAndRegion, allGroups);
         },
         onReady: function() {
-            //Apply content
             var viewAndRegion = this.get('name'),
-                uniqueId = viewAndRegion + '-' + this.get('hangerNumber') + '-hanger',
-                appliedContent = applyGroupContent(this.get('template'), this.options.dataSource.options.dataSource.get(this.get('data')));
-            this.$el.find('[region="hanger-container"]').html(appliedContent);
-
-            //Apply less
-            compileLess(uniqueId, this, 'hanger-container');
-
-            //Locate on the screen
+                uniqueId = viewAndRegion + '-' + this.get('stringNumber') + '-string',
+                appliedContent = applyGroupContent(this.get('template'), this.parentCt.options.dataSource.get(this.get('data')));
+            this.$el.find('[region="string-container"]').html(appliedContent);
+            compileLess(uniqueId, this, 'string-container');
             if (this.get('css_container')) {
                 $('#' + uniqueId + '-id').css(this.get('css_container'));
                 if (this.get('template')) {
                     this.$el.parent().css({ 'height': '', 'width': '', 'background-color': '' });
                     var allGroups = app.store.get(viewAndRegion);
-                    delete allGroups.hangerGroups[this.get('hangerNumber')].css_container.height;
-                    delete allGroups.hangerGroups[this.get('hangerNumber')].css_container.width;
-                    delete allGroups.hangerGroups[this.get('hangerNumber')].css_container['background-color'];
+                    delete allGroups.strings[this.get('stringNumber')].css_container.height;
+                    delete allGroups.strings[this.get('stringNumber')].css_container.width;
+                    delete allGroups.strings[this.get('stringNumber')].css_container['background-color'];
                     app.store.set(viewAndRegion, allGroups);
                 }
             }
@@ -449,7 +427,7 @@
         }
     };
 
-    var StackGroup = app.view('StackGroup', {
+    var Group = app.view('Group', {
         template: [
             '<div region="view-lock" action="update-group"></div>',
             '<div class="ui-draggable-item drag-top"></div>',
@@ -469,20 +447,19 @@
         widthFlag: true,
         onDragStart: function(event, ui) {
             var id = this.$el.parent().attr('id'),
-                arrayId = id.split('-'),
-                newId;
+                arrayId = id.split('-');
             arrayId.pop();
             var viewAndRegion = this.get('name'),
                 allGroups = app.store.get(viewAndRegion),
-                editStackGroup = allGroups.stackGroups,
-                last = editStackGroup.length - 1,
-                stackNumber = arrayId.pop(),
-                stackGroups = this.$el.parent().parent();
+                addGroup = allGroups.groups,
+                last = addGroup.length - 1,
+                groupNumber = arrayId.pop(),
+                groups = this.$el.parent().parent();
             if (event.hasClass('drag-top')) {
-                if (parseInt(stackNumber) === 0) {
-                    if (last === parseInt(stackNumber)) {
+                if (parseInt(groupNumber) === 0) {
+                    if (last === parseInt(groupNumber)) {
                         allGroups.direction = 'v';
-                        stackGroups.css({
+                        groups.css({
                             'flex-direction': 'column',
                         });
                         app.store.set(viewAndRegion, allGroups);
@@ -492,24 +469,23 @@
                     $('<div id="new"></div>').insertBefore('#' + id);
                 }
             } else if (event.hasClass('drag-bottom')) {
-                if (parseInt(stackNumber) === last) {
+                if (parseInt(groupNumber) === last) {
                     if (last === 0) {
                         allGroups.direction = 'v';
-                        stackGroups.css({
+                        groups.css({
                             'flex-direction': 'column',
                         });
                         app.store.set(viewAndRegion, allGroups);
                     }
-                    newId = viewAndRegion + '-' + (parseInt(stackNumber) + 1) + '-id';
                     this.$el.find('.drag-left').hide();
                     this.$el.find('.drag-right').hide();
-                    $('<div id="' + newId + '"></div>').insertAfter('#' + id);
+                    $('<div id="new"></div>').insertAfter('#' + id);
                 }
             } else if (event.hasClass('drag-left')) {
-                if (parseInt(stackNumber) === 0) {
-                    if (last === parseInt(stackNumber)) {
+                if (parseInt(groupNumber) === 0) {
+                    if (last === parseInt(groupNumber)) {
                         allGroups.direction = 'h';
-                        stackGroups.css({
+                        groups.css({
                             'flex-direction': 'row',
                         });
                         app.store.set(viewAndRegion, allGroups);
@@ -519,31 +495,29 @@
                     $('<div id="new"></div>').insertBefore('#' + id);
                 }
             } else if (event.hasClass('drag-right')) {
-                if (parseInt(stackNumber) === last) {
+                if (parseInt(groupNumber) === last) {
                     if (last === 0) {
                         allGroups.direction = 'h';
-                        stackGroups.css({
+                        groups.css({
                             'flex-direction': 'row',
                         });
                         app.store.set(viewAndRegion, allGroups);
                     }
-                    newId = viewAndRegion + '-' + (parseInt(stackNumber) + 1) + '-id';
                     this.$el.find('.drag-top').hide();
                     this.$el.find('.drag-bottom').hide();
-                    $('<div id="' + newId + '"></div>').insertAfter('#' + id);
+                    $('<div id="new"></div>').insertAfter('#' + id);
                 }
             }
         },
         onDrag: function(event, ui) {
-            var id = this.$el.parent().attr('id'),
-                arrayId = id.split('-'),
-                newId;
+            var id = this.$el.parent().attr('id');
+            var arrayId = id.split('-');
             arrayId.pop();
             var viewAndRegion = this.get('name'),
                 allGroups = app.store.get(viewAndRegion),
-                stackGroups = allGroups.stackGroups,
-                last = stackGroups.length - 1;
-            stackNumber = arrayId.pop();
+                addGroup = allGroups.groups,
+                last = addGroup.length - 1;
+            groupNumber = arrayId.pop();
             if (event.hasClass('drag-bottom')) {
                 if (this.heightFlag) {
                     this.initialHeight = this.$el.height();
@@ -553,12 +527,11 @@
                 var newBottomHeight = parseInt(this.change / this.initialHeight * this.initialBasis);
                 var bottomHeight = this.initialBasis - newBottomHeight;
                 this.$el.parent().css('flex', '0 1 ' + bottomHeight + '%');
-                if (parseInt(stackNumber) === last) {
-                    newId = viewAndRegion + '-' + (parseInt(stackNumber) + 1) + '-id';
+                if (parseInt(groupNumber) === last) {
                     if (this.heightFlag) {
                         this.heightFlag = false;
                     }
-                    $('#' + newId).css('flex', '0 1 ' + newBottomHeight + '%');
+                    $('#new').css('flex', '0 1 ' + newBottomHeight + '%');
                 } else {
                     var currentIdBottom = this.$el.parent().attr('id');
                     var nextBottom = $('#' + currentIdBottom).next();
@@ -578,7 +551,7 @@
                 var newTopHeight = parseInt(this.change / this.initialHeight * this.initialBasis);
                 var newHeight = this.initialBasis - newTopHeight;
                 this.$el.parent().css('flex', '0 1 ' + newHeight + '%');
-                if (parseInt(stackNumber) === 0) {
+                if (parseInt(groupNumber) === 0) {
                     if (this.heightFlag) {
                         this.heightFlag = false;
                     }
@@ -603,7 +576,7 @@
                 var newLeftWidth = parseInt(this.change / this.initialWidth * this.initialBasis);
                 var newWidth = this.initialBasis - newLeftWidth;
                 this.$el.parent().css('flex', '0 1 ' + newWidth + '%');
-                if (parseInt(stackNumber) === 0) {
+                if (parseInt(groupNumber) === 0) {
                     if (this.widthFlag) {
                         this.widthFlag = false;
                     }
@@ -627,15 +600,14 @@
                 this.change = arguments[1].originalPosition.left - arguments[1].position.left;
                 var rightWidth = this.initialBasis - newRightWidth;
                 this.$el.parent().css('flex', '0 1 ' + rightWidth + '%');
-                if (parseInt(stackNumber) === last) {
-                    newId = viewAndRegion + '-' + (parseInt(stackNumber) + 1) + '-id';
+                if (parseInt(groupNumber) === last) {
                     if (this.widthFlag) {
                         this.widthFlag = false;
                     }
-                    $('#' + newId).css('flex', '0 1 ' + newRightWidth + '%');
+                    $('#new').css('flex', '0 1 ' + newRightWidth + '%');
                 } else {
-                    var currentRightId = this.$el.parent().attr('id');
-                    var nextRight = $('#' + currentRightId).next();
+                    var currentIdRight = this.$el.parent().attr('id');
+                    var nextRight = $('#' + currentIdRight).next();
                     if (this.widthFlag) {
                         this.nextBasis = parseInt(nextRight.css('flex-basis'));
                         this.widthFlag = false;
@@ -662,14 +634,13 @@
             this.nextBasis = parseInt(next.css('flex-basis'));
             var id = this.$el.parent().attr('id'),
                 arrayId = id.split('-'),
-                position = 'middle',
-                newId;
+                position = 'middle';
             arrayId.pop();
             var viewAndRegion = this.get('name'),
                 allGroups = app.store.get(viewAndRegion),
-                editStackGroup = allGroups.stackGroups,
-                last = editStackGroup.length - 1;
-            stackNumber = arrayId.pop();
+                addGroup = allGroups.groups,
+                last = addGroup.length - 1;
+            groupNumber = arrayId.pop();
             var newData = {
                 template: '',
                 data: '',
@@ -681,9 +652,9 @@
                 }
             };
             var editedData = {
-                template: editStackGroup[parseInt(stackNumber)].template,
-                data: editStackGroup[parseInt(stackNumber)].data,
-                less: editStackGroup[parseInt(stackNumber)].less,
+                template: addGroup[parseInt(groupNumber)].template,
+                data: addGroup[parseInt(groupNumber)].data,
+                less: addGroup[parseInt(groupNumber)].less,
                 css_container: {
                     'flex-grow': '0',
                     'flex-shrink': '1',
@@ -691,165 +662,97 @@
                 }
             };
             if (event.hasClass('drag-bottom')) {
-                if (parseInt(stackNumber) === last) {
-                    position = 'end';
+                if (parseInt(groupNumber) === last) {
+                    addGroup = addGroup.slice(0, -1);
+                    addGroup.push(editedData);
+                    addGroup.push(newData);
                 } else {
                     position = 'next';
                 }
             }
             if (event.hasClass('drag-right')) {
-                if (parseInt(stackNumber) === last) {
-                    position = 'end';
+                if (parseInt(groupNumber) === last) {
+                    addGroup = addGroup.slice(0, -1);
+                    addGroup.push(editedData);
+                    addGroup.push(newData);
                 } else {
                     position = 'next';
                 }
             }
             if (event.hasClass('drag-top')) {
-                if (parseInt(stackNumber) === 0) {
-                    position = 'start';
-                    editStackGroup.shift();
-                    editStackGroup.unshift(editedData);
-                    editStackGroup.unshift(newData);
+                if (parseInt(groupNumber) === 0) {
+                    addGroup.shift();
+                    addGroup.unshift(editedData);
+                    addGroup.unshift(newData);
                 } else {
                     position = 'prev';
                 }
             }
             if (event.hasClass('drag-left')) {
-                if (parseInt(stackNumber) === 0) {
-                    position = 'start';
-                    editStackGroup.shift();
-                    editStackGroup.unshift(editedData);
-                    editStackGroup.unshift(newData);
+                if (parseInt(groupNumber) === 0) {
+                    addGroup.shift();
+                    addGroup.unshift(editedData);
+                    addGroup.unshift(newData);
                 } else {
                     position = 'prev';
                 }
             }
             if (position === 'prev') {
-                //Update the current Stack group
-                editStackGroup[parseInt(stackNumber)].css_container = {
+                addGroup[parseInt(groupNumber)].css_container = {
                     'flex-grow': '0',
                     'flex-shrink': '1',
                     'flex-basis': this.$el.parent().css('flex-basis'),
                 };
-
-                //Update the previous Stack group
-                editStackGroup[parseInt(stackNumber) - 1].css_container = {
+                addGroup[parseInt(groupNumber) - 1].css_container = {
                     'flex-grow': '0',
                     'flex-shrink': '1',
                     'flex-basis': this.prevBasis + '%',
                 };
-
-                //Update the cache
-                allGroups.stackGroups = editStackGroup;
-                app.store.set(viewAndRegion, allGroups);
-
-                editedData.stackNumber = this.get('stackNumber');
-                editedData.name = this.get('name');
-                this.set(editedData);
-
-                var prevId = this.get('name') + '-' + (parseInt(this.get('stackNumber')) - 1) + '-id';
-                var prevObj = editStackGroup[parseInt(stackNumber) - 1];
-                prevObj.stackNumber = parseInt(this.get('stackNumber')) - 1;
-                prevObj.name = this.get('name');
-                this.parentCt.$el.find('#' + prevId + ' .regional-stackgroup').data('view').set(prevObj);
             } else if (position === 'next') {
-                //Update the current Stack group
-                editStackGroup[parseInt(stackNumber)].css_container = {
+                addGroup[parseInt(groupNumber)].css_container = {
                     'flex-grow': '0',
                     'flex-shrink': '1',
                     'flex-basis': this.$el.parent().css('flex-basis'),
                 };
-
-                //Update the next Stack group
-                editStackGroup[parseInt(stackNumber) + 1].css_container = {
+                addGroup[parseInt(groupNumber) + 1].css_container = {
                     'flex-grow': '0',
                     'flex-shrink': '1',
                     'flex-basis': this.nextBasis + '%',
                 };
-
-                //Update the cache
-                allGroups.stackGroups = editStackGroup;
-                app.store.set(viewAndRegion, allGroups);
-
-                editedData.stackNumber = this.get('stackNumber');
-                editedData.name = this.get('name');
-                this.set(editedData);
-
-                var nextId = this.get('name') + '-' + (parseInt(this.get('stackNumber')) + 1) + '-id';
-                var nextObj = editStackGroup[parseInt(stackNumber) + 1];
-
-                nextObj.stackNumber = parseInt(this.get('stackNumber')) + 1;
-                nextObj.name = this.get('name');
-                this.parentCt.$el.find('#' + nextId + ' .regional-stackgroup').data('view').set(nextObj);
-            } else if (position === 'end') {
-                newId = this.get('name') + '-' + (parseInt(this.get('stackNumber')) + 1) + '-id';
-                //Dragging from end and adding a new stack group to the end
-                editStackGroup = editStackGroup.slice(0, -1);
-                editStackGroup.push(editedData);
-                newData.css_container['flex-basis'] = $('#' + newId).css('flex-basis');
-                editStackGroup.push(newData);
-
-                //Update the cache
-                allGroups.stackGroups = editStackGroup;
-                app.store.set(viewAndRegion, allGroups);
-
-                //Update the current Stack group with the updated height
-                editedData.stackNumber = this.get('stackNumber');
-                editedData.name = this.get('name');
-                newData.stackNumber = parseInt(this.get('stackNumber')) + 1;
-                newData.name = this.get('name');
-                this.set(editedData);
-
-                //Spray the new Stack group
-                var newStackGroup = new StackGroup({
-                    dataSource: this.options.dataSource,
-                    data: newData
-                });
-                this.parentCt.spray(('#' + newId), newStackGroup);
-            } else if (position === 'start') {
-                //Update the cache
-                allGroups.stackGroups = editStackGroup;
-                app.store.set(viewAndRegion, allGroups);
-
-                //coop for adding to the beginning
-                var options = {
-                    newStackGroups: editStackGroup,
-                    newHangerGroups: allGroups.hangerGroups,
-                    direction: allGroups.direction,
-                    name: this.get('name')
-                };
-                app.coop('update-data', options);
             }
+            allGroups.groups = addGroup;
+            var options = {
+                newGroups: allGroups.groups,
+                newStrings: allGroups.strings,
+                direction: allGroups.direction,
+                name: this.get('name')
+            };
+
+            var cssId = viewAndRegion + '-' + groupNumber + '-css';
+            $('#' + cssId).remove();
+            app.coop('update-data', options);
+
+            //Update cache
+            app.store.set(viewAndRegion, allGroups);
         },
         onReady: function() {
-            var viewAndRegion = this.get('name'),
-                allGroups = app.store.get(viewAndRegion),
-                uniqueId = viewAndRegion + '-' + this.get('stackNumber'),
-                template = this.get('template'),
-                data = this.get('data');
-
-            //Display the content
-            var appliedContent = applyGroupContent(template, this.options.dataSource.options.dataSource.get(data));
+            var template = this.get('template'),
+                data = this.get('data'),
+                appliedContent = applyGroupContent(template, this.parentCt.options.dataSource.get(data));
             this.$el.find('[region="view-lock"]').html(appliedContent);
             this.$el.css({
-                'order': this.get('stackNumber'),
+                'order': this.get('groupNumber'),
             });
+            this.$el.find('.drag-top').css('left', '50%', 'important');
+            this.$el.find('.drag-bottom').css('left', '50%', 'important');
+            this.$el.find('.drag-left').css('top', '50%', 'important');
+            this.$el.find('.drag-right').css('top', '50%', 'important');
 
-            //Locate the flex item
+            var viewAndRegion = this.get('name'),
+                uniqueId = viewAndRegion + '-' + this.get('groupNumber');
+            compileLess(uniqueId, this, 'view-lock');
             if (this.get('css_container')) {
                 $('#' + uniqueId + '-id').css(this.get('css_container'));
-            }
-
-            //Apply less
-            compileLess(uniqueId, this, 'view-lock');
-
-            //Remove extra handles
-            if (allGroups.direction === 'v') {
-                this.$el.find('.drag-left').hide();
-                this.$el.find('.drag-right').hide();
-            } else if (allGroups.direction === 'h') {
-                this.$el.find('.drag-top').hide();
-                this.$el.find('.drag-bottom').hide();
             }
         }
     });
@@ -913,57 +816,52 @@
                         },
                         baseId, uniqueId;
                     var allGroups = app.store.get(viewAndRegion),
-                        currentBuilder = this.options.dataSource.options.dataSource;
+                        currentBuilder = this.options.dataSource.parentCt;
 
-                    if (this.get('type') === 'stack') {
-                        var editRegionStackGroups = allGroups.stackGroups,
-                            stackNumber = obj.stackNumber;
-                        baseId = viewAndRegion + '-' + stackNumber;
+                    if (this.get('type') === 'group') {
+                        var editRegionGroups = allGroups.groups,
+                            groupNumber = obj.groupNumber;
+                        baseId = viewAndRegion + '-' + groupNumber;
                         uniqueId = baseId + '-id';
-                        editRegionStackGroups[stackNumber] = editedObj;
-                        allGroups.stackGroups = editRegionStackGroups;
-
-                        //Update the cache
-                        app.store.set(viewAndRegion, allGroups);
+                        editRegionGroups[groupNumber] = editedObj;
+                        allGroups.groups = editRegionGroups;
 
                         editedObj.name = viewAndRegion;
-                        editedObj.stackNumber = stackNumber;
+                        editedObj.groupNumber = groupNumber;
 
                         //Close the popover
                         this.close();
 
-                        //Reload the Stack group with the new data
+                        //Reload the Group view with the new data
                         this.options.dataSource.set(editedObj);
-                    } else if (this.get('type') === 'hanger') {
-                        var editRegionHangerGroups = allGroups.hangerGroups,
-                            hangerNumber = obj.hangerNumber;
-                        baseId = viewAndRegion + '-' + hangerNumber + '-hanger';
+                    } else if (this.get('type') === 'string') {
+                        var editRegionStrings = allGroups.strings,
+                            stringNumber = obj.stringNumber;
+                        baseId = viewAndRegion + '-' + stringNumber + '-string';
                         uniqueId = baseId + '-id';
-                        editRegionHangerGroups[hangerNumber] = editedObj;
-                        allGroups.hangerGroups = editRegionHangerGroups;
+                        editRegionStrings[stringNumber] = editedObj;
+                        allGroups.strings = editRegionStrings;
 
                         //Update css_container in the cache
                         if (editedObj.css_container) {
                             if (editedObj.template) {
                                 currentBuilder.$el.find('#' + uniqueId).css({ 'height': '', 'width': '', 'background-color': '' });
-                                delete allGroups.hangerGroups[hangerNumber].css_container.height;
-                                delete allGroups.hangerGroups[hangerNumber].css_container.width;
-                                delete allGroups.hangerGroups[hangerNumber].css_container['background-color'];
+                                delete allGroups.strings[stringNumber].css_container.height;
+                                delete allGroups.strings[stringNumber].css_container.width;
+                                delete allGroups.strings[stringNumber].css_container['background-color'];
                             }
                         }
-
-                        //Update the cache
-                        app.store.set(viewAndRegion, allGroups);
-
                         editedObj.name = viewAndRegion;
-                        editedObj.hangerNumber = hangerNumber;
+                        editedObj.stringNumber = stringNumber;
 
                         //Close the popover
                         this.close();
 
-                        //Update the Hanger group with the new data
+                        //Update the String view with the new data
                         this.options.dataSource.set(editedObj);
                     }
+                    //Update cache
+                    app.store.set(viewAndRegion, allGroups);
                 } else {
                     //TODO: Why this is undefined?
                     //console.log('tabs, ', this.getViewIn('tabs').$el.getViewIn('tab-html'));
@@ -977,69 +875,69 @@
             delete: function() {
                 var obj = this.get('obj'),
                     viewAndRegion = obj.name,
-                    stackNumber = obj.stackNumber,
-                    hangerNumber = obj.hangerNumber,
+                    groupNumber = obj.groupNumber,
+                    stringNumber = obj.stringNumber,
                     cacheData = app.store.get(viewAndRegion),
-                    deleteStackGroups = cacheData.stackGroups,
-                    deleteHangerGroups = cacheData.hangerGroups;
-                if (this.get('type') === 'stack') {
-                    var stackGroupId = viewAndRegion + '-' + stackNumber + '-id',
-                        basis = $('#' + stackGroupId).css('flex-basis');
-                    if (parseInt(stackNumber) === 0) {
-                        if (cacheData.stackGroups.length > 1) {
-                            var next = viewAndRegion + '-' + (parseInt(stackNumber) + 1) + '-id',
+                    deleteGroups = cacheData.groups,
+                    deleteStrings = cacheData.strings;
+                if (this.get('type') === 'group') {
+                    var groupId = viewAndRegion + '-' + groupNumber + '-id',
+                        basis = $('#' + groupId).css('flex-basis');
+                    if (parseInt(groupNumber) === 0) {
+                        if (cacheData.groups.length > 1) {
+                            var next = viewAndRegion + '-' + (parseInt(groupNumber) + 1) + '-id',
                                 nextBasis = parseInt($('#' + next).css('flex-basis')) + parseInt(basis);
-                            deleteStackGroups[(parseInt(stackNumber) + 1)].css_container = {
+                            deleteGroups[(parseInt(groupNumber) + 1)].css_container = {
                                 'flex-grow': '0',
                                 'flex-shrink': '1',
                                 'flex-basis': nextBasis + '%',
                             };
                         }
                     } else {
-                        var prev = viewAndRegion + '-' + (parseInt(stackNumber) - 1) + '-id',
+                        var prev = viewAndRegion + '-' + (parseInt(groupNumber) - 1) + '-id',
                             prevBasis = parseInt($('#' + prev).css('flex-basis')) + parseInt(basis);
-                        deleteStackGroups[(parseInt(stackNumber) - 1)].css_container = {
+                        deleteGroups[(parseInt(groupNumber) - 1)].css_container = {
                             'flex-grow': '0',
                             'flex-shrink': '1',
                             'flex-basis': prevBasis + '%',
                         };
                     }
-                    deleteStackGroups.splice(stackNumber, 1);
-                    cacheData.stackGroups = deleteStackGroups;
+                    deleteGroups.splice(groupNumber, 1);
+                    cacheData.groups = deleteGroups;
                     var options = {
-                        newStackGroups: cacheData.stackGroups,
-                        newHangerGroups: cacheData.hangerGroups,
+                        newGroups: cacheData.groups,
+                        newStrings: cacheData.strings,
                         direction: cacheData.direction,
                         name: viewAndRegion
                     };
-                    if (cacheData.stackGroups.length > 0) {
+                    if (cacheData.groups.length > 0) {
                         app.store.set(viewAndRegion, cacheData);
-                        var stackGroupCssId = viewAndRegion + '-' + stackNumber + '-css';
-                        $('#' + stackGroupCssId).remove();
+                        var cssId = viewAndRegion + '-' + groupNumber + '-css';
+                        $('#' + cssId).remove();
                         this.close();
                         app.coop('update-data', options);
                     } else {
                         this.close();
                     }
                 } else {
-                    deleteHangerGroups.splice(hangerNumber, 1);
-                    cacheData.hangerGroups = deleteHangerGroups;
-                    var hangerOptions = {
-                        newStackGroups: cacheData.stackGroups,
-                        newHangerGroups: cacheData.hangerGroups,
+                    deleteStrings.splice(stringNumber, 1);
+                    cacheData.strings = deleteStrings;
+                    var stringOptions = {
+                        newGroups: cacheData.groups,
+                        newStrings: cacheData.strings,
                         direction: cacheData.direction,
                         name: viewAndRegion
                     };
                     app.store.set(viewAndRegion, cacheData);
-                    var hangerGroupCssId = viewAndRegion + '-' + hangerNumber + '-hanger-css',
-                        hangerGroupId = viewAndRegion + '-' + hangerNumber + '-hanger-id';
+                    var stringCssId = viewAndRegion + '-' + stringNumber + '-string-css',
+                        stringId = viewAndRegion + '-' + stringNumber + '-string-id';
 
                     //Close the popover
                     this.close();
 
-                    //Remove the Hanger group from the screen
-                    $('#' + hangerGroupCssId).remove();
-                    $('#' + hangerGroupId).remove();
+                    //Remove the string from the screen
+                    $('#' + stringCssId).remove();
+                    $('#' + stringId).remove();
                 }
             }
         },

@@ -144,9 +144,12 @@
 			//replace the data.data object with data.datakey
 			obj.data.datakey = obj.data.data;
 			delete obj.data.data;
+
+			//insert dataSource into data to bridge code
+			obj.data.__dataSource = obj.dataSource;
 			//setup the data for the group editor view
 			this.getViewIn('group-editor').set(obj.data);
-			
+
 			this.$el.find('.clip-editing-holder').addClass('active');
 		},
 	});

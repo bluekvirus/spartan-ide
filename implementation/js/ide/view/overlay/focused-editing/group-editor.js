@@ -42,41 +42,46 @@
                     currentBuilder = this.get('builder');
 
                 //prepare the data as required in data view
-                if(this.get('type') === 'group'){
-                    var editRegionGroups = allGroups.groups,
-                        groupNumber = obj.groupNumber;
-                    baseId = viewAndRegion + '-' + groupNumber;
+                if(this.get('type') === 'stack'){
+                    var editRegionGroups = allGroups.stackGroups,
+                        stackNumber = obj.stackNumber;
+                    baseId = viewAndRegion + '-' + stackNumber;
                     uniqueId = baseId + '-id';
-                    editRegionGroups[groupNumber] = editedObj;
-                    allGroups.groups = editRegionGroups;
+                    editRegionGroups[stackNumber] = editedObj;
+                    allGroups.stackGroups = editRegionGroups;
+
+                    //Update cache
+                	app.store.set(viewAndRegion, allGroups);
 
                     editedObj.name = viewAndRegion;
-                    editedObj.groupNumber = groupNumber;
-                    editedObj.type = 'group';
+                    editedObj.stackNumber = stackNumber;
+                    editedObj.type = 'stack';
 
-                }else if (this.get('type') === 'string'){
-                    var editRegionStrings = allGroups.strings,
-                        stringNumber = obj.stringNumber;
-                    baseId = viewAndRegion + '-' + stringNumber + '-string';
+                }else if (this.get('type') === 'hanger'){
+                    var editRegionStrings = allGroups.hangerGroups,
+                        hangerNumber = obj.hangerNumber;
+                    baseId = viewAndRegion + '-' + hangerNumber + '-hanger';
                     uniqueId = baseId + '-id';
-                    editRegionStrings[stringNumber] = editedObj;
-                    allGroups.strings = editRegionStrings;
+                    editRegionStrings[hangerNumber] = editedObj;
+                    allGroups.hangerGroups = editRegionStrings;
+
+                    //Update cache
+                	app.store.set(viewAndRegion, allGroups);
+
                     editedObj.name = viewAndRegion;
-                    editedObj.stringNumber = stringNumber;
-                    editedObj.type = 'string';
+                    editedObj.hangerNumber = hangerNumber;
+                    editedObj.type = 'hanger';
                 }
-
-                //Update cache
-                app.store.set(viewAndRegion, allGroups);
+             
                 //trigger coop
-                app.coop('group-updated', obj, editedObj);
+                app.coop('group-updated', obj, editedObj, this.get('__dataSource'));
 			},
 			delete: function(){
 				var obj = this.get('obj'),
 					type = this.get('type');
 
 				//trigger coop
-                app.coop('group-deleted', obj, type);		
+                app.coop('group-deleted', obj, type);	
 			},
 		},
 		editors: {

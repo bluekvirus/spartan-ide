@@ -87,7 +87,7 @@
 					});
 				//setup default cache
 				app.store.set(cacheName, app.store.get(cacheName) || {
-				    'groups': [{
+				    'stackGroups': [{
 				        'template': that.get('template'),
 				        'data': '',
 				        'less': '',
@@ -97,7 +97,7 @@
 				            'flex-basis': '100%',
 				        }
 				    }, ],
-				    'strings': [],
+				    'hangerGroups': [],
 				    'direction': ''
 				});
 
