@@ -39,7 +39,7 @@
                     },
                     baseId, uniqueId;
                 var allGroups = app.store.get(viewAndRegion);
-                    currentBuilder = this.get('builder');
+                    
                 //prepare the data as required in data view
                 if(this.get('type') === 'stack'){
                     var editRegionGroups = allGroups.stackGroups,

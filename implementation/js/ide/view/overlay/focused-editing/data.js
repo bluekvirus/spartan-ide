@@ -40,7 +40,27 @@
 				try{
 					var data = JSON.parse(editor.getVal());
 					this.dataSourceForView.clear().set(data);
-				} catch(e){
+
+					//reload builder for updated data, if builder is already shown
+					var viewTabView = this.parentCt.getViewFromTab('View');
+					//check whether builder is being shown
+					if(viewTabView.builderShown){
+
+						//cache name = currently editing view + region name
+						var cacheName = _.string.slugify(viewTabView.get('cacheName'));
+
+						//create the builder view
+						var builder = app.get('Overlay.FocusedEditing.Builder')
+							.create({
+								cacheName : cacheName,
+								dataSource: this.dataSourceForView, //temporary placeholder,
+							});
+
+						//spray the builder view onto the region
+			      		this.parentCt.spray(this.parentCt.get('$clone'), builder);
+					}
+
+				} catch(event){
 					app.notify('PARSE ERROR', 'Data is not a valid JSON format.', 'danger');
 				}
 			}
