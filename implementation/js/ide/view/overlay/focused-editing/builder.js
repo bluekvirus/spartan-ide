@@ -255,7 +255,7 @@
             }else {
                 //wrong type
             }
-            console.log('updateGroup', editedObj);       
+            console.log('updateGroup', editedObj);
             //Reload the Stack group with the new data
             dataSource.set(editedObj);
         },
@@ -305,7 +305,7 @@
                     var cssId = viewAndRegion + '-' + stackNumber + '-css';
                     $('#' + cssId).remove();
                     app.coop('update-data', options);
-                } 
+                }
 
             } else {//type === 'hanger'
                 deleteStrings.splice(hangerNumber, 1);
