@@ -46,7 +46,8 @@
 			// this.registerEditingEvents($el);
 		},
 		onAppendClone: function(){
-			var $clone = this.get('$clone');
+			var $clone = this.get('$clone'),
+				that = this;
 
 			//modify css top to be center
 			var tabsHeight = this.parentCt.$el.find('.tabs-container .tabs').height(),
@@ -58,7 +59,40 @@
 			this.$el.append($clone);
 
 			//register builder loading event
-			this.registerEditingEvents($clone);
+			//this.registerEditingEvents($clone);
+			
+			//cache name = currently editing view + region name
+			var cacheName = _.string.slugify(this.get('cacheName')),
+				savedConfigs = app.store.get('__savedConfigs') || {};
+
+			//create the builder view
+			var builder = app.get('Overlay.FocusedEditing.Builder')
+				.create({
+					cacheName : cacheName,
+					dataSource: savedConfigs[cacheName] ? app.model(JSON.parse(savedConfigs[cacheName].data)) : app.model(),
+				});
+
+			//setup default cache
+			app.store.set(cacheName, app.store.get(cacheName) || {
+			    'stackGroups': [{
+			        'template': that.get('template'),
+			        'data': '',
+			        'less': '',
+			        'css_container': {
+			            'flex-grow': '0',
+			            'flex-shrink': '1',
+			            'flex-basis': '100%',
+			        }
+			    }, ],
+			    'hangerGroups': [],
+			    'direction': ''
+			});
+
+			//spray the builder view onto the region
+      		that.spray($clone, builder);
+
+      		//flip flag
+      		that.builderShown = true;
 		},
 		registerEditingEvents: function($el){
 			var that = this;
@@ -67,45 +101,7 @@
 				e.preventDefault();
 				e.stopPropagation();
 
-				//cache name = currently editing view + region name
-				var cacheName = _.string.slugify(that.get('cacheName'));
-
-				//check whether data view has been show or not?
-				var dataView;
-
-				try{
-					dataView = that.parentCt.getViewFromTab('Data');
-				}catch(event){
-					console.warn('You have not configed any data.' + event);
-				}
-
-				//create the builder view
-				var builder = app.get('Overlay.FocusedEditing.Builder')
-					.create({
-						cacheName : cacheName,
-						dataSource: dataView ? dataView.dataSourceForView : app.model(), //temporary placeholder,
-					});
-				//setup default cache
-				app.store.set(cacheName, app.store.get(cacheName) || {
-				    'stackGroups': [{
-				        'template': that.get('template'),
-				        'data': '',
-				        'less': '',
-				        'css_container': {
-				            'flex-grow': '0',
-				            'flex-shrink': '1',
-				            'flex-basis': '100%',
-				        }
-				    }, ],
-				    'hangerGroups': [],
-				    'direction': ''
-				});
-
-				//spray the builder view onto the region
-          		that.spray($el, builder);
-
-          		//flip flag
-          		that.builderShown = true;
+				
 			});
 		},
 		actions: {

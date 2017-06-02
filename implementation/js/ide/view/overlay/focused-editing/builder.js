@@ -829,7 +829,7 @@
                 uniqueId = viewAndRegion + '-' + this.get('stackNumber'),
                 template = this.get('template'),
                 data = this.get('data');
-            console.log('*******************',this.options.dataSource);
+
             //Display the content
             var appliedContent = applyGroupContent(template, this.options.dataSource.options.dataSource.get(data));
             this.$el.find('[region="view-lock"]').html(appliedContent);

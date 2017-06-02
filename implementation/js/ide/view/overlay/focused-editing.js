@@ -36,6 +36,7 @@
 				//close the sliding editing view
 				this.$el.find('.clip-editing-holder').removeClass('active');
 
+
 				this.tab('tabs', 'Overlay.FocusedEditing.' + tabId, tabId);
 			}
 				
@@ -46,13 +47,14 @@
 				this.close();
 			},
 			'save-builder': function(){
+				//Not a problem anymore since we now always show the builder view
 				//only save if builder has been shown
-				if(!this.getViewIn('tabs').getViewIn('tab-View').builderShown){
-					//notify
-					app.notify('No changes has been made.', 'You have not made any changes.', 'info');
+				// if(!this.getViewIn('tabs').getViewIn('tab-View').builderShown){
+				// 	//notify
+				// 	app.notify('No changes has been made.', 'You have not made any changes.', 'info');
 
-					return;
-				}
+				// 	return;
+				// }
 
 				//get builder view
 				var builder, template, dataTab, dataContent,
@@ -62,7 +64,7 @@
 					builder = app.locate('Overlay.FocusedEditing.Builder').view;
 				}catch(e){
 					builderFlag = false;
-					console.warn('You have NOT load the builder view into the region!');
+					console.warn('Get builder view error...');
 				}
 
 				//only assign tempalte if the builder view is loaded
@@ -70,7 +72,7 @@
 					template = builder.extractTemplate();
 
 				try{
-					dataTab = this.getViewIn('tabs').getViewIn('tab-Data');
+					dataTab = this.getViewFromTab('Data');
 				}catch(e){
 					dataFlag = false;
 					console.warn('You have NOT assign any data.');
@@ -78,30 +80,37 @@
 
 				//only assign data if the dataTab has been loaded
 				if(dataFlag){
-					if(dataTab.$el.find('#remote-switch').prop('checked')){
-						//remote data, fetch url editor's content as data
+					// if(dataTab.$el.find('#remote-switch').prop('checked')){
+					// 	//remote data, fetch url editor's content as data
 
-						dataContent = dataTab.get('url');
-					}else{
-						dataContent = dataTab.get('data-content');
-					}
+					// 	dataContent = dataTab.get('url');
+					// }else{
+					// 	dataContent = dataTab.get('data-content');
+					// }
+					// 
+					
+					dataContent = dataTab.aces.data.getValue(); //fetch value from ace editor
 				}
 
 				if(builderFlag && template){
 					//flip flag
 					this.saved = true;
 
-					//temporary solution
+					//for blank data config view
+					if(!dataContent)
+						dataContent = "{}";
+
+					//prepare the view for spraying back
 					this.spraying = app.view({
 										template: template,
-										data: dataContent || {}
+										data: JSON.parse(dataContent)
 									});
 
 					//save the extracted template and data to cache for future use
 					var savedConfigs = app.store.get('__savedConfigs') || {};
 					savedConfigs[this.get('cacheName')] = {
 						template: template,
-						data: dataContent || {}
+						data: dataContent
 					};
 
 					app.store.set('__savedConfigs', _.deepClone(savedConfigs));
@@ -123,13 +132,13 @@
 				if(stored){
 					this.spraying = app.view({
 										template: stored.template,
-										data: stored.data
+										data: JSON.parse(stored.data)
 									});
 				}
 				else{
 					this.spraying = app.view({
-										template: this.get('template'),
-										data: this.get('dataContent')
+										template: this.get('template') || ' ',
+										data: JSON.parse(this.get('dataContent'))
 									});
 				}
 			}
@@ -157,10 +166,13 @@
 			this.$el.find('.clip-editing-holder').addClass('active');
 		},
 
+		//------------------------- functions to insert ace editor to textarea editors -------------------------//
+		//coop event listener
 		onCreateAceEditor: function(id, options){
 			this._createAceEditor(id, options);
 		},
-		//------------------------- function to insert ace editor to textarea editors -------------------------//
+
+		//create function
 		_createAceEditor: function(elementId, options){
 			var pad = ace.edit(elementId);
 			//config ace editor
@@ -169,6 +181,9 @@
 			pad.getSession().setMode(options.mode && ('ace/mode/' + options.mode));
 			pad.$blockScrolling = Infinity;
 			//pad.setOption("maxLines", 1000);
+			
+			//use coop event to give back pad to every view
+			app.coop('ace-editor-initiated', elementId, pad);
 		},
 		
 	});

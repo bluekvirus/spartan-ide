@@ -36,15 +36,15 @@
 		//setup a tolerance for coordinates matching
 		app._global.tolerance = app._global.tolerance || 0.5;/*since some time points won't match down to every digit, we intoduce a tolerance parameter here(0.5%).*/
 
-		//initialize __layouts__
-		var layouts = app.store.get('__layouts__');
+		//initialize __layouts
+		var layouts = app.store.get('__layouts');
 		if(!layouts)
-			app.store.set('__layouts__', {});
+			app.store.set('__layouts', {});
 
-		//initialize __current__
-		var current = app.store.get('__current__');
+		//initialize __current
+		var current = app.store.get('__current');
 		if(!current)
-			app.store.set('__current__', {});
+			app.store.set('__current', {});
 
 		//generation to keep every element has a truly unique id.
 		var gen = app.store.get('generation');

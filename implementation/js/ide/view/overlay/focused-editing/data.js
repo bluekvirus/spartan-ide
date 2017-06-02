@@ -13,9 +13,13 @@
 		//data: 'url', {} or [],
 		//coop: ['e', 'e'],
 		//[editors]: {...},
-		
+		coop: ['ace-editor-initiated'],
 		initialize: function(){
+			//object to store current data
 			this.dataSourceForView = app.model();
+
+			//object to store configured ace editors
+			this.aces = {};
 		},
 		//onShow: function(){},
 		//onDataRendered: function(){},
@@ -36,38 +40,63 @@
 			});
 
 			//insert ace to editor
-			//fetch id, since only one textarea exists
-			var id = this.$el.find('textarea').attr('id');
-			this.coop('create-ace-editor', id, {theme: 'monokai', mode: 'json'});
-		},
-		onEditorChanged: function(name, editor){
-			if(name === 'data-content'){
-				try{
-					var data = JSON.parse(editor.getVal());
-					this.dataSourceForView.clear().set(data);
+			this.coop('create-ace-editor', 'data-ace-editor', {theme: 'monokai', mode: 'json'});
 
-					//reload builder for updated data, if builder is already shown
-					var viewTabView = this.parentCt.getViewFromTab('View');
-					//check whether builder is being shown
-					if(viewTabView.builderShown){
-
-						//cache name = currently editing view + region name
-						var cacheName = _.string.slugify(viewTabView.get('cacheName'));
-
-						//create the builder view
-						var builder = app.get('Overlay.FocusedEditing.Builder')
-							.create({
-								cacheName : cacheName,
-								dataSource: this.dataSourceForView, //temporary placeholder,
-							});
-
-						//spray the builder view onto the region
-			      		this.parentCt.spray(this.parentCt.get('$clone'), builder);
-					}
-
-				} catch(event){
-					app.notify('PARSE ERROR', 'Data is not a valid JSON format.', 'danger');
+			//after ace editor initiated, honor stored data value
+			_.defer(function(){
+				//get cacheName
+				var cacheName = that.parentCt.get('cacheName');
+				//fetch builder cache to get value
+				var savedConfigs = app.store.get('__savedConfigs') || {};
+				if(savedConfigs[cacheName]){
+					//make it pretty x.x de-stringify and stringify
+					that.aces.data.setValue(JSON.stringify(JSON.parse(savedConfigs[cacheName].data), null, '\t'), 1);
 				}
+			});
+		},
+		//----- coop for ace editors have been initiated -----//
+		onAceEditorInitiated: function(id, pad){
+			var that = this;
+			//data
+			if(id === 'data-ace-editor')
+				this.aces.data = pad;
+
+			//register change event for data editor
+			pad.getSession().on('change', _.debounce(function(e){
+				that.dataEditorChanged(pad);
+			}, 200));
+		},
+		dataEditorChanged: function(pad){
+			//try to parse JSON data in the editor
+			try{
+				var data = JSON.parse(pad.getValue());
+				this.dataSourceForView.clear().set(data);
+
+				//reload builder for updated data, if builder is already shown
+				var viewTabView = this.parentCt.getViewFromTab('View');
+				//check whether builder is being shown
+				if(viewTabView.builderShown){
+
+					//cache name = currently editing view + region name
+					var cacheName = _.string.slugify(viewTabView.get('cacheName'));
+
+					//create the builder view
+					var builder = app.get('Overlay.FocusedEditing.Builder')
+						.create({
+							cacheName : cacheName,
+							dataSource: this.dataSourceForView, //temporary placeholder,
+						});
+
+					//spray the builder view onto the region
+		      		this.parentCt.spray(this.parentCt.get('$clone'), builder);
+				}
+
+			} catch(event){
+
+				console.warn('JSON parse error...');
+
+				//no need to show notification, since ace editor can tell error
+				//app.notify('PARSE ERROR', 'Data is not a valid JSON format.', 'danger');
 			}
 		},
 		editors: {
@@ -84,10 +113,11 @@
 					required: true,
 				},
 			},
-			'data-content': {
-				type: 'textarea',
-				label: 'DATA',
-			},
+			// moved to browser native editor for using ace editor
+			// 'data-content': {
+			// 	type: 'textarea',
+			// 	label: 'DATA',
+			// },
 		},
 		actions: {
 			'fetch-remote': function(){
@@ -97,7 +127,7 @@
 					url: this.get('url'),
 				})
 				.done(function(data){
-					that.getEditor('data-content').setVal(JSON.stringify(data, null,'\t'), true);
+					that.aces.data.setValue(JSON.stringify(data, null,'\t'), 1);
 				})
 				.fail(function(){
 					//that.getEditor('data-content').setVal('fetch error');

@@ -635,11 +635,11 @@ h2 {
 							position: absolute;
 							left: 0;
 							right: 1px;
-							bottom: -49%;
+							bottom: -59%;
 							transition: 0.3s;
 							border: 1px solid @border;
 							box-shadow: -3px -3px 3px @border;
-							height: 50%;
+							height: 60%;
 							background-color: rgba(155, 155, 155, 0.7);
 							z-index: 101;
 							&.active {
@@ -681,6 +681,22 @@ h2 {
 									border-top: 1px solid #333;
 									padding: @grid-gutter-width 0;
 									text-align: left;
+									.html-editors,
+									.less-editors {
+										.name-holder {
+											>span {
+												font-weight: 600;
+											}
+										}
+										.editor {
+											position: absolute;
+											top: 40px;
+											bottom: @grid-gutter-width;
+											left: 0;
+											right: 0;
+										}
+									}
+
 									.form-group.editor.editor-basic {
 										label+div {
 											position: absolute;
@@ -774,6 +790,7 @@ h2 {
 									>div {
 										height: 100%;
 										padding: @grid-gutter-width;
+										position: relative;
 										.url-editor {
 											padding: @grid-gutter-width 0 0 0;
 											position: relative;
@@ -802,6 +819,20 @@ h2 {
 												resize: vertical;
 												height: 400px;
 												background-color: #000;
+											}
+										}
+										.data-editor-holder {
+											padding: @grid-gutter-width 0;
+											.name-holder {
+												text-align: left;
+												>span {
+													font-weight: 600;
+												}
+											}
+											#data-ace-editor {
+												margin-top: @grid-gutter-width;
+												width: 100%;
+												height: 500px;
 											}
 										}
 										.switch-holder {

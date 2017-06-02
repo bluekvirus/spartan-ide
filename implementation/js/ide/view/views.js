@@ -26,7 +26,7 @@
 			app.remote({
 				url: '/api/getViewList'
 			}).done(function(data){
-				var layouts = app.store.get('__layouts__'),
+				var layouts = app.store.get('__layouts'),
 					temp = data.slice();
 
 				_.each(temp, function(viewName, index){
@@ -48,12 +48,11 @@
 			});
 		},
 		onNavigateTo: function(path){
-
 			var that = this;
 			//
 			if(path && this.get('items')){
 				var viewName = path.pop(),
-					layouts = app.store.get('__layouts__');
+					layouts = app.store.get('__layouts');
 				//check what type of view
 				if((_.find(this.get('items'), function(v){ return v.name === viewName;})).remote)
 					this.show('preview', viewName);

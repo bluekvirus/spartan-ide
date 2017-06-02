@@ -41,18 +41,18 @@
 				url: '/api/getViewList',
 			}).done(function(data){
 				//locally stored configurations
-				var layouts = app.store.get('__layouts__'),
+				var layouts = app.store.get('__layouts'),
 				//stored configuration for current view
-					current = app.store.get('__current__');
+					current = app.store.get('__current');
 
 				var showing; //later to store view to be shown
 
 				//*** always consult layout, since we've asked user whether to save before switching ***//
-				//clear __current__ in cache
-				app.store.remove('__current__');
+				//clear __current in cache
+				app.store.remove('__current');
 
 				//overwrite current
-				current = app.store.set('__current__', layouts[that.editingViewName] || {viewName: that.editingViewName, template: 'currently no template stored',});
+				current = app.store.set('__current', layouts[that.editingViewName] || {viewName: that.editingViewName, template: 'currently no template stored',});
 
 				//check whether it is a remote view or a local view
 				//remote
@@ -111,7 +111,9 @@
 							this.close();
 						},
 					},
-					//need to put data here later
+					
+					//need to fetch from local storage, use cacheName rule from zahra
+
 				});
 
 				Temp.create().overlay({
@@ -133,65 +135,68 @@
 				//check which menu has been clicked
 				switch(type){
 					case 'view':
+						//temporarily disable view assignment function
+						console.log('form-clicked');
+
 						//fetch view list from backend
-						app
-						.remote({
-							url: '/api/getViewList',
-						})
-						.done(function(data){
+						// app
+						// .remote({
+						// 	url: '/api/getViewList',
+						// })
+						// .done(function(data){
 							
-							//combine local and remote view
-							var temp = data.slice();
-							_.each(temp, function(viewName, index){
-								temp[index] = {
-									remote: true,
-									name: viewName
-								};
-							});
+						// 	//combine local and remote view
+						// 	var temp = data.slice();
+						// 	_.each(temp, function(viewName, index){
+						// 		temp[index] = {
+						// 			remote: true,
+						// 			name: viewName
+						// 		};
+						// 	});
 
-							_.each(app.store.get('__layouts__'), function(view){
-								temp.unshift({
-									local: true,
-									name: view.viewName
-								});
-							});
+						// 	_.each(app.store.get('__layouts'), function(view){
+						// 		temp.unshift({
+						// 			local: true,
+						// 			name: view.viewName
+						// 		});
+						// 	});
 
-							//show the popover
-							app.view({
-								className: 'context-menu-view-popover',
-								data: temp,
-								template: [
-									'{{#items}}',
-										'<div class="context-menu-view-popover-item" {{#if remote}}data-type="remote"{{else}}data-type="local"{{/if}} data-view-name={{name}} action="assign-view">',
-											'{{#if remote}}<i class="fa fa-cloud"></i>{{/if}}',
-											'{{#if local}}<i class="fa fa-database"></i>{{/if}}',
-											'<span> {{name}}</span>',
-										'</div>',
-									'{{/items}}',
-								],
-								popover: true,
-								actions: {
-									'assign-view': function($self){
-										//get region name
-										var region =  that.contextMenuTrigger.attr('region'),
-										//get remote or local
-											type = $self.data('type');
+						// 	//show the popover
+						// 	app.view({
+						// 		className: 'context-menu-view-popover',
+						// 		data: temp,
+						// 		template: [
+						// 			'{{#items}}',
+						// 				'<div class="context-menu-view-popover-item" {{#if remote}}data-type="remote"{{else}}data-type="local"{{/if}} data-view-name={{name}} action="assign-view">',
+						// 					'{{#if remote}}<i class="fa fa-cloud"></i>{{/if}}',
+						// 					'{{#if local}}<i class="fa fa-database"></i>{{/if}}',
+						// 					'<span> {{name}}</span>',
+						// 				'</div>',
+						// 			'{{/items}}',
+						// 		],
+						// 		popover: true,
+						// 		actions: {
+						// 			'assign-view': function($self){
+						// 				//get region name
+						// 				var region =  that.contextMenuTrigger.attr('region'),
+						// 				//get remote or local
+						// 					type = $self.data('type');
 
-										//show the desired view on that region
-										if(type === 'remote')
-											that.getViewIn('content-editor').show(region, $self.data('view-name'));
-										else
-											that.getViewIn('content-editor'); //TBD
+						// 				//show the desired view on that region
+						// 				if(type === 'remote')
+						// 					that.getViewIn('content-editor').show(region, $self.data('view-name'));
+						// 				else
+						// 					that.getViewIn('content-editor'); //TBD
 										
-										//close the contextmenu after assign
-										that.closeContextMenu();
-									},
-								}
-							})
-							.create()
-							.popover($self, {placement: 'right', bond: that, style: {width: '300px', height: '300px'}/*give height and width to make the popover arrow at right position*/});
+						// 				//close the contextmenu after assign
+						// 				that.closeContextMenu();
+						// 			},
+						// 		}
+						// 	})
+						// 	.create()
+						// 	.popover($self, {placement: 'right', bond: that, style: {width: '300px', height: '300px'}/*give height and width to make the popover arrow at right position*/});
 
-						});
+						// });
 
 					break;
 					case 'form':
@@ -342,7 +347,7 @@
 					if(savedConfigs[cacheName]){//spray if exists
 						that.spray($el, app.view({
 							template: savedConfigs[cacheName].template,
-							data: savedConfigs[cacheName].data
+							data: JSON.parse(savedConfigs[cacheName].data)
 						}));
 					}
 
@@ -438,7 +443,7 @@
 						$clone: $clone,
 						cacheName: cacheName,
 						template: savedConfigs ? savedConfigs.template : $el.html(),
-						dataContent: savedConfigs ? savedConfigs.data : {},
+						dataContent: savedConfigs ? savedConfigs.data : "{}", //whatever stored in localstorage is an string. so default should be "{}"
 					},
 					onMoveCloneToCenter: function(ctForClone){
 						$clone.css({

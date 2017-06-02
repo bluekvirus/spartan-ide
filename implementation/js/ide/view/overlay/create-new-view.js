@@ -10,11 +10,11 @@
 			},
 			create: function(){
 				//create an object for this view in the layout object to accommodate the navigation logic
-				var layouts = app.store.get('__layouts__');
+				var layouts = app.store.get('__layouts');
 				layouts[this.get('viewName')] = {
 					layout: ['1'],
 				};
-				app.store.set('__layouts__', _.deepClone(layouts));
+				app.store.set('__layouts', _.deepClone(layouts));
 				//app.navigate('_IDE/Layout/' + this.get('viewName'));
 				window.location.reload();
 				this.close();

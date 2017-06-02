@@ -13,8 +13,32 @@
 		//data: 'url', {} or [],
 		//coop: ['e', 'e'],
 		//[editors]: {...},
+		coop: ['ace-editor-initiated'],
+		initialize: function(){
+			//object to store editor instances
+			this.aces = {};
+		},
 		onReady: function(){
+			var that = this;
+			//
 			this.activate('editing', 0);
+
+			//setup ace editor
+			//html
+			this.coop('create-ace-editor', 'html-ace-editor', {theme: 'github', mode: 'html'});
+			//less
+			this.coop('create-ace-editor', 'less-ace-editor', {theme: 'monokai', mode: 'less'});
+
+			//after editor initiated honor the data in the view model
+			_.defer(function(){
+				//honor html
+				if(that.get('html'))
+					that.aces.html.setValue(that.get('html'), 1);
+
+				//honor less
+				if(that.get('less'))
+					that.aces.less.setValue(that.get('less'), 1);
+			});
 		},
 		onItemActivated: function($item){
 			var tabId = $item.attr('tabId'),
@@ -24,6 +48,15 @@
 			this.$el.find('.' + tabId + '-editors').removeClass('hidden');
 			this.$el.find('.' + reverseTabId + '-editors').addClass('hidden');
 		},
+		//----- coop for ace editors have been initiated -----//
+		onAceEditorInitiated: function(id, pad){
+			//html
+			if(id === 'html-ace-editor')
+				this.aces.html = pad;
+
+			if(id === 'less-ace-editor')
+				this.aces.less = pad;
+		},
 		actions: {
 			close: function(){
 				this.parentCt.$el.find('.clip-editing-holder').removeClass('active');
@@ -32,9 +65,9 @@
 				var obj = this.get('obj'),
                     viewAndRegion = obj.name,
                     editedObj = {
-                        template: this.get('html'),
-                        data: this.get('datakey'),
-                        less: this.get('less'),
+                        template: this.aces.html.getValue(),//this.get('html'),
+                        data: this.get('datakey'), //datakey is editor
+                        less: this.aces.less.getValue(),//this.get('less'),
                         css_container: obj.css_container
                     },
                     baseId, uniqueId;
@@ -81,14 +114,14 @@
 			},
 		},
 		editors: {
-			html: {
-				label: 'HTML',
-				type: 'textarea',
-			},
-			less: {
-				label: 'LESS',
-				type: 'textarea',
-			},
+			// html: {
+			// 	label: 'HTML',
+			// 	type: 'textarea',
+			// },
+			// less: {
+			// 	label: 'LESS',
+			// 	type: 'textarea',
+			// },
 			datakey: {
 				label: 'Data-Key',
 				type: 'text',

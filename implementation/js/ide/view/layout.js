@@ -40,9 +40,9 @@
 				async: false,
 			}).done(function(data){
 				//locally stored configurations
-				var layouts = app.store.get('__layouts__'),
+				var layouts = app.store.get('__layouts'),
 				//stored configuration for current view
-					current = app.store.get('__current__');
+					current = app.store.get('__current');
 
 				if(path && !layouts[that.editingViewName] && !_.contains(data, that.editingViewName)){
 					app.get('Overlay.CreateNewView')
@@ -89,14 +89,14 @@
 				});
 
 				if(path){
-					//check whether __current__ is pointing to the loading view,
-					//if not rewrite __current__ based on stored data
+					//check whether __current is pointing to the loading view,
+					//if not rewrite __current based on stored data
 					if(current.viewName !== that.editingViewName){
-						//clear __current__ in cache
-						app.store.remove('__current__');
+						//clear __current in cache
+						app.store.remove('__current');
 
 						//overwrite current
-						current = app.store.set('__current__', layouts[that.editingViewName] || {viewName: that.editingViewName});
+						current = app.store.set('__current', layouts[that.editingViewName] || {viewName: that.editingViewName});
 					}
 					
 					//check if loading view is from backend
@@ -122,10 +122,10 @@
 						
 					}else {
 						//checkout local storage for the loading view
-						//honor __current__
+						//honor __current
 						that.initializeGlobal(current);
 
-						//honor __layouts__
+						//honor __layouts
 						if(layouts[that.editingViewName]){
 							//show the view preview first, in order to pick up html and size
 							that.show('preview', app.view({
@@ -136,11 +136,11 @@
 								}); //!later on show saved configs
 						}
 						else{
-							//initialize an object for the new view in __layouts__
+							//initialize an object for the new view in __layouts
 							layouts[that.editingViewName] = {};
-							//sync __layouts__ with local storage
-							app.store.remove('__layouts__');
-							app.store.set('__layouts__', _.deepClone(layouts));
+							//sync __layouts with local storage
+							app.store.remove('__layouts');
+							app.store.set('__layouts', _.deepClone(layouts));
 							//show a new blank view
 							that.show('preview', app.view({
 								template: 'NO TEMPLATE TBD',
@@ -218,13 +218,13 @@
 		//function to handle saving current view layout configurations into cache
 		onSaveLayout: function(obj){
 			//cache
-			var layouts = app.store.get('__layouts__');
+			var layouts = app.store.get('__layouts');
 
 			//modified layouts[this.editingViewName]
-			layouts[this.editingViewName] = _.deepClone(app.store.get('__current__'));//_.extend({viewName: this.editingViewName, layout: app.store.get('__current__')}, app._global);
+			layouts[this.editingViewName] = _.deepClone(app.store.get('__current'));//_.extend({viewName: this.editingViewName, layout: app.store.get('__current')}, app._global);
 
 			//save it to cache with a deep copy, avoid werid issue
-			app.store.set('__layouts__', _.deepClone(layouts));
+			app.store.set('__layouts', _.deepClone(layouts));
 
 			//once layout saved flip the dirty bit
 			if(this.modified)
@@ -256,12 +256,12 @@
 			}))
 			.once('ready', function(){
 				//update current
-				var current = app.store.get('__current__');
+				var current = app.store.get('__current');
 				current.layout = _.extend({bars: false}, temp.layout);
 				//current.template = that.getViewIn('preview').parentRegion.$el.html();
 				
 				//sync local storage
-				app.store.set('__current__', _.deepClone(current));
+				app.store.set('__current', _.deepClone(current));
 
 				//add new marker
 				that.genLayoutFromTemplate(that.getViewIn('preview'), that.getViewIn('preview').$el);
@@ -271,14 +271,14 @@
 
 		//function to handle local view remove
 		onDeleteLocalView: function(viewName){
-			var layouts = app.store.get('__layouts__');
+			var layouts = app.store.get('__layouts');
 
 			//remove stored view
 			delete layouts[viewName];
 
 			//sync to local storage
-			app.store.remove('__layouts__');
-			app.store.set('__layouts__', _.deepClone(layouts));
+			app.store.remove('__layouts');
+			app.store.set('__layouts', _.deepClone(layouts));
 
 			//navigate to a view
 			app.navigate('_IDE/Layout/');
@@ -294,9 +294,9 @@
 			app._global['horizontal-line'] = obj['horizontal-line'] || [];
 		},
 
-		//function to sync __current__ local storage
+		//function to sync __current local storage
 		syncLocal: function(){//alias for the coop function, to be used in this view
-			var current = _.extend(app.store.get('__current__'), {
+			var current = _.extend(app.store.get('__current'), {
 				endPoints: app._global.endPoints,
 				'horizontal-line': app._global['horizontal-line'],
 				'vertical-line': app._global['vertical-line'],
@@ -304,10 +304,10 @@
 			});
 			
 			//remove old for a clean setup
-			app.store.remove('__current__');
+			app.store.remove('__current');
 
 			//save current, with a duplicated object not a reference
-			app.store.set('__current__', _.deepClone(current));
+			app.store.set('__current', _.deepClone(current));
 		},
 
 		//function to setup the dirty-bit for the saving button
