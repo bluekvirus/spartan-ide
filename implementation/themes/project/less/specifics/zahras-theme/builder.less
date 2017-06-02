@@ -1,12 +1,16 @@
-.regional-builder,
 .regional-overlay-focusedediting-builder {
-    
+
     [region='stack-groups'] {
         position: absolute;
         height: 100%;
         width: 100%;
         display: flex;
         z-index: 10;
+        .regional-stackgroup {
+            height: 100%;
+            position: relative;
+            .border
+        }
     }
     [region='stack-groups'] > * {
         position: relative;
@@ -18,24 +22,10 @@
         top: 0;
         left: 0;
     }
-    [region='hanger-groups'] > * {
-        z-index: 100;
-    }
-    [region='hanger-groups'] .regional-hangergroup,
-    [region='hanger-groups'] .regional-hangergroup .region-hanger-container {
-        height: 100%;
-    }
     [region='view-lock'] {
         height: 100%;
         width: 100%;
-    }
-    [region="view-lock"] {
         position: absolute;
-    }
-    .region-stack-groups .regional-stackgroup {
-        height: 100%;
-        position: relative;
-        .border
     }
     .drag-top {
         position: absolute;
@@ -118,13 +108,4 @@
         border-width: 2px;
         border-color: lightgrey;
     }
-}
-
-[region="tab-html"] textarea,
-[region="tab-less"] textarea {
-    height: 200px;
-}
-
-.delete-group {
-    float: right;
 }

@@ -1,6 +1,6 @@
 /**
  * Created by Zahra
- * 
+ *
  */
 ;(function(app) {
     app.view('Overlay.FocusedEditing.Builder', {
@@ -39,11 +39,7 @@
                             position: 'absolute',
                             //-40 ~ 3em for the initial height
                             top: e.pageY - this.$el.offset().top - 40,
-                            left: parseInt((e.pageX - this.$el.offset().left) / this.$el.width() * 100) + '%',
-                            width: '6em',
-                            height: '3em',
-                            'background-color': 'lightgrey',
-                            'border-bottom': '2px dotted black'
+                            left: parseInt((e.pageX - this.$el.offset().left) / this.$el.width() * 100) + '%'
                         }
                     };
 
@@ -81,19 +77,6 @@
                             builder: this
                         }
                     });
-
-                    //comment out for sliding out editing view
-                    // (new PopOver({
-                    //     dataSource: region.parent().data('view'),
-                    //     data: {
-                    //         type: 'stack',
-                    //         html: currentStackGroup.template,
-                    //         data: currentStackGroup.data,
-                    //         css_container: currentStackGroup.css_container,
-                    //         less: currentStackGroup.less,
-                    //         obj: currentStackGroup
-                    //     }
-                    // })).popover(region, { placement: 'top', bond: region, style: { width: '600px' } });
                 }
             }
         },
@@ -226,9 +209,9 @@
 
         //------------------------------------------- coop events -------------------------------------------//
         //function to handle updating group event
-        onGroupUpdated: function(obj, editedObj, dataSource){
+        onGroupUpdated: function(editedObj, dataSource){
             //call helper function
-            this.updateGroup(obj, editedObj, dataSource);
+            this.updateGroup(editedObj, dataSource);
         },
         //function to handle deleting group event
         onGroupDeleted: function(obj, type){
@@ -238,28 +221,7 @@
 
         //------------------------------------------- helper functions -------------------------------------------//
         //function to update group contents
-        updateGroup: function(obj, editedObj, dataSource){
-            //HTML field is not empty
-            var viewAndRegion = obj.name,
-                baseId, uniqueId;
-            var allGroups = app.store.get(viewAndRegion);
-
-            if (editedObj.type === 'stack') {
-            } else if (editedObj.type === 'hanger') {
-                //need to find css here, it has a builder handle, so it's easier to do it here
-                //Update css_container in the cache
-                if (editedObj.css_container) {
-                    if (editedObj.template) {
-                        this.$el.find('#' + uniqueId).css({ 'height': '', 'width': '', 'background-color': '' });
-                        delete allGroups.hangerGroups[editedObj.hangerNumber].css_container.height;
-                        delete allGroups.hangerGroups[editedObj.hangerNumber].css_container.width;
-                        delete allGroups.hangerGroups[editedObj.hangerNumber].css_container['background-color'];
-                    }
-                }
-            }else {
-                //wrong type
-            }
-            console.log('updateGroup', editedObj);
+        updateGroup: function(editedObj, dataSource){
             //Reload the Stack group with the new data
             dataSource.set(editedObj);
         },
@@ -337,6 +299,10 @@
             '<div action-click="update-hanger" region="hanger-container"></div>',
             '<div class="ui-draggable-item drag-hanger-right"></div>',
         ],
+        initialize: function() {
+            this.flagX = false;
+            this.flagY = false;
+        },
         dnd: {
             drag: {
                 helper: 'original'
@@ -357,23 +323,8 @@
                         builder: this.parentCt
                     }
                 });
-
-                //comment out for sliding out editing view
-                // (new PopOver({
-                //     dataSource: this,
-                //     data: {
-                //         type: 'hanger',
-                //         html: this.get('template'),
-                //         data: this.get('data'),
-                //         css_container: this.get('css_container'),
-                //         less: this.get('less'),
-                //         obj: this.get()
-                //     }
-                // })).popover($btn, { placement: 'top', bond: this, style: { width: '600px' } });
             }
         },
-        flagX: false,
-        flagY: false,
         onDragStart: function(event, ui) {
             this.initialX = parseInt(this.$el.parent().css('left'));
             this.initialY = parseInt(this.$el.parent().css('top'));
@@ -405,18 +356,21 @@
             //Apply less
             compileLess(uniqueId, this, 'hanger-container');
 
-            //Locate on the screen
-            if (this.get('css_container')) {
-                $('#' + uniqueId + '-id').css(this.get('css_container'));
-                if (this.get('template')) {
-                    this.$el.parent().css({ 'height': '', 'width': '', 'background-color': '' });
-                    var allGroups = app.store.get(viewAndRegion);
-                    delete allGroups.hangerGroups[this.get('hangerNumber')].css_container.height;
-                    delete allGroups.hangerGroups[this.get('hangerNumber')].css_container.width;
-                    delete allGroups.hangerGroups[this.get('hangerNumber')].css_container['background-color'];
-                    app.store.set(viewAndRegion, allGroups);
-                }
+            //Apply css for div container
+            var hangerStyle = this.get('css_container');
+            if (this.get('template')) {
+                //Non-empty template
+                hangerStyle['border-bottom'] = '2px dotted black';
+                hangerStyle['z-index'] = '100';
+            } else {
+                //Nothing has been set in the template
+                hangerStyle['border-bottom'] = '2px dotted black';
+                hangerStyle['z-index'] = '100';
+                hangerStyle['background-color'] = 'lightgrey';
+                hangerStyle.width = '6em';
+                hangerStyle.height = '3em';
             }
+            this.$el.parent().css(hangerStyle);
         }
     });
 
@@ -459,6 +413,10 @@
             '<div class="ui-draggable-item drag-right"></div>',
             '<div class="ui-draggable-item drag-bottom"></div>',
         ],
+        initialize: function() {
+            this.heightFlag = true;
+            this.widthFlag = true;
+        },
         dnd: {
             drag: {
                 helper: 'original'
@@ -467,8 +425,6 @@
         actions: {
             _bubble: true,
         },
-        heightFlag: true,
-        widthFlag: true,
         onDragStart: function(event, ui) {
             var id = this.$el.parent().attr('id'),
                 arrayId = id.split('-'),
@@ -852,222 +808,6 @@
             } else if (allGroups.direction === 'h') {
                 this.$el.find('.drag-top').hide();
                 this.$el.find('.drag-bottom').hide();
-            }
-        }
-    });
-
-    var PopOver = app.view({
-        template: [
-            '<div class="col-md-12">',
-            '<div class="row">',
-            '<div class="form form-horizontal">',
-            '<ul class="nav nav-tabs">',
-            '<li activate="single" tabid="html"><a>html</a></li>',
-            '<li activate="single" tabid="less"><a>less</a></li>',
-            '</ul>',
-            '<div region="tabs"></div>',
-            '<div editor="data"></div>',
-            '</div>',
-            '</div>',
-            '</div>',
-            '<div class="row">',
-            '<span class="btn btn-primary" action-click="submit">Apply</span>',
-            '<span class="btn btn-info btn-outline" action-click="cancel">Cancel</span>',
-            '<span class="btn btn-danger delete-group" action-click="delete">Delete</span>',
-            '</div>'
-        ],
-        onItemActivated: function($item) {
-            var tabid = $item.attr('tabid');
-            this.tab('tabs', app.view({
-                template: ['<div editor="code"></div>'],
-                useParentData: tabid,
-                editors: {
-                    code: {
-                        value: this.get(tabid),
-                        label: tabid,
-                        type: 'textarea',
-                        placeholder: tabid,
-                        validate: {
-                            required: true
-                        }
-                    }
-                }
-            }), tabid);
-        },
-        editors: {
-            data: {
-                label: 'Data Key',
-                type: 'text',
-                placeholder: 'Data Key'
-            }
-        },
-        actions: {
-            submit: function() {
-                if (this.getViewIn('tabs').$el.find('[region="tab-html"] [editor="code"] textarea').val()) {
-                    //HTML field is not empty
-                    var obj = this.get('obj'),
-                        viewAndRegion = obj.name,
-                        editedObj = {
-                            template: this.getViewIn('tabs').$el.find('[region="tab-html"] [editor="code"] textarea').val(),
-                            data: this.getEditor('data').getVal(),
-                            less: this.getViewIn('tabs').$el.find('[region="tab-less"] [editor="code"] textarea').val(),
-                            css_container: obj.css_container
-                        },
-                        baseId, uniqueId;
-                    var allGroups = app.store.get(viewAndRegion),
-                        currentBuilder = this.options.dataSource.options.dataSource;
-
-                    if (this.get('type') === 'stack') {
-                        var editRegionStackGroups = allGroups.stackGroups,
-                            stackNumber = obj.stackNumber;
-                        baseId = viewAndRegion + '-' + stackNumber;
-                        uniqueId = baseId + '-id';
-                        editRegionStackGroups[stackNumber] = editedObj;
-                        allGroups.stackGroups = editRegionStackGroups;
-
-                        //Update the cache
-                        app.store.set(viewAndRegion, allGroups);
-
-                        editedObj.name = viewAndRegion;
-                        editedObj.stackNumber = stackNumber;
-
-                        //Close the popover
-                        this.close();
-
-                        //Reload the Stack group with the new data
-                        this.options.dataSource.set(editedObj);
-                    } else if (this.get('type') === 'hanger') {
-                        var editRegionHangerGroups = allGroups.hangerGroups,
-                            hangerNumber = obj.hangerNumber;
-                        baseId = viewAndRegion + '-' + hangerNumber + '-hanger';
-                        uniqueId = baseId + '-id';
-                        editRegionHangerGroups[hangerNumber] = editedObj;
-                        allGroups.hangerGroups = editRegionHangerGroups;
-
-                        //Update css_container in the cache
-                        if (editedObj.css_container) {
-                            if (editedObj.template) {
-                                currentBuilder.$el.find('#' + uniqueId).css({ 'height': '', 'width': '', 'background-color': '' });
-                                delete allGroups.hangerGroups[hangerNumber].css_container.height;
-                                delete allGroups.hangerGroups[hangerNumber].css_container.width;
-                                delete allGroups.hangerGroups[hangerNumber].css_container['background-color'];
-                            }
-                        }
-
-                        //Update the cache
-                        app.store.set(viewAndRegion, allGroups);
-
-                        editedObj.name = viewAndRegion;
-                        editedObj.hangerNumber = hangerNumber;
-
-                        //Close the popover
-                        this.close();
-
-                        //Update the Hanger group with the new data
-                        this.options.dataSource.set(editedObj);
-                    }
-                } else {
-                    //TODO: Why this is undefined?
-                    //console.log('tabs, ', this.getViewIn('tabs').$el.getViewIn('tab-html'));
-                    //this.getViewIn('tabs').getViewIn('tab-html').getEditor('code').validate(true);
-                    this.close();
-                }
-            },
-            cancel: function() {
-                this.close();
-            },
-            delete: function() {
-                var obj = this.get('obj'),
-                    viewAndRegion = obj.name,
-                    stackNumber = obj.stackNumber,
-                    hangerNumber = obj.hangerNumber,
-                    cacheData = app.store.get(viewAndRegion),
-                    deleteStackGroups = cacheData.stackGroups,
-                    deleteHangerGroups = cacheData.hangerGroups;
-                if (this.get('type') === 'stack') {
-                    var stackGroupId = viewAndRegion + '-' + stackNumber + '-id',
-                        basis = $('#' + stackGroupId).css('flex-basis');
-                    if (parseInt(stackNumber) === 0) {
-                        if (cacheData.stackGroups.length > 1) {
-                            var next = viewAndRegion + '-' + (parseInt(stackNumber) + 1) + '-id',
-                                nextBasis = parseInt($('#' + next).css('flex-basis')) + parseInt(basis);
-                            deleteStackGroups[(parseInt(stackNumber) + 1)].css_container = {
-                                'flex-grow': '0',
-                                'flex-shrink': '1',
-                                'flex-basis': nextBasis + '%',
-                            };
-                        }
-                    } else {
-                        var prev = viewAndRegion + '-' + (parseInt(stackNumber) - 1) + '-id',
-                            prevBasis = parseInt($('#' + prev).css('flex-basis')) + parseInt(basis);
-                        deleteStackGroups[(parseInt(stackNumber) - 1)].css_container = {
-                            'flex-grow': '0',
-                            'flex-shrink': '1',
-                            'flex-basis': prevBasis + '%',
-                        };
-                    }
-                    deleteStackGroups.splice(stackNumber, 1);
-                    cacheData.stackGroups = deleteStackGroups;
-                    var options = {
-                        newStackGroups: cacheData.stackGroups,
-                        newHangerGroups: cacheData.hangerGroups,
-                        direction: cacheData.direction,
-                        name: viewAndRegion
-                    };
-                    if (cacheData.stackGroups.length > 0) {
-                        app.store.set(viewAndRegion, cacheData);
-                        var stackGroupCssId = viewAndRegion + '-' + stackNumber + '-css';
-                        $('#' + stackGroupCssId).remove();
-                        this.close();
-                        app.coop('update-data', options);
-                    } else {
-                        this.close();
-                    }
-                } else {
-                    deleteHangerGroups.splice(hangerNumber, 1);
-                    cacheData.hangerGroups = deleteHangerGroups;
-                    var hangerOptions = {
-                        newStackGroups: cacheData.stackGroups,
-                        newHangerGroups: cacheData.hangerGroups,
-                        direction: cacheData.direction,
-                        name: viewAndRegion
-                    };
-                    app.store.set(viewAndRegion, cacheData);
-                    var hangerGroupCssId = viewAndRegion + '-' + hangerNumber + '-hanger-css',
-                        hangerGroupId = viewAndRegion + '-' + hangerNumber + '-hanger-id';
-
-                    //Close the popover
-                    this.close();
-
-                    //Remove the Hanger group from the screen
-                    $('#' + hangerGroupCssId).remove();
-                    $('#' + hangerGroupId).remove();
-                }
-            }
-        },
-        onReady: function() {
-            this.$el.find('[tabid="html"]').addClass('active');
-            var tabids = ['html', 'less'],
-                self = this;
-            _.map(tabids, function(tabid) {
-                self.tab('tabs', app.view({
-                    template: ['<div editor="code"></div>'],
-                    useParentData: tabid,
-                    editors: {
-                        code: {
-                            value: self.get(tabid),
-                            label: tabid,
-                            type: 'textarea',
-                            placeholder: tabid,
-                            validate: {
-                                required: true
-                            }
-                        }
-                    }
-                }), tabid);
-            });
-            if (this.get('type') === 'add') {
-                this.$el.find('.delete-group').addClass('hide');
             }
         }
     });
