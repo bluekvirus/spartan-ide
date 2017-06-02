@@ -8,7 +8,8 @@
     "open-sans-fontface": "*"
   },
   "dependencies": {
-    "roboto-fontface": "^0.7.0"
+    "roboto-fontface": "^0.7.0",
+    "ace-builds": "^1.2.6"
   },
   "open-source-libs": {
     "velocity": "*",

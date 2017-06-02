@@ -34,6 +34,11 @@
 					that.$el.find('.url-editor').slideUp( "fast" );//.addClass('hidden');
 				}
 			});
+
+			//insert ace to editor
+			//fetch id, since only one textarea exists
+			var id = this.$el.find('textarea').attr('id');
+			this.coop('create-ace-editor', id, {theme: 'monokai', mode: 'json'});
 		},
 		onEditorChanged: function(name, editor){
 			if(name === 'data-content'){

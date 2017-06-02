@@ -1,3 +1,7 @@
+/**
+ * Created by Zahra
+ * 
+ */
 ;(function(app) {
     app.view('Overlay.FocusedEditing.Builder', {
         template: [

@@ -32,8 +32,13 @@
 				}).once('ready', function(){
 					this.coop('move-clone-to-center', this);
 				}), tabId);
-			else
+			else{
+				//close the sliding editing view
+				this.$el.find('.clip-editing-holder').removeClass('active');
+
 				this.tab('tabs', 'Overlay.FocusedEditing.' + tabId, tabId);
+			}
+				
 		},
 		actions: {
 			'close-builder': function(){
@@ -75,6 +80,7 @@
 				if(dataFlag){
 					if(dataTab.$el.find('#remote-switch').prop('checked')){
 						//remote data, fetch url editor's content as data
+
 						dataContent = dataTab.get('url');
 					}else{
 						dataContent = dataTab.get('data-content');
@@ -101,8 +107,6 @@
 					app.store.set('__savedConfigs', _.deepClone(savedConfigs));
 
 				}
-				// //!!need to consult with zahra
-				//this.close();
 			},
 			'get-color': function($self, e){
 				console.log('TBD'); //show copy the color name to the clipboard
@@ -152,6 +156,21 @@
 
 			this.$el.find('.clip-editing-holder').addClass('active');
 		},
+
+		onCreateAceEditor: function(id, options){
+			this._createAceEditor(id, options);
+		},
+		//------------------------- function to insert ace editor to textarea editors -------------------------//
+		_createAceEditor: function(elementId, options){
+			var pad = ace.edit(elementId);
+			//config ace editor
+			pad.setTheme(options.theme && ('ace/theme/' + options.theme));
+			pad.setFontSize(options.fontsize || 14);
+			pad.getSession().setMode(options.mode && ('ace/mode/' + options.mode));
+			pad.$blockScrolling = Infinity;
+			//pad.setOption("maxLines", 1000);
+		},
+		
 	});
 
 })(Application);
