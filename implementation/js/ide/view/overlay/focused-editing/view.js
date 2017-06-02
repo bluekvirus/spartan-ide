@@ -54,7 +54,7 @@
 				parentHeight = this.parentCt.$el.height(),
 				newTop = (parentHeight - tabsHeight - $clone.height()) / 2;
 			//reset top	
-			$clone.css('top', newTop);
+			//$clone.css('top', newTop);
 			//append
 			this.$el.append($clone);
 

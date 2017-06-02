@@ -58,7 +58,8 @@
 
 				//get builder view
 				var builder, template, dataTab, dataContent,
-					builderFlag = true, dataFlag = true;
+					builderFlag = true, dataFlag = true,
+					savedConfigs = app.store.get('__savedConfigs') || {};
 				
 				try {
 					builder = app.locate('Overlay.FocusedEditing.Builder').view;
@@ -69,7 +70,7 @@
 
 				//only assign tempalte if the builder view is loaded
 				if(builderFlag)
-					template = builder.extractTemplate();
+					template = builder.extractTemplate() || ' ';
 
 				try{
 					dataTab = this.getViewFromTab('Data');
@@ -78,7 +79,7 @@
 					console.warn('You have NOT assign any data.');
 				}
 
-				//only assign data if the dataTab has been loaded
+				//only assign data if the dataTab has been loaded, otherwise try local stored data
 				if(dataFlag){
 					// if(dataTab.$el.find('#remote-switch').prop('checked')){
 					// 	//remote data, fetch url editor's content as data
@@ -97,8 +98,14 @@
 					this.saved = true;
 
 					//for blank data config view
-					if(!dataContent)
-						dataContent = "{}";
+					if(!dataContent){
+						//consult __savedConfig(unedited version) to see whether there is a data object there
+						if(savedConfigs[this.get('cacheName')] && savedConfigs[this.get('cacheName')].data){
+							dataContent = savedConfigs[this.get('cacheName')].data;
+						}else {//really no data
+							dataContent = "{}";	
+						}
+					}
 
 					//prepare the view for spraying back
 					this.spraying = app.view({
@@ -107,7 +114,6 @@
 									});
 
 					//save the extracted template and data to cache for future use
-					var savedConfigs = app.store.get('__savedConfigs') || {};
 					savedConfigs[this.get('cacheName')] = {
 						template: template,
 						data: dataContent
