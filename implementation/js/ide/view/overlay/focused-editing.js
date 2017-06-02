@@ -39,7 +39,7 @@
 
 				this.tab('tabs', 'Overlay.FocusedEditing.' + tabId, tabId);
 			}
-				
+
 		},
 		actions: {
 			'close-builder': function(){
@@ -60,7 +60,7 @@
 				var builder, template, dataTab, dataContent,
 					builderFlag = true, dataFlag = true,
 					savedConfigs = app.store.get('__savedConfigs') || {};
-				
+        
 				try {
 					builder = app.locate('Overlay.FocusedEditing.Builder').view;
 				}catch(e){
@@ -88,8 +88,8 @@
 					// }else{
 					// 	dataContent = dataTab.get('data-content');
 					// }
-					// 
-					
+					//
+
 					dataContent = dataTab.aces.data.getValue(); //fetch value from ace editor
 				}
 
@@ -164,8 +164,8 @@
 			obj.data.datakey = obj.data.data;
 			delete obj.data.data;
 
-			//insert dataSource into data to bridge code
-			obj.data.__dataSource = obj.dataSource;
+			//insert groupView into data to bridge code
+			obj.data.__groupView = obj.groupView;
 			//setup the data for the group editor view
 			this.getViewIn('group-editor').set(obj.data, {reset: true});
 
@@ -187,11 +187,11 @@
 			pad.getSession().setMode(options.mode && ('ace/mode/' + options.mode));
 			pad.$blockScrolling = Infinity;
 			//pad.setOption("maxLines", 1000);
-			
+
 			//use coop event to give back pad to every view
 			app.coop('ace-editor-initiated', elementId, pad);
 		},
-		
+
 	});
 
 })(Application);
