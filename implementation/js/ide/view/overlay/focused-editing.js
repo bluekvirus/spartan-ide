@@ -148,7 +148,7 @@
 			//insert dataSource into data to bridge code
 			obj.data.__dataSource = obj.dataSource;
 			//setup the data for the group editor view
-			this.getViewIn('group-editor').set(obj.data);
+			this.getViewIn('group-editor').set(obj.data, {reset: true});
 
 			this.$el.find('.clip-editing-holder').addClass('active');
 		},

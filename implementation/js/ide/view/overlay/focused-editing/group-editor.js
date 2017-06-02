@@ -40,7 +40,6 @@
                     baseId, uniqueId;
                 var allGroups = app.store.get(viewAndRegion);
                     currentBuilder = this.get('builder');
-
                 //prepare the data as required in data view
                 if(this.get('type') === 'stack'){
                     var editRegionGroups = allGroups.stackGroups,
@@ -49,7 +48,6 @@
                     uniqueId = baseId + '-id';
                     editRegionGroups[stackNumber] = editedObj;
                     allGroups.stackGroups = editRegionGroups;
-
                     //Update cache
                 	app.store.set(viewAndRegion, allGroups);
 
@@ -64,10 +62,8 @@
                     uniqueId = baseId + '-id';
                     editRegionStrings[hangerNumber] = editedObj;
                     allGroups.hangerGroups = editRegionStrings;
-
                     //Update cache
                 	app.store.set(viewAndRegion, allGroups);
-
                     editedObj.name = viewAndRegion;
                     editedObj.hangerNumber = hangerNumber;
                     editedObj.type = 'hanger';
