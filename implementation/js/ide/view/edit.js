@@ -14,7 +14,7 @@
 		//[editors]: {...},
 		initialize: function(){
 			//indicator of which $el triggered context menu
-			this.contextMenuTrigger = false;
+			this.$contextMenuTrigger = false;
 
 			//array to store all the first layer regions object
 			this.firstLayers = [];
@@ -104,22 +104,44 @@
 		},
 		actions: {
 			'export-region': function(){
-				var Temp = app.view({
-					template: this.contextMenuTrigger.html() + '<div class="close-holder" style="position:fixed;right:2em;top:1em;" action="close-preview"><i class="fa fa-2x fa-close"></i></div>',
-					actions: {
-						'close-preview': function(){
-							this.close();
-						},
-					},
+				//get the trigger $el
+				var $trigger = this.$contextMenuTrigger;
+				//preview solution
+				// var Temp = app.view({
+				// 	className: 'export-preview',
+				// 	template: $trigger.html() + '<div class="close-holder" style="position:fixed;right:2em;top:1em;" action="close-preview"><i class="fa fa-2x fa-close"></i></div>',
+				// 	attributes: {
+				// 		style: 'height:' + $trigger.height() + 'px;width:' + $trigger.width() + 'px;',
+				// 	},
+				// 	actions: {
+				// 		'close-preview': function(){
+				// 			this.close();
+				// 		},
+				// 	},
 					
-					//need to fetch from local storage, use cacheName rule from zahra
+				// 	//need to fetch from local storage, use cacheName rule from zahra
 
-				});
+				// });
 
-				Temp.create().overlay({
-					effect: false,
-					background: 'rgba(255, 255, 255, 0.7)'
-				});
+				// Temp.create().overlay({
+				// 	effect: false,
+				// 	background: 'rgba(255, 255, 255, 0.7)'
+				// });
+
+				//export solution
+				app.get('Overlay.ExportViewName')
+					.create({
+						data: {
+							html: $trigger.html(),
+							attributes: {
+								style: 'height:' + $trigger.height() + 'px;width:' + $trigger.width() + 'px;',//make it expand, temporary solution
+							},
+						},
+					})
+					.overlay({
+						effect: false,
+						background: 'rgba(255, 255, 255, 0.7)'
+					});
 
 				//close context menu
 				this.closeContextMenu();
@@ -135,7 +157,7 @@
 				//check which menu has been clicked
 				switch(type){
 					case 'view':
-						//temporarily disable view assignment function
+						//temporarily disabled view assignment function
 						console.log('form-clicked');
 
 						//fetch view list from backend
@@ -178,7 +200,7 @@
 						// 		actions: {
 						// 			'assign-view': function($self){
 						// 				//get region name
-						// 				var region =  that.contextMenuTrigger.attr('region'),
+						// 				var region =  that.$contextMenuTrigger.attr('region'),
 						// 				//get remote or local
 						// 					type = $self.data('type');
 
@@ -392,7 +414,10 @@
 			e.stopPropagation();
 
 			if(this.contextmenuShown){
-				this.closeContextMenu();
+				//defer to make sure when clicking on other regions, this.contextmenuShown has not been changed
+				_.defer(function(){
+					that.closeContextMenu();
+				});
 				return;
 			}
 
@@ -425,6 +450,7 @@
 
 			//append
 			$clone
+			.addClass('clone')
 			.css({
 				position: 'absolute',
 				top: top,
@@ -450,7 +476,10 @@
 							top: newTop,
 							left: newLeft
 						}).anyone(app.ADE, function(){
+							//add blur effect on the view
 							that.$el.addClass('viewport-blur');
+
+							//
 							ctForClone.trigger('view:append-clone');
 
 							//empty the content and add a highlight class to the region currently editing
@@ -501,7 +530,7 @@
 			this.$el.find('.first-layer-region').removeClass('active'); //remove first
 			$el.addClass('active');
 
-			this.contextMenuTrigger = $el;
+			this.$contextMenuTrigger = $el;
 		},
 
 		//function to handle closing context menu
@@ -513,14 +542,6 @@
 
 				if($el.popover())
 					$el.popover('hide');
-			});
-
-			//rebind all the click event for first layer region
-			_.each(this.firstLayers, function($el){
-				
-				$el.on('click', function(e){
-					that.regionClickCallback(e, $el);
-				});
 			});
 
 			//hide menu
