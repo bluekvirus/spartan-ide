@@ -137,7 +137,7 @@
 		},
 		onClose: function() {
 			//Remove group and related css
-			$('[id^=' + this.options.name + ']').remove();
+			$('[id^=' + this.options.cacheName + ']').remove();
 		},
 		extractTemplate: function() {
 			var builderName = this.options.cacheName,
@@ -199,7 +199,7 @@
 				allLess = '';
 			_.each(stacks, function(stack) {
 				if (stack.less) {
-					var cssId = builderName + '-' + stackNumber + '-css',
+					var cssId = builderName + '-' + stackNumber + '-id',
 						currentLess = '#' + cssId + '{' + stack.less + '}';
 					allLess += currentLess;
 				}
@@ -207,7 +207,7 @@
 			});
 			_.each(hangerGroups, function(hangerGroup) {
 				if (hangerGroup.less) {
-					var cssId = builderName + '-' + hangerNumber + '-hanger-css',
+					var cssId = builderName + '-' + hangerNumber + '-hanger-id',
 						currentLess = '#' + cssId + '{' + hangerGroup.less + '}';
 					allLess += currentLess;
 				}

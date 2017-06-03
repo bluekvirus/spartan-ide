@@ -57,9 +57,11 @@
 				// }
 
 				//get builder view
-				var builder, template, dataTab, dataContent,
+				var builder, template, dataTab, dataContent, less, compliedLess,
 					builderFlag = true, dataFlag = true,
-					savedConfigs = app.store.get('__savedConfigs') || {};
+					savedConfigs = app.store.get('__savedConfigs') || {},
+					theme = $('head link[rel="stylesheet"]').attr('href').split('/')[1],
+					cssId = 'exported-' + this.get('cacheName');
         
 				try {
 					builder = app.locate('Overlay.FocusedEditing.Builder').view;
@@ -70,7 +72,32 @@
 
 				//only assign tempalte if the builder view is loaded
 				if(builderFlag)
+					//fetch template
 					template = builder.extractTemplate() || ' ';
+
+					//fetch less
+					less = builder.extractLess();
+
+					//check if less exists, and then complie
+					//referenced Zahra's builder
+					if(less){
+						
+						app.remote({
+							url: 'api/less',
+							payload: {
+								less: less,
+								theme: theme
+							},
+							async: false,
+						}).done(function(data) {
+							//fetch complied less
+							compliedLess = data.msg;
+							//remove the old one, just case there is one
+							$('#' + cssId).remove();
+							//insert the new one
+							$('head').append('<style id="' + cssId + '">' + data.msg + '</style>');
+						});
+					}
 
 				try{
 					dataTab = this.getViewFromTab('Data');
@@ -116,11 +143,16 @@
 					//save the extracted template and data to cache for future use
 					savedConfigs[this.get('cacheName')] = {
 						template: template,
-						data: dataContent
+						data: dataContent,
+						cssId: cssId,
+						css: compliedLess
 					};
 
+					//sync cache
 					app.store.set('__savedConfigs', _.deepClone(savedConfigs));
 
+					//add notification
+					app.notify('Success!', 'Configuration has been successfully saved.', 'ok', {icon: 'fa fa-fort-awesome'});
 				}
 			},
 			'get-color': function($self, e){

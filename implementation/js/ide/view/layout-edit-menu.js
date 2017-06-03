@@ -30,16 +30,33 @@
 			'switch-method': function(){
 				//app.navigate('_IDE/' + ((this.get('method') === 'Layout') ? 'Edit' : 'Layout') + '/' + this.get('viewName'));
 				
-				//ask user whether they desier to save
-				app.get('Overlay.SaveLayout').create({
-					data: {
-						viewName: this.get('viewName'),
-						next: this.get('viewName'),
-						method: (this.get('method') === 'Layout') ? 'Edit' : 'Layout'
-					},
-				}).overlay({
-					effect: false,
-				});
+				var viewName = next = this.get('viewName'),
+					nextMethod = (this.get('method') === 'Layout') ? 'Edit' : 'Layout';
+
+				if(this.get('method') === 'Layout'){
+					//check whether the layout has been modified
+					if(this.parentCt.modified){//modified
+
+						//ask user whether they desier to save
+						app.get('Overlay.SaveLayout').create({
+							data: {
+								viewName: viewName,
+								next: next,
+								method: nextMethod
+							},
+						}).overlay({
+							effect: false,
+						});
+
+					}else{//not modified
+
+						//go to new view directly
+						app.navigate('_IDE/' + nextMethod + '/' + next);
+					}
+				}else{
+					app.navigate('_IDE/' + nextMethod + '/' + next);
+				}
+				
 			},
 			'save-layout': function(){
 				this.coop('save-layout');

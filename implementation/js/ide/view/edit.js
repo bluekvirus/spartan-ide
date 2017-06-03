@@ -134,7 +134,7 @@
 						data: {
 							html: $trigger.html(),
 							attributes: {
-								style: 'height:' + $trigger.height() + 'px;width:' + $trigger.width() + 'px;',//make it expand, temporary solution
+								style: 'height:' + $trigger.height() + 'px;width:' + $trigger.width() + 'px;margin: 40px auto 0 auto;',//make it expand, temporary solution
 							},
 						},
 					})
@@ -371,6 +371,8 @@
 							template: savedConfigs[cacheName].template,
 							data: JSON.parse(savedConfigs[cacheName].data)
 						}));
+
+						$('head').append('<style id="' + savedConfigs[cacheName].cssId + '">' + savedConfigs[cacheName].css + '</style>');
 					}
 
 					//keep a copy for later reference

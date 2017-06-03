@@ -111,6 +111,9 @@
 
 				//trigger coop
 				app.coop('group-updated', editedObj, this.get('__groupView'));
+
+				//close the sliding editor
+				this.parentCt.$el.find('.clip-editing-holder').removeClass('active');
 			},
 			delete: function() {
 				var obj = this.get('obj'),
@@ -118,6 +121,12 @@
 
 				//trigger coop
 				app.coop('group-deleted', obj, type);
+
+				//close the sliding editor
+				this.parentCt.$el.find('.clip-editing-holder').removeClass('active');
+
+				//show notification
+				app.notify('Success!', 'Group has been deleted.', 'ok', {icon: 'fa fa-fort-awesome'});
 			},
 		},
 		editors: {
