@@ -375,9 +375,8 @@
 				hangerStyle['z-index'] = '100';
 			} else {
 				//Nothing has been set in the template
-				hangerStyle['border-bottom'] = '2px dotted lightgrey';
+				hangerStyle.border = '2px dotted lightgrey';
 				hangerStyle['z-index'] = '100';
-				hangerStyle['background-color'] = 'lightgrey';
 				hangerStyle.width = '6em';
 				hangerStyle.height = '3em';
 			}
