@@ -230,6 +230,17 @@
 					case 'chart':
 						console.log('chart-clicked');
 					break;
+
+					//--------------- newly adde for assign/edit/draw ---------------//
+					case 'assign': 
+						console.log('assign a view to the region');
+					break;
+					case 'edit': 
+						this.contextmenuEdit(e, this.$contextMenuTrigger);
+					break;
+					case 'draw': 
+						console.log('svg');
+					break;
 				}
 			},
 		},
@@ -422,79 +433,6 @@
 				});
 				return;
 			}
-
-			//click event from children should be trigger until find the first-layer-region
-			while(!$el.hasClass('first-layer-region')){
-				$el = $el.parent();
-			}
-
-			//hide elements in side menu
-			this.$el.find('.view-edit-menu').css({
-				visibility: 'hidden'
-			});
-
-			//animation effect for the region is going to be edited
-			//clone a div in the exactly position
-			
-			//original position
-			var $clone = $el.clone(),
-				$editor = this.$el.find('.region-content-editor'),
-				top = $el.offset().top - $editor.offset().top,
-				left = $el.offset().left - $editor.offset().left,
-				height = $el.height(),
-				width = $el.width(),
-				cacheName = window.location.hash.split('/').pop() + '-' + $el.attr('region'),
-				savedConfigs = app.store.get('__savedConfigs') && app.store.get('__savedConfigs')[cacheName];
-
-			//calculate new positions
-			var newTop = ($editor.height() - height) / 2,
-				newLeft = ($editor.width() - width) / 2;
-
-			//append
-			$clone
-			.addClass('clone')
-			.css({
-				position: 'absolute',
-				top: top,
-				left: left,
-				height: height,
-				width: width,
-				border: '1px dashed #000',
-				transition: '.5s',
-			}).appendTo(this.$el.find('.region-content-editor'));
-
-			//load the focused edit view, clone a copy of $el and pass it to the focused editing view
-			app.get('Overlay.FocusedEditing')
-				.create({
-					data: {
-						$element: $el,
-						$clone: $clone,
-						cacheName: cacheName,
-						template: savedConfigs ? savedConfigs.template : $el.html(),
-						dataContent: savedConfigs ? savedConfigs.data : "{}", //whatever stored in localstorage is an string. so default should be "{}"
-					},
-					onMoveCloneToCenter: function(ctForClone){
-						$clone.css({
-							top: newTop,
-							left: newLeft
-						}).anyone(app.ADE, function(){
-							//add blur effect on the view
-							that.$el.addClass('viewport-blur');
-
-							//
-							ctForClone.trigger('view:append-clone');
-
-							//empty the content and add a highlight class to the region currently editing
-							$el.addClass('editing').empty();
-	            		});
-					}
-				})
-				.overlay({
-					effect: false,
-					class: 'focused-editing-overlay'
-				});
-
-
 		},
 
 		//function to handle region right click (contextmenu) event
@@ -533,6 +471,94 @@
 			$el.addClass('active');
 
 			this.$contextMenuTrigger = $el;
+		},
+
+		//function to handle context menu assign
+		contextmenuAssign: function(){
+			//TBD...
+		},
+
+		//function to handle context menu edit
+		contextmenuEdit: function(e, $el){
+			var that = this;
+			//click event from children should be trigger until find the first-layer-region
+			while(!$el.hasClass('first-layer-region')){
+				$el = $el.parent();
+			}
+
+			//hide elements in side menu
+			this.$el.find('.view-edit-menu').css({
+				visibility: 'hidden'
+			});
+
+			//animation effect for the region is going to be edited
+			//clone a div in the exactly position
+			
+			//original position
+			var $clone = $el.clone(),
+				$editor = this.$el.find('.region-content-editor'),
+				top = $el.offset().top,// - $editor.offset().top,
+				left = $el.offset().left,// - $editor.offset().left,
+				height = $el.height(),
+				width = $el.width(),
+				cacheName = window.location.hash.split('/').pop() + '-' + $el.attr('region'),
+				savedConfigs = app.store.get('__savedConfigs') && app.store.get('__savedConfigs')[cacheName];
+
+			//calculate new positions
+			var newTop = ($editor.height() - height) / 2,
+				newLeft = ($editor.width() - width) / 2;
+
+			//append
+			$clone
+			.addClass('clone')
+			.css({
+				position: 'absolute',
+				top: top,
+				left: left,
+				height: height,
+				width: width,
+				border: '1px dashed #000',
+				transition: '.5s',
+			}).appendTo(this.$el);//.appendTo(this.$el.find('.region-content-editor'));
+
+			//load the focused edit view, clone a copy of $el and pass it to the focused editing view
+			app.get('Overlay.FocusedEditing')
+				.create({
+					data: {
+						$element: $el,
+						$clone: $clone,
+						cacheName: cacheName,
+						template: savedConfigs ? savedConfigs.template : $el.html(),
+						dataContent: savedConfigs ? savedConfigs.data : "{}", //whatever stored in localstorage is an string. so default should be "{}"
+					},
+					onMoveCloneToCenter: function(ctForClone){
+						$clone.css({
+							top: (this.$el.find('.region-tabs').height() - height) / 2,
+							left: (this.$el.find('.region-tabs').width() - width) / 2
+						}).anyone(app.ADE, function(){
+							//add blur effect on the view
+							that.$el.addClass('viewport-blur');
+
+							//
+							ctForClone.trigger('view:append-clone');
+
+							//empty the content and add a highlight class to the region currently editing
+							$el.addClass('editing').empty();
+	            		});
+					}
+				})
+				.overlay({
+					effect: false,
+					class: 'focused-editing-overlay'
+				});
+
+			//close contextmenu
+			this.closeContextMenu();
+		},
+
+		//function to handle context menu draw
+		contextmenuDraw: function(){
+			//TBD...
 		},
 
 		//function to handle closing context menu

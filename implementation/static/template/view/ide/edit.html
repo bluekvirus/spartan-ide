@@ -2,7 +2,7 @@
 <div class="right-container">
 	<div region="content-editor"></div>
 	<div class="context-menu hidden">
-		<div class="info clearfix">
+		<!-- <div class="info clearfix">
 			<div class="text pull-left"><span>Assign Region</span></div>
 			<div class="close-holder pull-right"><i class="fa fa-close" action="close-context-menu"></i></div>
 		</div>
@@ -23,6 +23,15 @@
 		</div>
 		<div class="context-menu-item" action="export-region">
 			<span>EXPORT AS A VIEW</span>
+		</div> -->
+		<div class="context-menu-item" data-type="assign" action="context-menu-item-clicked">
+			<span class="text">ASSIGN</span><span class="info">(VIEW)</span>
+		</div>
+		<div class="context-menu-item" data-type="edit" action="context-menu-item-clicked">
+			<span class="text">EDIT</span><span class="info">(HTML/CSS)</span>
+		</div>
+		<div class="context-menu-item" data-type="draw" action="context-menu-item-clicked">
+			<span class="text">DRAW</span><span class="info">(SVG)</span>
 		</div>
 	</div>
 </div>

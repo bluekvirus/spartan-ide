@@ -27,10 +27,11 @@
 		<div class="dirty-bit hidden"><i class="fa fa-circle"></i></div>
 	</div>
 	<div class="switch-views-holder">
+		<div class=""></div>
 		{{#items}}
 			<div class="view-list-item">
 				<div class="{{#if (../xif3 name ../viewName)}}active{{/if}}" action="switch-view" activate="single">
-					{{#if (../xif3 source "remote")}}<i class="fa fa-cloud"></i>{{/if}}
+					{{#if (../xif3 source "remote")}}<!-- <i class="fa fa-cloud"></i> -->{{/if}}
 					{{#if (../xif3 source "local")}}<i class="fa fa-database"></i>{{/if}}
 					<span class="text">{{name}}</span>
 					{{#if (../xif3 source "local")}}
@@ -41,10 +42,11 @@
 				</div>
 			</div>
 		{{/items}}
-		<div class="info-tag"><span>switch to ...</span></div>
+		<!-- <div class="info-tag"><span>switch to ...</span></div> -->
 	</div>
 </div>
 <div class="view-edit-menu {{#unless edit}}hidden{{/unless}}">
+	<div class="sliding-button"><i class="fa fa-bars"></i></div>
 	<div class="view-name">
 		<span>{{viewName}}</span>
 	</div>
@@ -69,15 +71,16 @@
 		<div class="btn btn-block btn-default" action="apply-change"><span><i class="fa fa-floppy-o"></i> SAVE</span></div>
 	</div>
 	<div class="switch-views-holder">
+		<div class="switch-title"><span>View List</span></div>
 		{{#items}}
 			<div class="view-list-item">
 				<div class="{{#if (../xif3 name ../viewName)}}active{{/if}}" action="switch-view" activate="single">
-					{{#if (../xif3 source "remote")}}<i class="fa fa-cloud"></i>{{/if}}
+					{{#if (../xif3 source "remote")}}<!-- <i class="fa fa-cloud"></i> -->{{/if}}
 					{{#if (../xif3 source "local")}}<i class="fa fa-database"></i>{{/if}}
 					<span class="text">{{name}}</span>
 				</div>
 			</div>
 		{{/items}}
-		<div class="info-tag"><span>switch to ...</span></div>
+		<!-- <div class="info-tag"><span>switch to ...</span></div> -->
 	</div>
 </div>

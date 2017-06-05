@@ -104,6 +104,10 @@ h2 {
 				flex: 0 0 @left-menu-width;
 				border-right: 1px solid @border;
 				max-width: @left-menu-width;
+				transition: 0.3s;
+				&.closed {
+					flex: 0 0 1px;
+				}
 				.regional-layouteditmenu {
 					height: 100%;
 					.view-layout-menu,
@@ -113,6 +117,11 @@ h2 {
 						height: 100%;
 						position: relative;
 						width: 100%;
+						.sliding-button {
+							position: absolute;
+							right: 0;
+							top: 0;
+						}
 						.view-name {
 							padding: @grid-gutter-width / 2 @grid-gutter-width 0 @grid-gutter-width;
 							text-align: center;
@@ -235,6 +244,13 @@ h2 {
 									font-size: 0.8em;
 								}
 							}
+							.switch-title {
+								text-align: center;
+								>span {
+									font-weight: 600;
+									color: #aaa;
+								}
+							}
 							.view-list-item {
 								padding: @grid-gutter-width / 2 0;
 								&:first-child {
@@ -287,7 +303,13 @@ h2 {
 					.context-menu-item {
 						padding: @grid-gutter-width / 2;
 						>span {
-							//font-weight: 600;
+							//font-weight: 600;\
+							&.text {
+
+							}
+							&.info {
+								color: #aaa;
+							}
 						}
 						&:nth-child(odd) {
 							background-color: @background;

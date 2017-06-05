@@ -3,7 +3,7 @@
 		<div class="title"><span class="text">VIEWS</span></div>
 		{{#items}}
 		<div class="view-list-item" action="preview-view" activate="single" {{#if remote}}source="remote"{{/if}} {{#if local}}source="local"{{/if}}>
-			{{#if remote}}<i class="fa fa-cloud"></i> {{/if}}
+			{{#if remote}}<!-- <i class="fa fa-cloud"></i> --> {{/if}}
 			{{#if local}}<i class="fa fa-database"></i> {{/if}}
 			<span class="text">{{name}}</span>
 		    <div class="edit-holder pull-right" action="edit-view"><i class="fa fa-edit"></i></div>
