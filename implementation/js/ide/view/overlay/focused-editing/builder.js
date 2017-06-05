@@ -154,7 +154,7 @@
 				direction = 'flex-direction: column;';
 			}
 			allTemplate.append('<div region="stack-groups" style="height:100%; display:flex; ' + direction + '"></div>');
-			allTemplate.append('<div region="hanger-groups" style="position:absolute; top:0; left:0; height:100%;"></div>');
+			allTemplate.append('<div region="hanger-groups" style="position:absolute; top:0; left:0; height:100%; width:100%;"></div>');
 			_.each(stackGroups, function(stackGroup) {
 				if (stackGroup.template) {
 					var stackId = builderName + '-' + stackNumber + '-id',
@@ -371,11 +371,11 @@
 			if (this.get('template')) {
 				//Non-empty template-Replace new style
 				this.$el.parent().removeAttr('style');
-				hangerStyle['border-bottom'] = '2px dotted black';
+				hangerStyle['border-bottom'] = '2px dotted lightgrey';
 				hangerStyle['z-index'] = '100';
 			} else {
 				//Nothing has been set in the template
-				hangerStyle['border-bottom'] = '2px dotted black';
+				hangerStyle['border-bottom'] = '2px dotted lightgrey';
 				hangerStyle['z-index'] = '100';
 				hangerStyle['background-color'] = 'lightgrey';
 				hangerStyle.width = '6em';
