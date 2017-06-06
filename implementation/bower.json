@@ -2,13 +2,14 @@
   "name": "my.project",
   "private": true,
   "devDependencies": {
-    "stage": "^1.10.1",
+    "stage": "^1.10.2",
     "bootstrap": "~3.x.x",
     "fontawesome": "~4.x.x",
     "open-sans-fontface": "*"
   },
   "dependencies": {
-    "roboto-fontface": "^0.7.0"
+    "roboto-fontface": "^0.7.0",
+    "ace-builds": "^1.2.6"
   },
   "open-source-libs": {
     "velocity": "*",
@@ -46,5 +47,5 @@
     "roboto-fontface": "*",
     "ubuntu-fontface": "*"
   },
-  "updatedOn": "2017-03-24T01:31:01.263Z"
+  "updatedOn": "2017-06-02T17:25:48.060Z"
 }
