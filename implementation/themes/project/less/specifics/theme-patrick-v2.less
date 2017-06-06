@@ -3,7 +3,7 @@
  * @author: Patrick Zhu
  */
 
-@left-menu-width: 300px;
+@left-menu-width: 600px;
 //temprary force all h2 with no margin
 h2 {
 	margin: 0 !important;
@@ -96,183 +96,270 @@ h2 {
 		.regional-layout,
 		.regional-edit {
 			height: 100%;
-			display: flex;
+			position: relative;
 			&.viewport-blur {
 				filter: blur(3px);
 			}
 			.left-container {
-				flex: 0 0 @left-menu-width;
+				//flex: 0 0 @left-menu-width;
+				position: absolute;
+				left: 0;
+				width: @left-menu-width;
+				top: 0;
+				bottom: 0;
 				border-right: 1px solid @border;
-				max-width: @left-menu-width;
-				transition: 0.3s;
+				transition: 0.2s;
+				position: relative;
+				z-index: 10;
+				height: 100%;
+				background-color: #fff;
+				box-shadow: 0 2px 2px @border;
 				&.closed {
-					flex: 0 0 1px;
+					width: 0;
+					.sliding-button {
+						.opened {
+							display: none;
+						}
+						.closed {
+							display: inline-block;
+						}
+					}
 				}
-				.regional-layouteditmenu {
+				.sliding-button {
+					position: absolute;
+					right: -38px;
+					top: 0px;
+					background-color: rgba(100, 100, 100, 0.8);
+					padding: @grid-gutter-width / 4 @grid-gutter-width * 1.2 @grid-gutter-width / 2 @grid-gutter-width / 2;
+					border-bottom-right-radius: 100%;
+					z-index: 1;
+					box-shadow: 1px 0px 1px @gray-lighter;
+					>i {
+						font-size: 1.1em;
+					}
+					.opened {
+						display: inline-block;
+					}
+					.closed {
+						display: none;
+					}
+				}
+				.region-menu {
 					height: 100%;
-					.view-layout-menu,
-					.view-edit-menu {
-						padding: @grid-gutter-width / 2 0;
-						overflow-x: hidden;
+					.regional-layouteditmenu {
 						height: 100%;
-						position: relative;
-						width: 100%;
-						.sliding-button {
-							position: absolute;
-							right: 0;
-							top: 0;
-						}
-						.view-name {
-							padding: @grid-gutter-width / 2 @grid-gutter-width 0 @grid-gutter-width;
-							text-align: center;
-							//border-bottom: 1px solid @border;
+						.view-layout-menu,
+						.view-edit-menu {
+							padding: @grid-gutter-width / 2 0;
+							overflow-x: hidden;
+							height: 100%;
 							width: 100%;
-							white-space: nowrap; 
-						    overflow: hidden;
-						    text-overflow: ellipsis; 
-							> span {
-								font-size: 2em;
-								font-weight: 600;
+							position: relative;
+							.export-holder {
+								position: absolute;
+								right: @grid-gutter-width / 3;
+								top: 2px;
+								>span {
+									font-weight: 600;
+									font-size: 0.9em;
+									text-decoration: underline;
+								}
 							}
-						}
-						.layout-edit-switch-holder {
-							padding: @grid-gutter-width;
-							.layout-edit-switch {
-								border: 1px solid #adadad;
-								height: 40px;
-								padding: 3px;
-								.switch-inner {
-									width: 100%;
-									height: 100%;
-									label {
-										height: 100%;
+							.view-name {
+								padding: @grid-gutter-width / 2 @grid-gutter-width 0 @grid-gutter-width;
+								text-align: center;
+								//border-bottom: 1px solid @border;
+								width: 100%;
+								white-space: nowrap; 
+							    overflow: hidden;
+							    text-overflow: ellipsis; 
+								> span {
+									font-size: 2em;
+									font-weight: 600;
+								}
+							}
+							.data-editor-holder {
+								position: absolute;
+								bottom: 50%;
+								left: 0;
+								right: 0;
+								top: 120px;
+								padding: @grid-gutter-width;
+								.editor-name {
+									padding:  0 0 @grid-gutter-width / 2 0;
+									.pull-left{
+										>span {
+											font-weight: 600;
+										}
+									}
+									.pull-right {
+										label {
+											margin: 0;
+										}
+										input {
+											margin-top: 2px;
+										}
+										span {
+											display: inline-block;
+											vertical-align: top;
+										}
+									}
+								}
+								.url-editor {
+									padding: @grid-gutter-width / 4 0;
+									position: relative;
+									> input {
 										width: 100%;
-										input[type="checkbox"] {
-											display: none;
+										height: 100%;
+									}
+									.remote-fetch {
+										position: absolute;
+										right: @grid-gutter-width  / 4;
+										top: 7px;
+										>span {
+											font-size: 0.8em;
+											font-weight: 600;
 										}
-										input[type="checkbox"]:checked + .slider {
-											.inner-slider {
-												background-color: rgba(100, 100, 100, 0.5);
-												left: 126px;
-											}
-											.layout-text {
-												color: #aaa;
-											}
-											.edit-text {
-												color: #000;
-											}
-										}
-										input[type="checkbox"]:not(:checked) + .slider {
-											.inner-slider {
-												background-color: rgba(0, 0, 0, 0.5);
-												left: 2px;
-											}
-											.layout-text {
-												color: #000;
-											}
-											.edit-text {
-												color: #aaa;
-											}
-										}
-										.slider {
+									}
+								}
+								.data-editor {
+									position: absolute;
+									left: @grid-gutter-width;
+									right: @grid-gutter-width;
+									top: 92px;
+									bottom: @grid-gutter-width;
+									&.local {
+										top: 42px;
+									}
+								}
+							}
+							.layout-edit-switch-holder {
+								padding: @grid-gutter-width;
+								border-bottom: 1px solid @border;
+								.layout-edit-switch {
+									border: 1px solid #adadad;
+									height: 40px;
+									padding: 3px;
+									.switch-inner {
+										width: 100%;
+										height: 100%;
+										label {
 											height: 100%;
 											width: 100%;
-											position: relative;
-											.layout-text,
-											.edit-text {
-												display: inline-block;
-												width: 50%;
-												line-height: 40px - 2 * 3px - 2px;
-												text-align: center;
-												font-weight: 600;
-												font-size: 0.9em;
+											input[type="checkbox"] {
+												display: none;
 											}
-											.inner-slider {
-												width: 50%;
-												position: absolute;
-												height: 40px - 2 * 3px - 2 * 3px;
-												top: 2px;
-												transition: .5s;
+											input[type="checkbox"]:checked + .slider {
+												.inner-slider {
+													background-color: rgba(100, 100, 100, 0.5);
+													left: 277px;
+												}
+												.layout-text {
+													color: #aaa;
+												}
+												.edit-text {
+													color: #000;
+												}
+											}
+											input[type="checkbox"]:not(:checked) + .slider {
+												.inner-slider {
+													background-color: rgba(0, 0, 0, 0.5);
+													left: 2px;
+												}
+												.layout-text {
+													color: #000;
+												}
+												.edit-text {
+													color: #aaa;
+												}
+											}
+											.slider {
+												height: 100%;
+												width: 100%;
+												position: relative;
+												.layout-text,
+												.edit-text {
+													display: inline-block;
+													width: 50%;
+													line-height: 40px - 2 * 3px - 2px;
+													text-align: center;
+													font-weight: 600;
+													font-size: 0.9em;
+												}
+												.inner-slider {
+													width: 50%;
+													position: absolute;
+													height: 40px - 2 * 3px - 2 * 3px;
+													top: 2px;
+													transition: .5s;
+												}
 											}
 										}
 									}
 								}
 							}
-						}
-						.apply-button-holder,
-						.switch-button-holder {
-							padding: @grid-gutter-width;
-							position: relative;
-							&.switch-button-holder {
-								padding-bottom: @grid-gutter-width / 2;
-							}
-							&.apply-button-holder {
-								//padding-top: @grid-gutter-width / 2;
-								border-top: 1px solid @border;
-								border-bottom: 1px solid @border;
-							}
-							.btn {
-								>span {
-									font-weight: 600;
+							.apply-button-holder,
+							.switch-button-holder {
+								padding: @grid-gutter-width;
+								position: relative;
+								&.switch-button-holder {
+									padding-bottom: @grid-gutter-width / 2;
+								}
+								&.apply-button-holder {
+									//padding-top: @grid-gutter-width / 2;
+									//border-top: 1px solid @border;
+									border-bottom: 1px solid @border;
+								}
+								.btn {
+									>span {
+										font-weight: 600;
+									}
+								}
+								.dirty-bit {
+									position: absolute;
+									right: @grid-gutter-width * 2;
+									top: @grid-gutter-width * 3 / 2;
 								}
 							}
-							.dirty-bit {
-								position: absolute;
-								right: @grid-gutter-width * 2;
-								top: @grid-gutter-width * 3 / 2;
-							}
-						}
-						.switch-views-holder {
-							padding: @grid-gutter-width;
-							position: absolute;
-							left: 0;
-							right: 0;
-							bottom: 0;
-							top: 50%;
-							overflow-y: auto;
-							border-top: 1px solid @border;
-							.info-tag {
+							.switch-views-holder {
+								padding: @grid-gutter-width;
 								position: absolute;
 								left: 0;
-								top:0;
-								background-color: #000;
-								padding: 2px  @grid-gutter-width;
-								line-height: 0.8em;
-								>span {
-									color: #fff;
-									font-weight: 600;
-									font-size: 0.8em;
-								}
-							}
-							.switch-title {
-								text-align: center;
-								>span {
-									font-weight: 600;
-									color: #aaa;
-								}
-							}
-							.view-list-item {
-								padding: @grid-gutter-width / 2 0;
-								&:first-child {
-									padding-top: @grid-gutter-width;
-								}
-								>div {
-									font-weight: 600;
-									border: 1px solid @border;
-									padding: @grid-gutter-width;
-									box-shadow: 1px 1px 1px @border;
-									&:hover {
-										background-color: rgba(155, 155, 155, 0.7);
-										color: #000;
+								right: 0;
+								bottom: 0;
+								top: 50%;
+								overflow-y: auto;
+								border-top: 1px solid @border;
+								.switch-title {
+									text-align: center;
+									>span {
+										font-weight: 600;
+										color: #aaa;
 									}
-									&.active {
-										background-color: rgba(0, 0, 0, 0.7);
-										color: #fff;
-										.delete-holder {
-											position: relative;
-											z-index: 2; //for higher z-index than view-list-item
-											>i {
-												color: #fff;
+								}
+								.view-list-item {
+									padding: @grid-gutter-width / 2 0;
+									&:first-child {
+										padding-top: @grid-gutter-width;
+									}
+									>div {
+										font-weight: 600;
+										border: 1px solid @border;
+										padding: @grid-gutter-width;
+										box-shadow: 1px 1px 1px @border;
+										&:hover {
+											background-color: rgba(155, 155, 155, 0.7);
+											color: #000;
+										}
+										&.active {
+											background-color: rgba(0, 0, 0, 0.7);
+											color: #fff;
+											.delete-holder {
+												position: relative;
+												z-index: 2; //for higher z-index than view-list-item
+												>i {
+													color: #fff;
+												}
 											}
 										}
 									}
@@ -283,8 +370,13 @@ h2 {
 				}
 			}
 			.right-container {
-				flex: 1 1 0;
-				position: relative;
+				//flex: 1 1 0;
+				height: 100%;
+				position: absolute;
+				left: 0;
+				right: 0;
+				top: 0;
+				bottom: 0;
 				.context-menu {
 					position: absolute;
 					top: 0;
@@ -348,6 +440,7 @@ h2 {
 					height: 100%;
 					width: 100%;
 					position: relative;
+					display: flex;
 					>div {
 						height: 100%;
 						width: 100%;

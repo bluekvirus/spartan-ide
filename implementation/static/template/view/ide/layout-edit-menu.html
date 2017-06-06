@@ -1,12 +1,15 @@
-<div class="view-layout-menu {{#unless layout}}hidden{{/unless}}">
-	<div class="view-name">
-		{{#if viewName}}<span>{{viewName}}</span>{{else}}<span>choose to edit</span>{{/if}}
-	</div>
+<div class="{{#if layout}}view-layout-menu{{else}}view-edit-menu{{/if}}">
+	{{#if edit}}<div class="export-holder" action="export-parent"><span>EXPORT</span></div>{{/if}}
+	{{#if layout}}
+		<div class="view-name">{{#if viewName}}<span>{{viewName}}</span>{{else}}<span>choose to edit</span>{{/if}}</div>
+	{{else}}
+		<div class="view-name"><span>{{viewName}}</span></div>
+	{{/if}}
 	<div class="layout-edit-switch-holder">
 		<div class="layout-edit-switch">
 			<div class="switch-inner">
 				<label for="layout-edit-switch" action="switch-method">
-					<input type="checkbox" id="layout-edit-switch">
+					<input type="checkbox" id="layout-edit-switch" {{#if edit}}checked{{/if}}>
 					<div class="slider">
 						<span class="layout-text">LAYOUT</span
 						><span class="edit-text">EDIT</span>
@@ -16,60 +19,30 @@
 			</div>
 		</div>
 	</div>
-	<!-- <div class="switch-button-holder">
-		<div class="btn btn-block btn-default" action="add-new"><span><i class="fa fa-plus"></i> ADD NEW VIEW</span></div>
-	</div> -->
-	<!-- <div class="switch-button-holder">
-		<div class="btn btn-block btn-default" action="switch-method"><span><i class="fa fa-pencil"></i> EDIT VIEW CONTENT</span></div>
-	</div> -->
-	<div class="apply-button-holder">
-		<div class="btn btn-block btn-default" action="save-layout"><span><i class="fa fa-floppy-o"></i> SAVE</span></div>
-		<div class="dirty-bit hidden"><i class="fa fa-circle"></i></div>
-	</div>
-	<div class="switch-views-holder">
-		<div class=""></div>
-		{{#items}}
-			<div class="view-list-item">
-				<div class="{{#if (../xif3 name ../viewName)}}active{{/if}}" action="switch-view" activate="single">
-					{{#if (../xif3 source "remote")}}<!-- <i class="fa fa-cloud"></i> -->{{/if}}
-					{{#if (../xif3 source "local")}}<i class="fa fa-database"></i>{{/if}}
-					<span class="text">{{name}}</span>
-					{{#if (../xif3 source "local")}}
-						<div class="delete-holder pull-right">
-							<i class="fa fa-lg fa-close" action="delete-local-view" data-name="{{name}}"></i>
-						</div>
-					{{/if}}
+	{{#if layout}}
+		<div class="apply-button-holder">
+			<div class="btn btn-block btn-default" action="save-layout"><span><i class="fa fa-floppy-o"></i> SAVE</span></div>
+			<div class="dirty-bit hidden"><i class="fa fa-circle"></i></div>
+		</div>
+	{{/if}}
+	{{#if edit}}
+		<div class="data-editor-holder">
+			<div class="editor-name clearfix">
+				<div class="pull-left"><span>PARENT DATA</span></div>
+				<div class="pull-right">
+					<label for="parent-data-remote-switch">
+						<span>remote</span>
+						<input type="checkbox" id="parent-data-remote-switch">
+					</label>
 				</div>
 			</div>
-		{{/items}}
-		<!-- <div class="info-tag"><span>switch to ...</span></div> -->
-	</div>
-</div>
-<div class="view-edit-menu {{#unless edit}}hidden{{/unless}}">
-	<div class="sliding-button"><i class="fa fa-bars"></i></div>
-	<div class="view-name">
-		<span>{{viewName}}</span>
-	</div>
-	<div class="layout-edit-switch-holder">
-		<div class="layout-edit-switch">
-			<div class="switch-inner">
-				<label for="layout-edit-switch" action="switch-method">
-					<input type="checkbox" id="layout-edit-switch" checked>
-					<div class="slider">
-						<span class="layout-text">LAYOUT</span
-						><span class="edit-text">EDIT</span>
-						<div class="inner-slider"></div>
-					</div>
-				</label>
+			<div class="url-editor hidden">
+				<input type="text" id="parent-remote-url" placeholder="url for remote fetch...">
+				<div class="remote-fetch btn btn-xs btn-info" action="parent-remote-fetch"><span><i class="fa fa-refresh"></i> FETCH</span></div>
 			</div>
+			<div class="data-editor local" id="parent-data-content"></div>
 		</div>
-	</div>
-	<!-- <div class="switch-button-holder">
-		<div class="btn btn-block btn-default" action="switch-method"><span><i class="fa fa-table"></i> EDIT VIEW LAYOUT</span></div>
-	</div> -->
-	<div class="apply-button-holder">
-		<div class="btn btn-block btn-default" action="apply-change"><span><i class="fa fa-floppy-o"></i> SAVE</span></div>
-	</div>
+	{{/if}}
 	<div class="switch-views-holder">
 		<div class="switch-title"><span>View List</span></div>
 		{{#items}}
@@ -78,9 +51,15 @@
 					{{#if (../xif3 source "remote")}}<!-- <i class="fa fa-cloud"></i> -->{{/if}}
 					{{#if (../xif3 source "local")}}<i class="fa fa-database"></i>{{/if}}
 					<span class="text">{{name}}</span>
+					{{#if ../layout}}
+						{{#if (../xif3 source "local")}}
+							<div class="delete-holder pull-right">
+								<i class="fa fa-lg fa-close" action="delete-local-view" data-name="{{name}}"></i>
+							</div>
+						{{/if}}
+					{{/if}}
 				</div>
 			</div>
 		{{/items}}
-		<!-- <div class="info-tag"><span>switch to ...</span></div> -->
 	</div>
 </div>

@@ -43,142 +43,47 @@
 		},
 		actions: {
 			'close-builder': function(){
+				//collect information first
+				var configs = this.builderResult();
+
 				//close focused-editing view
 				this.close();
 			},
-			'save-builder': function(){
-				//Not a problem anymore since we now always show the builder view
-				//only save if builder has been shown
-				// if(!this.getViewIn('tabs').getViewIn('tab-View').builderShown){
-				// 	//notify
-				// 	app.notify('No changes has been made.', 'You have not made any changes.', 'info');
+			'export-builder': function(){
+				//collect information first
+				var configs = this.builderResult();
+				//call view name overlay to configure a export name
+				var ExportName = app.get('Overlay.ExportViewName').create({
+					viewType: 'parent',
+					data: {
+						template: configs.template,
+						dataContent: configs.data,
+						remoteFlag: configs.remoteFlag
+					},
+				});
+				//close current view
+				this.close();
+				//overlay
+				ExportName.overlay({
+					effect: false
+				});
 
-				// 	return;
-				// }
-
-				//get builder view
-				var builder, template, dataTab, dataContent, less, compliedLess,
-					builderFlag = true, dataFlag = true,
-					savedConfigs = app.store.get('__savedConfigs') || {},
-					theme = $('head link[rel="stylesheet"]').attr('href').split('/')[1],
-					cssId = 'exported-' + this.get('cacheName');
-        
-				try {
-					builder = app.locate('Overlay.FocusedEditing.Builder').view;
-				}catch(e){
-					builderFlag = false;
-					console.warn('Get builder view error...');
-				}
-
-				//only assign tempalte if the builder view is loaded
-				if(builderFlag)
-					//fetch template
-					template = builder.extractTemplate() || ' ';
-
-					//fetch less
-					less = builder.extractLess();
-
-					//check if less exists, and then complie
-					//referenced Zahra's builder
-					if(less){
-						
-						app.remote({
-							url: 'api/less',
-							payload: {
-								less: less,
-								theme: theme
-							},
-							async: false,
-						}).done(function(data) {
-							//fetch complied less
-							compliedLess = data.msg;
-							//remove the old one, just case there is one
-							$('#' + cssId).remove();
-							//insert the new one
-							$('head').append('<style id="' + cssId + '">' + data.msg + '</style>');
-						});
-					}
-
-				try{
-					dataTab = this.getViewFromTab('Data');
-				}catch(e){
-					dataFlag = false;
-					console.warn('You have NOT assign any data.');
-				}
-
-				//only assign data if the dataTab has been loaded, otherwise try local stored data
-				if(dataFlag){
-					// if(dataTab.$el.find('#remote-switch').prop('checked')){
-					// 	//remote data, fetch url editor's content as data
-
-					// 	dataContent = dataTab.get('url');
-					// }else{
-					// 	dataContent = dataTab.get('data-content');
-					// }
-					//
-
-					dataContent = dataTab.aces.data.getValue(); //fetch value from ace editor
-				}
-
-				if(builderFlag && template){
-					//flip flag
-					this.saved = true;
-
-					//for blank data config view
-					if(!dataContent){
-						//consult __savedConfig(unedited version) to see whether there is a data object there
-						if(savedConfigs[this.get('cacheName')] && savedConfigs[this.get('cacheName')].data){
-							dataContent = savedConfigs[this.get('cacheName')].data;
-						}else {//really no data
-							dataContent = "{}";	
-						}
-					}
-
-					//prepare the view for spraying back
-					this.spraying = app.view({
-										template: template,
-										data: JSON.parse(dataContent)
-									});
-
-					//save the extracted template and data to cache for future use
-					savedConfigs[this.get('cacheName')] = {
-						template: template,
-						data: dataContent,
-						cssId: cssId,
-						css: compliedLess
-					};
-
-					//sync cache
-					app.store.set('__savedConfigs', _.deepClone(savedConfigs));
-
-					//add notification
-					app.notify('Success!', 'Configuration has been successfully saved.', 'ok', {icon: 'fa fa-fort-awesome'});
-				}
 			},
 			'get-color': function($self, e){
 				console.log('TBD'); //show copy the color name to the clipboard
 			},
 		},
 		onClose: function(){
-
 			//fetch cache if there is nothing configured
 			if(!this.spraying){
-				var savedConfigs = app.store.get('__savedConfigs');
+				console.log('im here with no spraying...');
 				//go fetch what has been stored in the cache, if not configured
-				var stored = savedConfigs && savedConfigs[this.get('cacheName')];
+				var stored = app.store.get(this.get('cacheName'));
 
-				if(stored){
-					this.spraying = app.view({
-										template: stored.template,
-										data: JSON.parse(stored.data)
-									});
-				}
-				else{
-					this.spraying = app.view({
-										template: this.get('template') || ' ',
-										data: JSON.parse(this.get('dataContent'))
-									});
-				}
+				this.spraying = app.view({
+									template: stored.template || ' ',
+									data: JSON.parse(stored.data) || this.get('dataContent')
+								});
 			}
 
 			app.coop('view-edit-menu-closed', {
@@ -202,6 +107,112 @@
 			this.getViewIn('group-editor').set(obj.data, {reset: true});
 
 			this.$el.find('.clip-editing-holder').addClass('active');
+		},
+
+		//------------------------- helper functions -------------------------//
+		//function to collect builder's informations
+		builderResult: function(){
+			var builder, template, dataTab, dataContent, less, compliedLess,
+				builderFlag = true, dataFlag = true, remoteFlag = false,
+				savedConfigs = app.store.get(this.get('cacheName')),
+				theme = $('head link[rel="stylesheet"]').attr('href').split('/')[1],
+				cssId = 'exported-' + this.get('cacheName');
+    
+    		//fetch builder view
+			try {
+				builder = app.locate('Overlay.FocusedEditing.Builder').view;
+			}catch(e){
+				builderFlag = false;
+				console.warn('Get builder view error...');
+			}
+
+			//only assign tempalte if the builder view is loaded
+			if(builderFlag)
+				//extract template
+				template = builder.extractTemplate() || ' ';
+
+				//extract less
+				less = builder.extractLess();
+
+				//check if less exists, and then complie
+				//referenced Zahra's builder
+				if(less){
+					app.remote({
+						url: 'api/less',
+						payload: {
+							less: less,
+							theme: theme
+						},
+						async: false,
+					}).done(function(data) {
+						//fetch complied less
+						compliedLess = data.msg;
+						//remove the old one, just case there is one
+						$('#' + cssId).remove();
+						//insert the new one
+						$('head').append('<style id="' + cssId + '">' + data.msg + '</style>');
+					});
+				}
+
+			//check whether user has configured data tab.	
+			try{
+				dataTab = this.getViewFromTab('Data');
+			}catch(e){
+				dataFlag = false;
+				console.warn('You have NOT assign any data.');
+			}
+
+			//only assign data if the dataTab has been loaded, otherwise try local stored data
+			if(dataFlag){
+				//check whether remote or not
+				if(dataTab.$el.find('#remote-switch').prop('checked')){//remote
+					dataContent = dataTab.get('url'); //fetch url from url editor
+					//flip the flag
+					remoteFlag = true;
+				}else{//local
+					dataContent = dataTab.aces.data.getValue(); //fetch value from ace editor
+				}
+			}
+
+			if(builderFlag && template){
+				//flip flag
+				this.saved = true;
+
+				//if blank data and no dataTab, then consult the data stored in local storage
+				//otherwise blank data is set up by the user
+				if(!dataContent && !dataFlag) {
+
+					if(savedConfigs.data){
+						//fetch data
+						dataContent = savedConfigs.data;
+						//fetch remote flag
+						remoteFlag = savedConfigs.remoteFlag;	
+					}else {//really there is no data for this view
+						dataContent = "{}"; //for consistency as local storage, since we need to parse later
+					}
+
+				}
+
+				//prepare the view for spraying back
+				this.spraying = app.view({
+									template: template,
+									data: remoteFlag ? dataContent : JSON.parse(dataContent)
+								});
+
+				//save the extracted template and data to cache for future use
+				savedConfigs = _.extend(savedConfigs, 
+										{
+											template: template,
+											data: dataContent,
+											cssId: cssId,
+											css: compliedLess,
+											remoteFlag: remoteFlag
+										});
+				//sync with local storage
+				app.store.set(this.get('cacheName'), _.deepClone(savedConfigs));
+
+				return savedConfigs;
+			}
 		},
 
 		//------------------------- functions to insert ace editor to textarea editors -------------------------//
