@@ -63,13 +63,24 @@
 			
 			//cache name = currently editing view + region name
 			var cacheName = _.string.slugify(this.get('cacheName')),
-				savedConfigs = app.store.get(cacheName) || {};
+				savedConfigs = app.store.get(cacheName) || {},
+				dataSource = savedConfigs.data;
 
+			//fetch dataSource if remote
+			if(savedConfigs.remoteFlag){
+				app.remote({
+					url: savedConfigs.data,
+					async: false,
+				}).done(function(data){
+					dataSource = data;
+				});
+			}
+			
 			//create the builder view
 			var builder = app.get('Overlay.FocusedEditing.Builder')
 				.create({
 					cacheName : cacheName,
-					dataSource: savedConfigs.data ? app.model(JSON.parse(savedConfigs.data)) : app.model(),
+					dataSource: savedConfigs.data ? app.model(savedConfigs.remoteFlag ? dataSource : JSON.parse(dataSource)) : app.model(),
 				});
 
 			//setup default cache

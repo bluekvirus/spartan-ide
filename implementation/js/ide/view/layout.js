@@ -185,7 +185,7 @@
 		},
 
 		//========================================== coop event handlers ==========================================//
-		
+
 		//open menu when clicked on endpoints
 		onEndpointClicked: function(e){
 			//call function:endpointClicked to handle this coop event

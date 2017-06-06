@@ -62,7 +62,7 @@
 		//function to handle exporting
 		exportView: function(name, overwrite){
 			var that = this;
-
+			console.log(this.get(), this.options.viewType);
 			app.remote({
 				url: '/api/viewexport',
 				payload: {
@@ -81,7 +81,7 @@
 				if(!overwrite)
 					app.locate('Edit').view
 						.getViewIn('menu').$el.find('.switch-views-holder')
-						.prepend('<div class="view-list-item"><div action="switch-view" activate="single"><i class="fa fa-cloud"></i> <span class="text">' + name + '</span></div></div>');
+						.append('<div class="view-list-item"><div action="switch-view" activate="single"><span class="text">' + name + '</span></div></div>');
 				
 				//close the view
 				that.close();

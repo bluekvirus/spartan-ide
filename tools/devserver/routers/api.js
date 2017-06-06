@@ -88,7 +88,7 @@ module.exports = function(server){
 			attributes = req.body.attributes,
 			overwrite = req.body.overwrite,
 			remoteFlag = req.body.remoteFlag;
-
+		console.log(req.body);
 		//make sure to capitalize first letters after "." of name to meet Stage.js view naming scheme
 		name = (_.map(name.split('.'), function(str){ return str.charAt(0).toUpperCase() + str.slice(1); })).join('.');
 

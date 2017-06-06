@@ -49,8 +49,27 @@
 				//fetch builder cache to get value
 				var savedConfigs = app.store.get(cacheName) || {};
 				if(savedConfigs.data){
-					//make it pretty x.x de-stringify and stringify
-					that.aces.data.setValue(JSON.stringify(JSON.parse(savedConfigs[cacheName].data), null, '\t'), 1);
+					//check whether remote
+					if(savedConfigs.remoteFlag){//remote
+						//make slider go to remote
+						that.$el.find('#remote-switch').prop('checked', true);
+
+						//change the value in url edit, and slidedown
+						that.getEditor('url').setVal(savedConfigs.data);
+						that.$el.find('.url-editor').slideDown('fast');
+
+						//fetch the data and change the value in the ace editor
+						app.remote({
+							url: savedConfigs.data,
+						}).done(function(data){
+							that.aces.data.setValue(JSON.stringify(data, null, '\t'), 1);
+						});
+
+					}else{//local
+
+						//make it pretty x.x de-stringify and stringify
+						that.aces.data.setValue(JSON.stringify(JSON.parse(savedConfigs.data), null, '\t'), 1);
+					}
 				}
 			});
 		},

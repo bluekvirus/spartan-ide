@@ -48,17 +48,25 @@
 
 				//close focused-editing view
 				this.close();
+
+				app.notify('SAVED!', 'Configuration of the view has been saved.', 'success');
 			},
 			'export-builder': function(){
 				//collect information first
 				var configs = this.builderResult();
+
+				//get dimension attributes
+				var $trigger = this.get('$element');
+
 				//call view name overlay to configure a export name
 				var ExportName = app.get('Overlay.ExportViewName').create({
-					viewType: 'parent',
 					data: {
 						template: configs.template,
 						dataContent: configs.data,
-						remoteFlag: configs.remoteFlag
+						remoteFlag: configs.remoteFlag,
+						attributes: {
+							style: 'height:' + $trigger.height() + 'px;width:' + $trigger.width() + 'px;margin: 40px auto 0 auto;position:relative;',//make it expand, temporary solution
+						},
 					},
 				});
 				//close current view
@@ -112,7 +120,7 @@
 		//------------------------- helper functions -------------------------//
 		//function to collect builder's informations
 		builderResult: function(){
-			var builder, template, dataTab, dataContent, less, compliedLess,
+			var builder, template, dataTab, dataContent, less, compliedLess, attribute,
 				builderFlag = true, dataFlag = true, remoteFlag = false,
 				savedConfigs = app.store.get(this.get('cacheName')),
 				theme = $('head link[rel="stylesheet"]').attr('href').split('/')[1],
@@ -198,6 +206,7 @@
 									template: template,
 									data: remoteFlag ? dataContent : JSON.parse(dataContent)
 								});
+
 
 				//save the extracted template and data to cache for future use
 				savedConfigs = _.extend(savedConfigs, 

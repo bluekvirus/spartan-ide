@@ -34,6 +34,12 @@
 					}
 				});
 			}
+
+			//wait for the ace setup
+			//shrink the menu after ace initiated to avoid styling glitch
+			_.defer(function(){
+				that.parentCt.$el.find('.left-container').addClass('closed');
+			});
 		},
 		actions: {
 			'export-parent': function(){
