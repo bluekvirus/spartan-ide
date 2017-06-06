@@ -25,7 +25,7 @@
 			this.modified = false;
 		},
 		onReady: function(){
-
+			
 		},
 		onNavigateTo: function(path){
 			var that = this;
@@ -161,6 +161,9 @@
 			});
 		},
 		actions: {
+			slide: function(){
+				this.$el.find('.left-container').toggleClass('closed');
+			},
 			//action to delete a line in certain direction of an endpoint
 			'delete-line': function($self){
 				//if the line is deletable

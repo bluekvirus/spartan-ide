@@ -103,6 +103,9 @@
 
 		},
 		actions: {
+			slide: function(){
+				this.$el.find('.left-container').toggleClass('closed');
+			},
 			'export-region': function(){
 				//get the trigger $el
 				var $trigger = this.$contextMenuTrigger;
@@ -353,7 +356,7 @@
 			//get all first layer regions
 			_.each(viewInstance.$el.find('div[region]'), function(el, index){
 				var $el = $(el), $parent = $el.parent(), firstLayer = true, cacheName,
-					savedConfigs = app.store.get('__savedConfigs') || {};
+					savedConfigs;
 
 				//trace every div with region tags, to see if any of its parents has class region
 				//if yes, then it is NOT a first layer region.
@@ -373,17 +376,19 @@
 				if(firstLayer){
 					//add a class for giving border
 					$el.addClass('first-layer-region');
-
 					//check whether there is a config stored in the localstorage
-					cacheName = window.location.hash.split('/').pop() + '-' + $el.attr('region');
+					cacheName = _.string.slugify(window.location.hash.split('/').pop() + '-' + $el.attr('region'));
+					//get saved configs
+					savedConfigs = app.store.get(cacheName) || {};
 
-					if(savedConfigs[cacheName]){//spray if exists
+					if(savedConfigs.template){//spray if exists template to avoid undefined
 						that.spray($el, app.view({
-							template: savedConfigs[cacheName].template,
-							data: JSON.parse(savedConfigs[cacheName].data)
+							template: savedConfigs.template,
+							data: savedConfigs.remoteFlag ? savedConfigs.data : JSON.parse(savedConfigs.data)
 						}));
 
-						$('head').append('<style id="' + savedConfigs[cacheName].cssId + '">' + savedConfigs[cacheName].css + '</style>');
+
+						$('head').append('<style id="' + savedConfigs.cssId + '">' + savedConfigs.css + '</style>');
 					}
 
 					//keep a copy for later reference
@@ -426,6 +431,9 @@
 			e.preventDefault();
 			e.stopPropagation();
 
+			//close side menu
+			this.closeSideMenu();
+
 			if(this.contextmenuShown){
 				//defer to make sure when clicking on other regions, this.contextmenuShown has not been changed
 				_.defer(function(){
@@ -440,6 +448,9 @@
 			//routine
 			e.preventDefault();
 			e.stopPropagation();
+
+			//close side menu
+			this.closeSideMenu();
 
 			//click event from children should be trigger until find the first-layer-region
 			while(!$el.hasClass('first-layer-region')){
@@ -501,8 +512,8 @@
 				left = $el.offset().left,// - $editor.offset().left,
 				height = $el.height(),
 				width = $el.width(),
-				cacheName = window.location.hash.split('/').pop() + '-' + $el.attr('region'),
-				savedConfigs = app.store.get('__savedConfigs') && app.store.get('__savedConfigs')[cacheName];
+				cacheName = _.string.slugify(window.location.hash.split('/').pop() + '-' + $el.attr('region')),
+				savedConfigs = app.store.get('cacheName');
 
 			//calculate new positions
 			var newTop = ($editor.height() - height) / 2,
@@ -580,6 +591,11 @@
 
 			//flip flag
 			this.contextmenuShown = false;
+		},
+
+		//function to close side menu
+		closeSideMenu: function(){
+			this.$el.find('.left-container').addClass('closed');
 		},
 
 		//function to match regions with endpoints for persistent

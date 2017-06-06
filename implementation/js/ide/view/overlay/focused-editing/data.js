@@ -33,9 +33,9 @@
 				var $this = $(this);
 
 				if($this.prop('checked')){//show url editor if true
-					that.$el.find('.url-editor').slideDown( "fast" );//.removeClass('hidden');
+					that.$el.find('.url-editor').slideDown('fast');//.removeClass('hidden');
 				}else{
-					that.$el.find('.url-editor').slideUp( "fast" );//.addClass('hidden');
+					that.$el.find('.url-editor').slideUp('fast');//.addClass('hidden');
 				}
 			});
 
@@ -47,8 +47,8 @@
 				//get cacheName
 				var cacheName = that.parentCt.get('cacheName');
 				//fetch builder cache to get value
-				var savedConfigs = app.store.get('__savedConfigs') || {};
-				if(savedConfigs[cacheName]){
+				var savedConfigs = app.store.get(cacheName) || {};
+				if(savedConfigs.data){
 					//make it pretty x.x de-stringify and stringify
 					that.aces.data.setValue(JSON.stringify(JSON.parse(savedConfigs[cacheName].data), null, '\t'), 1);
 				}

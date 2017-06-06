@@ -67,8 +67,11 @@
 				url: '/api/viewexport',
 				payload: {
 					name: name, //name
-					html: that.get('html'), //template
-					attributes: that.get('attributes'), //give it a height and a width
+					template: this.get('template'), //template
+					attributes: (this.options.viewType === 'parent') ? {} : this.get('attributes'), //give it a height and a width if sub-view
+					data: this.get('dataContent'),
+					layout: this.get('layout'),
+					remoteFlag: this.get('remoteFlag'),
 					overwrite: overwrite
 				},
 			}).done(function(){
