@@ -10,7 +10,7 @@
 			var that = this;
 			
 			//only happens in edit context, not layout.
-			if(this.get('edit')) {
+			//if(this.get('edit')) {
 				//initialize data-content editor to an ace editor
 				var elementId = 'parent-data-content';
 				var pad = ace.edit(elementId);
@@ -33,7 +33,7 @@
 						that.$el.find('.data-editor').addClass('local');
 					}
 				});
-			}
+			//}
 
 			//wait for the ace setup
 			//shrink the menu after ace initiated to avoid styling glitch
@@ -96,14 +96,21 @@
 						data: {
 							viewName: this.get('viewName'),
 							next: $self.find('.text').text(),
-							method: this.get('method')
+							method: this.get('method'),
+							parentCt: this
 						},
 					}).overlay({
 						effect: false,
 					});
 
-				else
+				else{
+
+					//reset parent indicators before navigate away
+					this.resetParentIndicator();
+					
 					app.navigate('_IDE/' + this.get('method') + '/' + $self.find('.text').text());
+				}
+					
 			},
 			'add-new': function(){
 				app.get('Overlay.AddNewView').create().overlay({
@@ -142,6 +149,12 @@
 				
 			},
 			'save-layout': function(){
+				var that = this;
+				if((_.find(this.get('items'), function(v){ return v.name === that.get('viewName'); })).source === 'remote'){
+					app.notify('ERROR!', 'Currently you cannot save the layout for a remote view.', 'danger');
+					return;
+				}
+
 				this.coop('save-layout');
 			},
 			'delete-local-view': function($self){
@@ -156,6 +169,37 @@
 				});
 			},
 		},
+
+		//========================================== helper functions ==========================================//
+
+		//function to reset parent's indicator, based on current context
+		resetParentIndicator: function(){
+
+			//reset all the indicators based on context
+			if(this.get('method') === 'Layout'){
+				//indicate whether endpoint menu is current being shown or not
+				this.parentCt.endpointMenuShown = false;
+
+				//indicate whether it is outline only
+				this.parentCt.outlineOnly = false;
+
+				//indicate whether current view has been edited
+				this.parentCt.modified = false;
+			}
+
+			else if(this.get('method') === 'Edit'){
+				//indicator of which $el triggered context menu
+				this.parentCt.$contextMenuTrigger = false;
+
+				//array to store all the first layer regions object
+				this.parentCt.firstLayers = [];
+
+				//indicate whether context menu is currently showing
+				this.parentCt.contextmenuShown = false;
+			}
+		},
+
+		//function to compare two values in Handlerbar.js
 		templateHelpers: {
 			xif3: function(val1, val2){
 				return val1 === val2;
@@ -166,11 +210,19 @@
 		
 		//user choose not to save
 		onSaveLayoutDenied: function(obj){
+
+			//reset parent indicators before navigate away
+			this.resetParentIndicator();
+
 			app.navigate('_IDE/' + obj.method + '/' + obj.next);
 		},
 
 		//user choose to save
 		onSaveLayoutConfirmed: function(obj){
+
+			//reset parent indicators before navigate away
+			this.resetParentIndicator();
+
 			//call parentCt to handle to save method
 			this.coop('save-layout', obj);
 

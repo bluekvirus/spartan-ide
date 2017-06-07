@@ -11,7 +11,7 @@
 
 module.exports = {
 
-	port: '5004',
+	port: '5003',
 
 	//standard express-session middleware config
 	session: {

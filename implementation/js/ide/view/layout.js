@@ -84,7 +84,7 @@
 						items: viewList,
 						layout: true,
 						method: 'Layout',
-						viewName: that.editingViewName
+						viewName: that.editingViewName,
 					},
 				});
 
@@ -782,7 +782,7 @@
 					bottom: info.endPoint
 				}, info.id);
 			}
-		}
+		},
 		
 	});
 

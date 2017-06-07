@@ -75,18 +75,24 @@
 					overwrite: overwrite
 				},
 			}).done(function(){
-				app.notify('SUCCESS!', 'View has been successfully exported.', 'success');
-
 				//update the viewlist on menu, if not overwrite
-				if(!overwrite)
-					app.locate('Edit').view
+				if(!overwrite){
+					var currentContext = app.locate('Edit') || app.locate('Layout');
+
+					currentContext.view
 						.getViewIn('menu').$el.find('.switch-views-holder')
-						.append('<div class="view-list-item"><div action="switch-view" activate="single"><span class="text">' + name + '</span></div></div>');
+						//append and add User. in front to fake the name.
+						.append('<div class="view-list-item"><div action="switch-view" activate="single"><span class="text">User.' + (name.charAt(0).toUpperCase() + name.slice(1)) + '</span></div></div>');
+				}
 				
 				//close the view
 				that.close();
 
+				//give notification
+				app.notify('SUCCESS!', 'View has been successfully exported.', 'success');
+
 			}).fail(function(){
+				//give notification
 				app.notify('FAIL!', 'View export error.', 'danger');
 			});
 		},

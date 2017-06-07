@@ -1,12 +1,21 @@
 /**
- * Theme file for v2
+ * Theme file for prototype v2
  * @author: Patrick Zhu
  */
 
 @left-menu-width: 600px;
-//temprary force all h2 with no margin
-h2 {
-	margin: 0 !important;
+//routine, stretch the height
+html,
+body,
+[region="app"] {
+	height: 100%;
+	overflow: hidden;
+	.regional-main {
+		height: 100%;
+		.region-contexts {
+			height: 100%;
+		}
+	}
 }
 
 .context-ide {
@@ -183,8 +192,13 @@ h2 {
 								bottom: 50%;
 								left: 0;
 								right: 0;
-								top: 120px;
 								padding: @grid-gutter-width;
+								&.edit-menu {
+									top: 120px;
+								}
+								&.layout-menu {
+									top: 185px;
+								}
 								.editor-name {
 									padding:  0 0 @grid-gutter-width / 2 0;
 									.pull-left{

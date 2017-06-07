@@ -1,5 +1,7 @@
 <div class="{{#if layout}}view-layout-menu{{else}}view-edit-menu{{/if}}">
-	{{#if edit}}<div class="export-holder" action="export-parent"><span>EXPORT</span></div>{{/if}}
+
+		<div class="export-holder" action="export-parent"><span>EXPORT</span></div>
+
 	{{#if layout}}
 		<div class="view-name">{{#if viewName}}<span>{{viewName}}</span>{{else}}<span>choose to edit</span>{{/if}}</div>
 	{{else}}
@@ -25,8 +27,8 @@
 			<div class="dirty-bit hidden"><i class="fa fa-circle"></i></div>
 		</div>
 	{{/if}}
-	{{#if edit}}
-		<div class="data-editor-holder">
+
+		<div class="data-editor-holder {{#if edit}}edit-menu{{/if}}{{#if layout}}layout-menu{{/if}}">
 			<div class="editor-name clearfix">
 				<div class="pull-left"><span>PARENT DATA</span></div>
 				<div class="pull-right">
@@ -42,7 +44,7 @@
 			</div>
 			<div class="data-editor local" id="parent-data-content"></div>
 		</div>
-	{{/if}}
+
 	<div class="switch-views-holder">
 		<div class="switch-title"><span>View List</span></div>
 		{{#items}}
