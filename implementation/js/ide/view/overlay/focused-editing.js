@@ -67,6 +67,8 @@
 						attributes: {
 							style: 'height:' + $trigger.height() + 'px;width:' + $trigger.width() + 'px;margin: 40px auto 0 auto;position:relative;',//make it expand, temporary solution
 						},
+						less: configs.less ? configs.less : ' ',
+						themeName: configs.themeName,
 					},
 				});
 				//close current view
@@ -84,9 +86,8 @@
 		onClose: function(){
 			//fetch cache if there is nothing configured
 			if(!this.spraying){
-				console.log('im here with no spraying...');
 				//go fetch what has been stored in the cache, if not configured
-				var stored = app.store.get(this.get('cacheName'));
+				var stored = app.store.get('__builder')[this.get('cacheName')];
 
 				this.spraying = app.view({
 									template: stored.template || ' ',
@@ -122,11 +123,12 @@
 		builderResult: function(){
 			var builder, template, dataTab, dataContent, less, compliedLess, attribute,
 				builderFlag = true, dataFlag = true, remoteFlag = false,
-				savedConfigs = app.store.get(this.get('cacheName')),
+				allBuilders = app.store.get('__builder'),
+				savedConfigs = allBuilders[this.get('cacheName')],
 				theme = $('head link[rel="stylesheet"]').attr('href').split('/')[1],
 				cssId = 'exported-' + this.get('cacheName');
-    
-    		//fetch builder view
+
+			//fetch builder view
 			try {
 				builder = app.locate('Overlay.FocusedEditing.Builder').view;
 			}catch(e){
@@ -142,6 +144,22 @@
 				//extract less
 				less = builder.extractLess();
 
+				//save this less to backend, so we don't need to store in the cache in order to preserve the styling
+				//only exporting less when exporting a view.
+				// if(less){
+				// 	app.remote({
+				// 		url: 'api/saveless',
+				// 		payload: {
+				// 			lessString: less,
+				// 			themeName: theme,
+
+				// 		},
+				// 	}).done(function(data){
+				// 		console.log('less saved to the backend');
+				// 	});
+				// }
+
+				//still need this, since until user reload the page, they won't able to get the new less
 				//check if less exists, and then complie
 				//referenced Zahra's builder
 				if(less){
@@ -162,7 +180,7 @@
 					});
 				}
 
-			//check whether user has configured data tab.	
+			//check whether user has configured data tab.
 			try{
 				dataTab = this.getViewFromTab('Data');
 			}catch(e){
@@ -194,7 +212,7 @@
 						//fetch data
 						dataContent = savedConfigs.data;
 						//fetch remote flag
-						remoteFlag = savedConfigs.remoteFlag;	
+						remoteFlag = savedConfigs.remoteFlag;
 					}else {//really there is no data for this view
 						dataContent = "{}"; //for consistency as local storage, since we need to parse later
 					}
@@ -209,16 +227,19 @@
 
 
 				//save the extracted template and data to cache for future use
-				savedConfigs = _.extend(savedConfigs, 
+				savedConfigs = _.extend(savedConfigs,
 										{
 											template: template,
 											data: dataContent,
 											cssId: cssId,
 											css: compliedLess,
-											remoteFlag: remoteFlag
+											remoteFlag: remoteFlag,
+											less: less ? less : ' ',
+											themeName: theme,
 										});
 				//sync with local storage
-				app.store.set(this.get('cacheName'), _.deepClone(savedConfigs));
+				allBuilders[this.get('cacheName')] = _.deepClone(savedConfigs);
+				app.store.set('__builder', _.deepClone(allBuilders));
 
 				return savedConfigs;
 			}

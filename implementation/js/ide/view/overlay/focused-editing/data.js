@@ -47,7 +47,7 @@
 				//get cacheName
 				var cacheName = that.parentCt.get('cacheName');
 				//fetch builder cache to get value
-				var savedConfigs = app.store.get(cacheName) || {};
+				var savedConfigs = app.store.get('__builder')[cacheName] || {};
 				if(savedConfigs.data){
 					//check whether remote
 					if(savedConfigs.remoteFlag){//remote
@@ -107,7 +107,7 @@
 						});
 
 					//spray the builder view onto the region
-		      		this.parentCt.spray(this.parentCt.get('$clone'), builder);
+					  this.parentCt.spray(this.parentCt.get('$clone'), builder);
 				}
 
 			} catch(event){
@@ -141,7 +141,7 @@
 		actions: {
 			'fetch-remote': function(){
 				var that = this;
-				
+
 				app.remote({
 					url: this.get('url'),
 				})

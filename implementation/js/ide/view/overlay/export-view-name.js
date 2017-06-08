@@ -72,7 +72,9 @@
 					data: this.get('dataContent'),
 					layout: this.get('layout'),
 					remoteFlag: this.get('remoteFlag'),
-					overwrite: overwrite
+					less: this.get('less'),
+					themeName: this.get('themeName'),
+					overwrite: overwrite, //overwrite flag
 				},
 			}).done(function(){
 				//update the viewlist on menu, if not overwrite

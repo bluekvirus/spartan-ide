@@ -70,6 +70,8 @@
 			apply: function() {
 				var obj = this.get('obj'),
 					viewAndRegion = obj.name,
+					allBuilders = app.store.get('__builder'),
+					allGroups = allBuilders[viewAndRegion],
 					editedObj = {
 						template: this.aces.html.getValue(), //this.get('html'),
 						data: this.get('datakey'), //datakey is editor
@@ -77,7 +79,6 @@
 						css_container: obj.css_container
 					},
 					baseId, uniqueId;
-				var allGroups = app.store.get(viewAndRegion);
 
 				//prepare the data as required in data view
 				if (this.get('type') === 'stack') {
@@ -88,7 +89,8 @@
 					editRegionGroups[stackNumber] = editedObj;
 					allGroups.stackGroups = editRegionGroups;
 					//Update cache
-					app.store.set(viewAndRegion, allGroups);
+					allBuilders[viewAndRegion] = allGroups;
+					app.store.set('__builder', _.deepClone(allBuilders));
 
 					editedObj.name = viewAndRegion;
 					editedObj.stackNumber = stackNumber;
@@ -102,7 +104,8 @@
 					editRegionStrings[hangerNumber] = editedObj;
 					allGroups.hangerGroups = editRegionStrings;
 					//Update cache
-					app.store.set(viewAndRegion, allGroups);
+					allBuilders[viewAndRegion] = allGroups;
+					app.store.set('__builder', _.deepClone(allBuilders));
 
 					editedObj.name = viewAndRegion;
 					editedObj.hangerNumber = hangerNumber;

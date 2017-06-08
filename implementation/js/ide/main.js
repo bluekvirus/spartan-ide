@@ -16,7 +16,7 @@
 		//Note: Always set navRegion if using app template here, unless you've merged it(the tpl) with index.html;
 		//defaultContext: '_IDE/Create',
 		defaultContext: '_IDE/Views',
-		viewSrcs: 'js/ide', //set this to a folder path to enable view dynamic loading. 
+		viewSrcs: 'js/ide', //set this to a folder path to enable view dynamic loading.
 		//---------------------------------------------------------------------------------------------
 		fullScreen: false, //this will put <body> to be full screen sized (window.innerHeight).
 		//---------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@
 	});
 
 	///////////initializers/////////// - [optional]
-	
+
 	app.addInitializer(function(){
 
 		//***cache loading now at mesh.js, since every view has its own cached layout***//
@@ -46,6 +46,11 @@
 		if(!current)
 			app.store.set('__current', {});
 
+		//initialize __builder
+		var builder = app.store.get('__builder');
+		if(!builder)
+			app.store.set('__builder', {});
+
 		//generation to keep every element has a truly unique id.
 		var gen = app.store.get('generation');
 		if(gen)
@@ -59,7 +64,7 @@
 
 	// app.addInitializer(function(){
 	// 	//reload previously stored configuration
-		
+
 	// 	var endPoints, hlines, vlines, temp, regionView;
 
 	// 	if(app.store.get('current')){//has currently actived template
@@ -88,13 +93,13 @@
 	// 		regionView = cached.regionView;
 
 	// 	}else{//no currently actived template
-			
+
 	// 		endPoints = app.store.get('endPoints');
 	// 		hlines = app.store.get('horizontal-line');
 	// 		vlines = app.store.get('vertical-line');
 	// 		regionView = app.store.get('regionView');
 	// 	}
-		
+
 	// 	if(endPoints && hlines && vlines){
 	// 		app._global = app._global || {};
 	// 		app._global.endPoints = endPoints;
@@ -117,9 +122,9 @@
 	// 	app.store.set('generation', gen);
 
 	// });
-	//Note: initializer can return a promise object for async loading, 
+	//Note: initializer can return a promise object for async loading,
 	//add more initializers if you need. e.g `return app.remote() or $.ajax()`.
-	
+
 	///////////////////////////warning///////////////////////////
 	//Don't put app.run() here, use the one found in index.html//
 	/////////////////////////////////////////////////////////////

@@ -13,16 +13,16 @@
 		//data: 'url', {} or [],
 		//coop: ['group-updated',],
 		//[editors]: {...},
-		
+
 		initialize: function(){
 			//indicate whether builder has been shown
-			this.builderShown = false;			
+			this.builderShown = false;
 		},
 		//onShow: function(){},
 		//onDataRendered: function(){},
 		onReady: function(){
 			// var that = this;
-			
+
 			// //move the element to the center save the original height and width
 			// var $el = this.get('$element'),
 			// 	height = $el.height(),
@@ -53,17 +53,17 @@
 			var tabsHeight = this.parentCt.$el.find('.tabs-container .tabs').height(),
 				parentHeight = this.parentCt.$el.height(),
 				newTop = (parentHeight - tabsHeight - $clone.height()) / 2;
-			//reset top	
+			//reset top
 			//$clone.css('top', newTop);
 			//append
 			this.$el.append($clone);
 
 			//register builder loading event
 			//this.registerEditingEvents($clone);
-			
+
 			//cache name = currently editing view + region name
 			var cacheName = _.string.slugify(this.get('cacheName')),
-				savedConfigs = app.store.get(cacheName) || {},
+				savedConfigs = app.store.get('__builder')[cacheName] || {},
 				dataSource = savedConfigs.data;
 
 			//fetch dataSource if remote
@@ -75,7 +75,7 @@
 					dataSource = data;
 				});
 			}
-			
+
 			//create the builder view
 			var builder = app.get('Overlay.FocusedEditing.Builder')
 				.create({
@@ -84,26 +84,31 @@
 				});
 
 			//setup default cache
-			app.store.set(cacheName, app.store.get(cacheName) || {
-			    'stackGroups': [{
-			        'template': that.get('template'),
-			        'data': '',
-			        'less': '',
-			        'css_container': {
-			            'flex-grow': '0',
-			            'flex-shrink': '1',
-			            'flex-basis': '100%',
-			        }
-			    }, ],
-			    'hangerGroups': [],
-			    'direction': ''
-			});
+			var allBuilders = app.store.get('__builder');
+
+			if (!allBuilders[cacheName]) {
+				allBuilders[cacheName] = {
+					'stackGroups': [{
+						'template': that.get('template'),
+						'data': '',
+						'less': '',
+						'css_container': {
+							'flex-grow': '0',
+							'flex-shrink': '1',
+							'flex-basis': '100%',
+						}
+					}, ],
+					'hangerGroups': [],
+					'direction': ''
+				};
+				app.store.set('__builder', _.deepClone(allBuilders));
+			}
 
 			//spray the builder view onto the region
-      		that.spray($clone, builder);
+			  that.spray($clone, builder);
 
-      		//flip flag
-      		that.builderShown = true;
+			  //flip flag
+			  that.builderShown = true;
 		},
 		registerEditingEvents: function($el){
 			var that = this;
@@ -112,7 +117,7 @@
 				e.preventDefault();
 				e.stopPropagation();
 
-				
+
 			});
 		},
 		actions: {

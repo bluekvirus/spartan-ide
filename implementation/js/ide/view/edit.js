@@ -57,7 +57,7 @@
 				//check whether it is a remote view or a local view
 				//remote
 				if(_.contains(data, that.editingViewName)){
-					
+
 					that.showEditingView(that.editingViewName);
 				}
 				//local
@@ -121,7 +121,7 @@
 				// 			this.close();
 				// 		},
 				// 	},
-					
+
 				// 	//need to fetch from local storage, use cacheName rule from zahra
 
 				// });
@@ -169,7 +169,7 @@
 						// 	url: '/api/getViewList',
 						// })
 						// .done(function(data){
-							
+
 						// 	//combine local and remote view
 						// 	var temp = data.slice();
 						// 	_.each(temp, function(viewName, index){
@@ -212,7 +212,7 @@
 						// 					that.getViewIn('content-editor').show(region, $self.data('view-name'));
 						// 				else
 						// 					that.getViewIn('content-editor'); //TBD
-										
+
 						// 				//close the contextmenu after assign
 						// 				that.closeContextMenu();
 						// 			},
@@ -235,13 +235,13 @@
 					break;
 
 					//--------------- newly adde for assign/edit/draw ---------------//
-					case 'assign': 
+					case 'assign':
 						console.log('assign a view to the region');
 					break;
-					case 'edit': 
+					case 'edit':
 						this.contextmenuEdit(e, this.$contextMenuTrigger);
 					break;
-					case 'draw': 
+					case 'draw':
 						console.log('svg');
 					break;
 				}
@@ -273,11 +273,11 @@
 			// 	//spary the view here to make the parentCt edit
 			// 	this.spray(obj.$element, obj.spraying);
 			// }
-				
+
 		},
 
 		//========================================== helper functions ==========================================//
-		
+
 		//function to initialize app._global
 		initializeGlobal: function(obj){
 			//create a global object to store points, horizontal lines and vertical lines
@@ -339,7 +339,7 @@
 								//mark the region size at the left bottom of every first layer region
 								that.markFirstLayer();
 							});
-			
+
 			this.show('content-editor',  showing);
 		},
 
@@ -352,7 +352,7 @@
 
 			//remove older markers
 			//this.getViewIn('content-editor').$el.find('.size-marker').remove();
-			
+
 			//get all first layer regions
 			_.each(viewInstance.$el.find('div[region]'), function(el, index){
 				var $el = $(el), $parent = $el.parent(), firstLayer = true, cacheName,
@@ -379,7 +379,7 @@
 					//check whether there is a config stored in the localstorage
 					cacheName = _.string.slugify(window.location.hash.split('/').pop() + '-' + $el.attr('region'));
 					//get saved configs
-					savedConfigs = app.store.get(cacheName) || {};
+					savedConfigs = app.store.get('__builder')[cacheName] || {};
 
 					if(savedConfigs.template){//spray if exists template to avoid undefined
 						that.spray($el, app.view({
@@ -387,7 +387,7 @@
 							data: savedConfigs.remoteFlag ? savedConfigs.data : JSON.parse(savedConfigs.data)
 						}));
 
-
+						//still need this one, exported less is only for exported view
 						$('head').append('<style id="' + savedConfigs.cssId + '">' + savedConfigs.css + '</style>');
 					}
 
@@ -415,7 +415,7 @@
 					left = $el.offset().left - contentOffsetLeft,
 					height = $el.height(),
 					width = $el.width();
-				
+
 				var markerBottom = contentOffsetHeight - height - top - 1,
 					markerLeft = left;
 
@@ -504,7 +504,7 @@
 
 			//animation effect for the region is going to be edited
 			//clone a div in the exactly position
-			
+
 			//original position
 			var $clone = $el.clone(),
 				$editor = this.$el.find('.region-content-editor'),
@@ -513,7 +513,7 @@
 				height = $el.height(),
 				width = $el.width(),
 				cacheName = _.string.slugify(window.location.hash.split('/').pop() + '-' + $el.attr('region')),
-				savedConfigs = app.store.get('cacheName');
+				savedConfigs = app.store.get('__builder')[cacheName];
 
 			//calculate new positions
 			var newTop = ($editor.height() - height) / 2,
@@ -555,7 +555,7 @@
 
 							//empty the content and add a highlight class to the region currently editing
 							$el.addClass('editing').empty();
-	            		});
+						});
 					}
 				})
 				.overlay({
@@ -585,7 +585,7 @@
 
 			//hide menu
 			this.$el.find('.context-menu').addClass('hidden');
-			
+
 			//remove the highlight
 			this.$el.find('.first-layer-region.active').removeClass('active');
 
