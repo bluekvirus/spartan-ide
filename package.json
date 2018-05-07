@@ -1,0 +1,27 @@
+{
+  "name": "spartan-ide",
+  "version": "1.0.0",
+  "description": "web IDE for UI templates and Backend services",
+  "main": "server.js",
+  "author": "Tim Lauv",
+  "license": "MIT",
+  "scripts": {
+    "build": "mkdir -p static && browserify -g markoify --extension='.marko' ./client.js -o static/js/bundle.js",
+    "build-prod": "mkdir -p static && NODE_ENV=production browserify -g markoify --extension='.marko' ./client.js -o static/js/bundle.js",
+    "start": "npm run build && browser-refresh server.js",
+    "start-prod": "npm run build && node server.js"
+  },
+  "dependencies": {
+    "@shopify/draggable": "^1.0.0-beta.7",
+    "axios": "^0.18.0",
+    "express": "^4.16.3",
+    "marko": "^4.9.7",
+    "serve-static": "^1.13.2"
+  },
+  "devDependencies": {
+    "browser-refresh-taglib": "^1.1.0",
+    "browserify": "^16.2.0",
+    "html5-boilerplate": "^6.1.0",
+    "markoify": "^2.2.2"
+  }
+}
