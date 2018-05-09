@@ -9,3 +9,6 @@ test/
 
 #dists
 dist/
+
+#marko build caches
+*.marko.js
