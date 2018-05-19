@@ -1,1 +1,22 @@
-p -- nothing
+div.workbench-container
+    div.workbench style="width:${input.width}" on-click('clicked')
+
+style.less {
+    .workbench-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        padding: 35px;
+        box-sizing: border-box;
+    }
+
+    .workbench {
+        margin: 0 auto;
+        height: 100%;
+        border: 4px solid;
+        box-sizing: border-box;
+        overflow: auto;
+    }
+}

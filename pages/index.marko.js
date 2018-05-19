@@ -9,9 +9,6 @@ var marko_template = module.exports = require("marko/src/html").t(__filename),
     marko_helpers = require("marko/src/runtime/html/helpers"),
     marko_loadTag = marko_helpers.t,
     component_globals_tag = marko_loadTag(require("marko/src/components/taglib/component-globals-tag")),
-    marko_loadTemplate = require("marko/src/runtime/helper-loadTemplate"),
-    main_template = marko_loadTemplate(require.resolve("../components/main.marko")),
-    main_tag = marko_loadTag(main_template),
     browser_refresh_tag = marko_loadTag(require("browser-refresh-taglib/refresh-tag")),
     init_components_tag = marko_loadTag(require("marko/src/components/taglib/init-components-tag")),
     await_reorderer_tag = marko_loadTag(require("marko/src/taglibs/async/await-reorderer-tag"));
@@ -23,11 +20,7 @@ function render(input, out, __component, component, state) {
 
   component_globals_tag({}, out);
 
-  out.w("<!--[if lte IE 9]>\n    <p class=\"browserupgrade\">You are using an <strong>outdated</strong> browser. Please <a href=\"https://browsehappy.com/\">upgrade your browser</a> to improve your experience and security.</p>\n  <![endif]-->");
-
-  main_tag({}, out, __component, "13");
-
-  out.w("<script src=\"/static/js/vendor/modernizr-3.6.0.min.js\"></script><script src=\"/static/js/plugins.js\"></script><script src=\"/static/js/bundle.js\"></script>");
+  out.w("<!--[if lte IE 9]>\n    <p class=\"browserupgrade\">You are using an <strong>outdated</strong> browser. Please <a href=\"https://browsehappy.com/\">upgrade your browser</a> to improve your experience and security.</p>\n  <![endif]--><div id=\"main\"></div> <script src=\"/static/js/vendor/modernizr-3.6.0.min.js\"></script><script src=\"/static/js/plugins.js\"></script><script src=\"/static/js/bundle.js\"></script>");
 
   browser_refresh_tag({
       enabled: "true"
@@ -51,7 +44,6 @@ marko_template.meta = {
     id: "/spartan-ide$1.0.0/pages/index.marko",
     tags: [
       "marko/src/components/taglib/component-globals-tag",
-      "../components/main.marko",
       "browser-refresh-taglib/refresh-tag",
       "marko/src/components/taglib/init-components-tag",
       "marko/src/taglibs/async/await-reorderer-tag"

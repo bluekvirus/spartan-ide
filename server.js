@@ -9,7 +9,7 @@ var serveStatic = require('serve-static');
 // hot reloading for certain types of files to short-circuit
 // a full process restart. You *should* use browser-refresh
 // in development: https://www.npmjs.com/package/browser-refresh
-require('marko/browser-refresh').enable();
+require('marko/browser-refresh').enable('*.marko *.css *.less *.styl *.scss *.sass *.png *.jpeg *.jpg *.gif *.webp *.svg');
 
 var app = express();
 

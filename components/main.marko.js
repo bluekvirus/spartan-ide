@@ -7,23 +7,18 @@ var marko_template = module.exports = require("marko/src/html").t(__filename),
     marko_renderer = components_helpers.r,
     marko_defineComponent = components_helpers.c,
     marko_loadTemplate = require("marko/src/runtime/helper-loadTemplate"),
-    toolbelt_template = marko_loadTemplate(require.resolve("./toolbelt")),
+    index_template = marko_loadTemplate(require.resolve("./workbench/index.marko")),
     marko_helpers = require("marko/src/runtime/html/helpers"),
     marko_loadTag = marko_helpers.t,
-    toolbelt_tag = marko_loadTag(toolbelt_template),
-    workbench_template = marko_loadTemplate(require.resolve("./workbench")),
-    workbench_tag = marko_loadTag(workbench_template);
+    include_tag = marko_loadTag(require("marko/src/taglibs/core/include-tag"));
 
 function render(input, out, __component, component, state) {
   var data = input;
 
-  out.w("<div>IDEv2.0");
-
-  toolbelt_tag({}, out, __component, "1");
-
-  workbench_tag({}, out, __component, "2");
-
-  out.w("</div>");
+  include_tag({
+      _target: index_template,
+      width: "100%"
+    }, out, __component, "0");
 }
 
 marko_template._ = marko_renderer(render, {
@@ -36,7 +31,7 @@ marko_template.Component = marko_defineComponent({}, marko_template._);
 marko_template.meta = {
     id: "/spartan-ide$1.0.0/components/main.marko",
     tags: [
-      "./toolbelt",
-      "./workbench"
+      "./workbench/index.marko",
+      "marko/src/taglibs/core/include-tag"
     ]
   };

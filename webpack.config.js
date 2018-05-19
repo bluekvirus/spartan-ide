@@ -1,10 +1,14 @@
 /**
- * Note that the `yarn build` cmd will run `webpack` according to the config here.
+ * `yarn build` cmd will run `webpack` according to the config here.
  * 
- * `yarn start` will start the server with a special browser-refresh reload supporting .marko file changes, js only;
- * `yarn watch` will run `webpack -w`, this will update the bundle.css;
+ * Dev cli sequence:
+ * 
+ * `yarn watch` will run `webpack -w`, this will update the bundle.css and bundle.js upon dev changes;
+ * `yarn start` will start the server with a special browser-refresh reload supporting multiple types (see server.js) of file changes --> browser;
  * 
  * Note that without `yarn watch`, the less/css changes in the components will not be emitted by webpack nor picked up by browser-refresh.
+ * 
+ * @author Tim Lauv
  *  
  */
 
@@ -16,6 +20,10 @@ module.exports = {
     // Add source map support
     devtool: '#cheap-source-map',
     entry: './client.js',
+    watchOptions: {
+        aggregateTimeout: 200,
+        ignored: /node_modules/
+    },
     output: {
         path: __dirname,
         filename: 'static/js/bundle.js'

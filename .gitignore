@@ -4,6 +4,9 @@ bower_components/
 #npm
 node_modules/
 
+#yarn
+*.log
+
 #test files
 test/
 
