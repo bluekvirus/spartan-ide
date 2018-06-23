@@ -4,7 +4,7 @@ A web IDE for fast app development. See branch `starter` for common web app proj
 ## ToDo
 1. Connect/Express middlewares for apis, policy and tasks.
 2. Waterline models for data persistence.
-3. SSO and roles.
+3. SSO session and roles.
 
 ## Contribute
 
