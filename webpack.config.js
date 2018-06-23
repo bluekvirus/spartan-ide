@@ -17,6 +17,7 @@ const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
+    mode: 'development',
     // Add source map support
     devtool: '#cheap-source-map',
     entry: './client.js',

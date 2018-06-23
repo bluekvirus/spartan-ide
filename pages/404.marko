@@ -34,7 +34,7 @@
 
         p {
             margin: 0 auto;
-            width: 280px;
+            /*width: 280px;*/
         }
 
         @media only screen and (max-width: 280px) {
@@ -54,7 +54,7 @@
 </head>
 <body>
     <h1>Page Not Found</h1>
-    <p>Sorry, but the page you were trying to view does not exist.</p>
+    <p>Sorry, but <strong>${input.path? 'marko page ' + input.path : 'the url'}</strong> you were trying to view does not exist.</p>
 </body>
 </html>
 <!-- IE needs 512+ bytes: https://blogs.msdn.microsoft.com/ieinternals/2010/08/18/friendly-http-error-pages/ -->

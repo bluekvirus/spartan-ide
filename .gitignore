@@ -7,6 +7,9 @@ node_modules/
 #yarn
 *.log
 
+#Mac sh*t
+.DS_Store
+
 #test files
 test/
 

@@ -1,46 +1,6 @@
-<!doctype html>
-<html class="no-js" lang="">
-
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <title></title>
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-  <link rel="manifest" href="/static/site.webmanifest">
-  <link rel="apple-touch-icon" href="/static/icon.png">
-  <!-- Place favicon.ico in the root directory -->
-  <link rel="icon" type="image/png" href="/static/favicon.ico">
-
-  <link rel="stylesheet" href="/static/css/normalize.css">
-  <link rel="stylesheet" href="/static/css/bundle.css" media="all">
-</head>
-
-<body>
-  <!--[if lte IE 9]>
-    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
-  <![endif]-->
-
-  <!-- Add your site or application content here -->
-  <!-- <main/> if using server-side rendering -->
-  <div id="main"/> <!-- if using client-side rendering -->
-
-  <script src="/static/js/vendor/modernizr-3.6.0.min.js"></script>
-  <!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-  <script>window.jQuery || document.write('<script src="/static/js/vendor/jquery-3.3.1.min.js"><\/script>')</script> -->
-  <script src="/static/js/plugins.js"></script>
-  <script src="/static/js/bundle.js"></script>
-
-  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
-  <!-- <script>
-    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
-    ga('create', 'UA-XXXXX-Y', 'auto'); ga('send', 'pageview')
-  </script>
-  <script src="https://www.google-analytics.com/analytics.js" async defer></script> -->
-
-  <!-- Requires browser-refresh-taglib in npm and a correct .browser-refresh-ignore file to ignore *.marko.js file changes-->
-  <browser-refresh enabled="true" />
-</body>
-
-</html>
+<include('../components/layout')>
+  <@main>
+  <!-- <main/> if using server-side rendering in client.js-->
+  <div id="main"/><!--  if using client-side rendering in client.js-->
+  </@main>
+</include>
