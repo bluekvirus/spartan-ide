@@ -20,14 +20,15 @@ We used **h5bp**, **marko**, **express**, **browser-refresh** and **webpack** to
 ## ToDo List
 
 ### main.marko
-0. SPA routing like Backbone
+0. SPA routing like Backbone.
 
 ### server.js
 1. Connect/Express middlewares for `/services` and `/tasks`.
 2. Waterline models for data persistence.
 3. SSO session and roles with policies.
 
-### Issue List
+## Issue List
+
 1. Multiple calls of marko/hot-reload `File modified` notification.
 
 ## Contribute
