@@ -22,7 +22,8 @@ module.exports = {
     devtool: '#cheap-source-map',
     entry: './client.js',
     watchOptions: {
-        aggregateTimeout: 200,
+        aggregateTimeout: 300,
+        poll: 500,
         ignored: /node_modules/
     },
     output: {
