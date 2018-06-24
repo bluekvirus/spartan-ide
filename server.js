@@ -10,8 +10,8 @@ var mockjs = require('mockjs');
 // hot reloading for certain types of files to short-circuit
 // a full process restart. You *should* use browser-refresh
 // in development: https://www.npmjs.com/package/browser-refresh
-require('lasso/browser-refresh')
-    .enable('bundle.js *.marko *.css *.less *.styl *.scss *.sass *.png *.jpeg *.jpg *.gif *.webp *.svg');
+// save the special/partial reload obj for .remove() cleanup.
+var sR = require('./utils/browser-refresh').enable();
 
 // Grab cli params (--watch)
 const argv = require('yargs').argv;
@@ -65,6 +65,12 @@ var watcher;
 if (argv.w || argv.watch) {
     const webpack = require('webpack');
     const compiler = webpack(require('./webpack.config'));
+    compiler.hooks.done.tap('LogCompileError', (stats) => {
+        if (stats.compilation.errors.length)
+            console.error('[webpack watch]: compile failed', stats.compilation.errors);
+        else 
+            console.log('[webpack watch]: re-compiled.');
+    });
     watcher = compiler.watch({}, (err, stats) => {
         if (err)
             throw err;
@@ -75,8 +81,6 @@ if (argv.w || argv.watch) {
 // Bind port and serve
 app.listen(port, function (err) {
     if (err) {
-        if (watcher)
-            watcher.close(() => {console.log('[webpack watch]: ended.');})
         throw err;
     }
     console.log('Listening on port %d', port);
@@ -86,5 +90,13 @@ app.listen(port, function (err) {
     if (process.send) {
         process.send('online');
     }
+
+    // Caveat: SIGHUP,SIGTERM,SIGINT is more like intercepted instead of listened to...
+    process.once('SIGTERM', () => {
+        watcher.close(() => {console.log('[webpack watch]: ended.');});
+        sR.remove();
+        // Note: call this, or it will hang! default behavior removed by intercepting SIGTERM.
+        process.exit();
+    });
 });
 

@@ -4,7 +4,7 @@ A web IDE for fast app development. See branch `starter` for common web app proj
 
 ## Libs
 
-We used **h5bp**, **marko**, **express**, **lasso/browser-refresh** and **webpack** to form the starter kit.
+We used **h5bp**, **marko**, **express**, **browser-refresh** and **webpack** to form the starter kit.
 
 ## To Use
 
@@ -23,9 +23,12 @@ We used **h5bp**, **marko**, **express**, **lasso/browser-refresh** and **webpac
 0. SPA routing like Backbone
 
 ### server.js
-0. Connect/Express middlewares for `/services` and `/tasks`.
-1. Waterline models for data persistence.
-2. SSO session and roles with policies.
+1. Connect/Express middlewares for `/services` and `/tasks`.
+2. Waterline models for data persistence.
+3. SSO session and roles with policies.
+
+### Issue List
+1. Multiple calls of marko/hot-reload `File modified` notification.
 
 ## Contribute
 
