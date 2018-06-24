@@ -12,6 +12,9 @@ var serveStatic = require('serve-static');
 require('lasso/browser-refresh')
     .enable('bundle.js *.marko *.css *.less *.styl *.scss *.sass *.png *.jpeg *.jpg *.gif *.webp *.svg');
 
+// Grab cli params (--watch)
+const argv = require('yargs').argv;
+
 var app = express();
 var port = process.env.PORT || 9000;
 
@@ -45,9 +48,21 @@ app.use(function(req, res, next){
     res.redirect('/pages/404');
 });
 
+// Webpack watch (optional on -w, --watch)
+var watcher;
+if (argv.w || argv.watch) {
+    const webpack = require('webpack');
+    const compiler = webpack(require('./webpack.config'));
+    watcher = compiler.watch({}, (err, stats) => {
+        console.log('[webpack watch]: started.');
+    });
+}
+
 // Bind port and serve
 app.listen(port, function (err) {
     if (err) {
+        if (watcher)
+            watcher.close(() => {console.log('[webpack watch]: ended.');})
         throw err;
     }
     console.log('Listening on port %d', port);
@@ -58,3 +73,4 @@ app.listen(port, function (err) {
         process.send('online');
     }
 });
+

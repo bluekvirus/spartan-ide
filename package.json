@@ -6,23 +6,19 @@
   "author": "Tim Lauv",
   "license": "MIT",
   "scripts": {
-    "watch": "webpack -w",
+    "watch": "browser-refresh server.js --watch",
     "build": "webpack",
-    "start": "browser-refresh server.js",
-    "start-prod": "npm run build && node server.js"
+    "start": "yarn build && node server.js"
   },
   "dependencies": {
     "d3": "^5.x",
     "marko": "^4.x",
     "express": "^4.x",
-    "serve-static": "^1.13.2"
-  },
-  "devDependencies": {
+    "serve-static": "^1.13.2",
     "browser-refresh": "^1.7.2",
     "browser-refresh-taglib": "^1.1.0",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
-    "html5-boilerplate": "^6.1.0",
     "less": "^3.0.4",
     "less-loader": "^4.1.0",
     "marko-loader": "^1.3.3",
@@ -30,6 +26,10 @@
     "style-loader": "^0.21.0",
     "webpack": "^4.8.1",
     "webpack-cli": "^2.1.3",
-    "lasso": "^3.2.0"
+    "lasso": "^3.2.0",
+    "yargs": "^11.0.0"
+  },
+  "devDependencies": {
+    "html5-boilerplate": "^6.1.0"
   }
 }

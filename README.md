@@ -32,7 +32,7 @@ We used **h5bp**, **marko**, **express**, **lasso/browser-refresh** and **webpac
 1. Clone the project
 2. `npm -g install yarn` if you haven't
 3. `yarn install`
-4. `npm run watch` and another cli tab with `npm start`
+4. `yarn watch` for development env (auto bundle and refresh browser with limited server restart)
 
-Read `packages.json` script section for cli commands to build/watch/start.
+Read `packages.json` script section for cli commands to build/start without auto refreshing the browser.
 
