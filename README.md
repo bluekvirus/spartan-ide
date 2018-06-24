@@ -11,10 +11,11 @@ We used **h5bp**, **marko**, **express**, **lasso/browser-refresh** and **webpac
 - `/components/` for your marko components. (does not matter which side you are rendering)
     - `main.marko` for SPA entrypoint if you prefer. (routing wip)
     - `layout.marko` for easily creating `/pages/`.
-- `/pages/` for your multi-page pleasure.
+- `/pages/` for your multi-page pleasure, served under `/pages/`.
 - `/static/` JS/CSS bundles and static assets like fonts and images. (assets can be embedded in components)
 - `client.js` bundler entrypoint, add your pages under `/pages/` in it as require() calls. SPA loading is already done for you.
 - `server.js` backend entrypoint. (statics, `/pages/` auto-routes and more)
+- `/mockdata/` backend mockup data templates, served under `/mockdata/`. (Mock.js flavor) 
 
 ## ToDo List
 
@@ -22,10 +23,9 @@ We used **h5bp**, **marko**, **express**, **lasso/browser-refresh** and **webpac
 0. SPA routing like Backbone
 
 ### server.js
-0. Mockjs middleware for `/mockdata`.
-1. Connect/Express middlewares for `/services` and `/tasks`.
-2. Waterline models for data persistence.
-3. SSO session and roles with policies.
+0. Connect/Express middlewares for `/services` and `/tasks`.
+1. Waterline models for data persistence.
+2. SSO session and roles with policies.
 
 ## Contribute
 

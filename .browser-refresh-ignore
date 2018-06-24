@@ -4,3 +4,5 @@
 /components/**/*.js
 *.marko.js
 *.map
+*.json
+*.md

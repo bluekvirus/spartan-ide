@@ -4,6 +4,7 @@ require('marko/node-require');
 var express = require('express');
 var compression = require('compression'); // Provides gzip compression for the HTTP response
 var serveStatic = require('serve-static');
+var mockjs = require('mockjs');
 
 // If the process was started using browser-refresh then enable
 // hot reloading for certain types of files to short-circuit
@@ -31,12 +32,23 @@ app.get('/', function(req, res){
     res.marko(indexPageTpl, {});
 });
 
+// Map the "/mockdata/*" route to Mock.js templates (*.js with module.exports = { tpl })
+app.get('/mockdata/:tplName', function(req, res){
+    var mockTpl;
+    try {
+        mockTpl = require('./mockdata/' + req.params['tplName']);
+        res.json(mockjs.mock(mockTpl));
+    } catch (e) {
+        res.redirect('/pages/404');
+    }
+});
+
 // Map the "/pages/*" route to dynamic marko pages
 app.get('/pages/:pageName', function(req, res){
     var dynamicPage, error = {};
     try {
         dynamicPage = require('./pages/' + req.params['pageName']);
-    } catch (e){
+    } catch (e) {
         dynamicPage = require('./pages/404');
         error = {path: '/pages/' + req.params['pageName']};
     }
@@ -54,6 +66,8 @@ if (argv.w || argv.watch) {
     const webpack = require('webpack');
     const compiler = webpack(require('./webpack.config'));
     watcher = compiler.watch({}, (err, stats) => {
+        if (err)
+            throw err;
         console.log('[webpack watch]: started.');
     });
 }
