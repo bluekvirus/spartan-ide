@@ -11,7 +11,7 @@ We used **h5bp**, **marko**, **express**, **browser-refresh** and **webpack** to
 - `/components/` for your marko components. (does not matter which side you are rendering)
     - `main.marko` for SPA entrypoint if you prefer. (routing wip)
     - `layout.marko` for easily creating `/pages/`.
-- `/pages/` for your multi-page pleasure, served under `/pages/`.
+- `/pages/` for your multi-page pleasure, served under `/pages/`. (make sure you **require()** newly added page in `client.js`)
 - `/static/` JS/CSS bundles and static assets like fonts and images. (assets can be embedded in components)
 - `client.js` bundler entrypoint, add your pages under `/pages/` in it as require() calls. SPA loading is already done for you.
 - `server.js` backend entrypoint. (statics, `/pages/` auto-routes and more)
