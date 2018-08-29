@@ -33,7 +33,7 @@ exports.enable = function(patterns) {
 
     if (!patterns) {
         // Reasonable default with client-side only files...
-        patterns = 'bundle.js *.marko *.css *.less *.styl *.scss *.sass *.png *.jpeg *.jpg *.gif *.webp *.svg *.eot *.ttf *.woff *.woff2';
+        patterns = 'bundle.js *.md *.yaml *.json *.marko *.css *.less *.styl *.scss *.sass *.png *.jpeg *.jpg *.gif *.webp *.svg *.eot *.ttf *.woff *.woff2';
     }
 
     var sR = browserRefreshClient

@@ -1,0 +1,60 @@
+openapi: "3.0.0"
+
+info:
+  title: "Sample Data Platform APIs"
+  version: "1.0.0"
+
+paths:
+
+  /api/scan/target:
+    post:
+      tags: 
+        - "Scan"
+      summary: "(Initiate a deeper scan of the target data source.)"
+      requestBody:
+        content: 
+          "application/json":
+            schema:
+              properties:
+                ip:
+                  type: "string"
+                port:
+                  type: "number"
+                type:
+                  type: "string"
+                username:
+                  type: "string"
+                password:
+                  type: "string"
+                baseline:
+                  type: "boolean"
+                selection:
+                  type: "array"
+                  items: 
+                    type: "string"
+      responses:
+        "200": 
+          description: "Target accepted"
+          content:
+            "application/json": {}
+  
+  /api/ds/servers:
+    get:
+      tags:
+        - "Data Source"
+      summary: "(Get the list of discovered servers.)"
+      responses:
+        "200": 
+          description: "Result listing/item returned."
+          content:
+            "application/json": {}
+  /api/ds/servers/{id}:
+    get:
+      tags:
+        - "Data Source"
+      summary: "(Drill down specific server.)"
+      responses:
+        "200": 
+          description: "Result listing/item returned."
+          content:
+            "application/json": {}

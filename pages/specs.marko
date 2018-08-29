@@ -1,0 +1,20 @@
+import SwaggerUI from 'swagger-ui';
+
+class {
+    onMount() {
+        SwaggerUI({
+            url: '/specs/api.yaml',
+            dom_id: '#specs',
+        });
+    }
+}
+
+
+include("../components/layout.marko")
+    @main
+        div#specs
+
+
+style.less {
+    @import (inline) "../node_modules/swagger-ui/dist/swagger-ui.css";
+}

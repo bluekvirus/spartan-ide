@@ -15,6 +15,7 @@
 'use strict';
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require('path');
 
 module.exports = {
     mode: 'development',
@@ -48,7 +49,13 @@ module.exports = {
                     }, {
                         loader: 'css-loader' // translates CSS into CommonJS
                     }, {
-                        loader: 'less-loader' // compiles Less to CSS
+                        loader: 'less-loader', // compiles Less to CSS
+                        options: {
+                            paths: [
+                                path.resolve(__dirname, 'components'),
+                                path.resolve(__dirname, 'node_modules')
+                            ]
+                        }
                 }]
             },
             {

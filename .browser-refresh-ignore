@@ -1,8 +1,11 @@
+.DS_Store
 /node_modules
 /.cache
 /build
 /components/**/*.js
 *.marko.js
 *.map
-*.json
-*.md
+
+# *.json
+# *.md
+# *.yaml

@@ -1,3 +1,10 @@
+/**
+ * Dev server with api proxy support and easy page/mockdata rendering.
+ * 
+ * @author Tim Lauv
+ * @created 2018.5
+ */
+
 require('marko/express');
 require('marko/node-require');
 
@@ -24,6 +31,8 @@ var port = process.env.PORT || 9000;
 app.use(compression());
 // Allow all of the generated files under "static" to be served up by Express
 app.use('/static', serveStatic(__dirname + '/static'));
+// Allow api and user docs/specs to be served. (optional)
+app.use('/specs', serveStatic(__dirname + '/specs'));
 
 // :Routes:
 // Map the "/" route to the home page
@@ -32,8 +41,17 @@ app.get('/', function(req, res){
     res.marko(indexPageTpl, {});
 });
 
+// Map proxied apis according to proxy.js
+var proxiedCalls = require('./proxy');
+var proxyFactory = require('http-proxy-middleware');
+for (var p in proxiedCalls) {
+    var s = proxiedCalls[p];
+    s = typeof s == 'string' ? {target: s} : s;
+    app.use(p, proxyFactory(s));
+}
+
 // Map the "/mockdata/*" route to Mock.js templates (*.js with module.exports = { tpl })
-app.get('/mockdata/:tplName', function(req, res){
+app.all('/mockdata/:tplName', function(req, res){
     var mockTpl;
     try {
         mockTpl = require('./mockdata/' + req.params['tplName']);
@@ -49,6 +67,7 @@ app.get('/pages/:pageName', function(req, res){
     try {
         dynamicPage = require('./pages/' + req.params['pageName']);
     } catch (e) {
+        console.log('marko page error:', e);
         dynamicPage = require('./pages/404');
         error = {path: '/pages/' + req.params['pageName']};
     }
@@ -99,4 +118,3 @@ app.listen(port, function (err) {
         process.exit();
     });
 });
-

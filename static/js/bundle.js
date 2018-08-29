@@ -36,17 +36,32 @@
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -103,6 +118,7 @@
 // A: using server-side component rendering: (component tags in pages)
 //    require that page!! (multiple)
 __webpack_require__(/*! ./pages/index.marko */ "./pages/index.marko");
+//require('./pages/specs.marko');
 // ...
 // ... require other dynamic marko pages here ...
 // ...
@@ -129,7 +145,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-// Compiled using marko@4.11.2 - DO NOT EDIT
+// Compiled using marko@4.12.5 - DO NOT EDIT
 
 
 var marko_template = module.exports = __webpack_require__(/*! marko/src/vdom */ "./node_modules/marko/src/vdom.js").t(),
@@ -265,7 +281,7 @@ marko_template.Component = marko_defineComponent({}, marko_template._);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-// Compiled using marko@4.11.2 - DO NOT EDIT
+// Compiled using marko@4.12.5 - DO NOT EDIT
 
 
 var marko_template = module.exports = __webpack_require__(/*! marko/src/vdom */ "./node_modules/marko/src/vdom.js").t(),
@@ -326,8 +342,8 @@ module.exports = class {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! !../../node_modules/mini-css-extract-plugin/dist/loader.js!css-loader!less-loader!../../node_modules/marko-loader/src/code-loader.js?CODE=2e776f726b62656e63682d636f6e7461696e6572207b0a2020202020202020706f736974696f6e3a206162736f6c7574653b0a2020202020202020746f703a20303b0a20202020202020206c6566743a20303b0a202020202020202077696474683a20313030253b0a20202020202020206865696768743a20313030253b0a202020202020202070616464696e673a20333570783b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a202020207d0a0a202020202e776f726b62656e6368207b0a20202020202020206d617267696e3a2030206175746f3b0a20202020202020206865696768743a20313030253b0a2020202020202020626f726465723a2034707820736f6c69643b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a20202020202020206f766572666c6f773a206175746f3b0a202020207d!./index.marko */ "./node_modules/mini-css-extract-plugin/dist/loader.js!./node_modules/css-loader/index.js!./node_modules/less-loader/dist/cjs.js!./node_modules/marko-loader/src/code-loader.js?CODE=2e776f726b62656e63682d636f6e7461696e6572207b0a2020202020202020706f736974696f6e3a206162736f6c7574653b0a2020202020202020746f703a20303b0a20202020202020206c6566743a20303b0a202020202020202077696474683a20313030253b0a20202020202020206865696768743a20313030253b0a202020202020202070616464696e673a20333570783b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a202020207d0a0a202020202e776f726b62656e6368207b0a20202020202020206d617267696e3a2030206175746f3b0a20202020202020206865696768743a20313030253b0a2020202020202020626f726465723a2034707820736f6c69643b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a20202020202020206f766572666c6f773a206175746f3b0a202020207d!./components/workbench/index.marko")
-// Compiled using marko@4.11.2 - DO NOT EDIT
+__webpack_require__(/*! !../../node_modules/mini-css-extract-plugin/dist/loader.js!css-loader!less-loader?{"paths":["/Users/tim/Projects/spartan-ide/components","/Users/tim/Projects/spartan-ide/node_modules"]}!../../node_modules/marko-loader/src/code-loader.js?CODE=2e776f726b62656e63682d636f6e7461696e6572207b0a2020202020202020706f736974696f6e3a206162736f6c7574653b0a2020202020202020746f703a20303b0a20202020202020206c6566743a20303b0a202020202020202077696474683a20313030253b0a20202020202020206865696768743a20313030253b0a202020202020202070616464696e673a20333570783b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a202020207d0a0a202020202e776f726b62656e6368207b0a20202020202020206d617267696e3a2030206175746f3b0a20202020202020206865696768743a20313030253b0a2020202020202020626f726465723a2034707820736f6c69643b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a20202020202020206f766572666c6f773a206175746f3b0a202020207d!./index.marko */ "./node_modules/mini-css-extract-plugin/dist/loader.js!./node_modules/css-loader/index.js!./node_modules/less-loader/dist/cjs.js?{\"paths\":[\"/Users/tim/Projects/spartan-ide/components\",\"/Users/tim/Projects/spartan-ide/node_modules\"]}!./node_modules/marko-loader/src/code-loader.js?CODE=2e776f726b62656e63682d636f6e7461696e6572207b0a2020202020202020706f736974696f6e3a206162736f6c7574653b0a2020202020202020746f703a20303b0a20202020202020206c6566743a20303b0a202020202020202077696474683a20313030253b0a20202020202020206865696768743a20313030253b0a202020202020202070616464696e673a20333570783b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a202020207d0a0a202020202e776f726b62656e6368207b0a20202020202020206d617267696e3a2030206175746f3b0a20202020202020206865696768743a20313030253b0a2020202020202020626f726465723a2034707820736f6c69643b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a20202020202020206f766572666c6f773a206175746f3b0a202020207d!./components/workbench/index.marko")
+// Compiled using marko@4.12.5 - DO NOT EDIT
 "use strict";
 
 var marko_template = module.exports = __webpack_require__(/*! marko/src/vdom */ "./node_modules/marko/src/vdom.js").t(),
@@ -352,7 +368,7 @@ function render(input, out, __component, component, state) {
         style: marko_styleAttr("width:" + input.width),
         "class": "workbench"
       }, "1", component, 0, 4, {
-        onclick: __component.d("clicked", false)
+        onclick: __component.d("click", "clicked", false)
       });
 }
 
@@ -443,6 +459,7 @@ exports.render = function(input, out) {
 var StackParser = __webpack_require__(/*! error-stack-parser */ "./node_modules/error-stack-parser/error-stack-parser.js");
 var env = typeof process !== 'undefined' && "development";
 var isDevelopment = !env || env === 'dev' || env === 'development';
+var showModuleComplains = typeof process !== 'undefined' && Boolean(process.env.SHOW_MODULE_COMPLAINS);
 var logger = typeof console !== 'undefined' && console.warn && console;
 var cwd = typeof process !== 'undefined' && process.cwd() + '/' || '';
 var linebreak = typeof process !== 'undefined' && 'win32' === process.platform ? '\r\n' : '\n';
@@ -458,9 +475,10 @@ complain.stream = typeof process !== 'undefined' && process.stderr;
 complain.silence = false;
 complain.color = complain.stream && complain.stream.isTTY;
 complain.colors = { warning:'\x1b[31;1m', message:false, location:'\u001b[90m' };
+complain.getModuleName = getModuleName;
 
 /* istanbul ignore next */
-if(typeof module !== 'undefined' && module.exports) {
+if (typeof module !== 'undefined' && module.exports) {
   module.exports = complain;
 } else if(typeof window !== 'undefined') {
   window.complain = complain;
@@ -490,6 +508,19 @@ function complain() {
   }
 
   location = options.location || getLocation(getCallToDeprecate);
+  
+  var moduleName = complain.getModuleName(location);
+
+  if (moduleName && !showModuleComplains) {
+    if (!hits[moduleName]) {
+      var output = format('WARNING!!', complain.colors.warning) 
+      output += linebreak + format('The module ['+moduleName+'] is using deprecated features.', complain.colors.message);
+      output += linebreak + format('Run with process.env.SHOW_MODULE_COMPLAINS=1 to see all warnings.', complain.colors.message);
+      complain.log(linebreak + output + linebreak);
+      hits[moduleName] = true;
+    }
+    return;
+  }
 
   /* istanbul ignore next */
   // Location is only missing in older browsers.
@@ -565,6 +596,16 @@ function getLocation(getCallToDeprecate) {
   } catch(e) {}
 
   return location;
+}
+
+function getModuleName(location) {
+  var locationParts = location.replace(cwd, '').split(/\/|\\/g);
+  for(var i = locationParts.length-1; i >= 0; i--) {
+    if (locationParts[i] === 'node_modules') {
+      var moduleName = locationParts[i+1];
+      return (moduleName[0] === '@') ? moduleName+'/'+locationParts[i+2] : moduleName;
+    }
+  }
 }
 
 function noop(){};
@@ -1380,7 +1421,10 @@ function handleCustomEventWithMethodListener(
     }
 
     var targetComponent = componentLookup[component.___scope];
-    var targetMethod = targetComponent[targetMethodName];
+    var targetMethod =
+        typeof targetMethodName === "function"
+            ? targetMethodName
+            : targetComponent[targetMethodName];
     if (!targetMethod) {
         throw Error("Method not found: " + targetMethodName);
     }
@@ -1980,6 +2024,8 @@ module.exports = Component;
 var repeatedRegExp = /\[\]$/;
 var componentUtil = __webpack_require__(/*! ./util */ "./node_modules/marko/src/components/util-browser.js");
 var attachBubblingEvent = componentUtil.___attachBubblingEvent;
+var addDelegatedEventHandler = __webpack_require__(/*! ./event-delegation */ "./node_modules/marko/src/components/event-delegation.js")
+    .___addDelegatedEventHandler;
 var extend = __webpack_require__(/*! raptor-util/extend */ "./node_modules/marko/node_modules/raptor-util/extend.js");
 var KeySequence = __webpack_require__(/*! ./KeySequence */ "./node_modules/marko/src/components/KeySequence.js");
 
@@ -2050,34 +2096,14 @@ ComponentDef.prototype = {
         }
     },
     /**
-     * Registers a DOM event for a nested HTML element associated with the
-     * component. This is only done for non-bubbling events that require
-     * direct event listeners to be added.
-     * @param  {String} type The DOM event type ("mouseover", "mousemove", etc.)
-     * @param  {String} targetMethod The name of the method to invoke on the scoped component
-     * @param  {String} elId The DOM element ID of the DOM element that the event listener needs to be added too
-     */
-    e: function(type, targetMethod, elId, isOnce, extraArgs) {
-        if (targetMethod) {
-            // The event handler method is allowed to be conditional. At render time if the target
-            // method is null then we do not attach any direct event listeners.
-            (this.___domEvents || (this.___domEvents = [])).push([
-                type,
-                targetMethod,
-                elId,
-                isOnce,
-                extraArgs
-            ]);
-        }
-    },
-    /**
      * Returns the next auto generated unique ID for a nested DOM element or nested DOM component
      */
     ___nextComponentId: function() {
         return this.id + "-c" + this.___nextIdIndex++;
     },
 
-    d: function(handlerMethodName, isOnce, extraArgs) {
+    d: function(eventName, handlerMethodName, isOnce, extraArgs) {
+        addDelegatedEventHandler(eventName);
         return attachBubblingEvent(this, handlerMethodName, isOnce, extraArgs);
     },
 
@@ -2441,54 +2467,6 @@ module.exports = function beginComponent(componentsContext, component) {
 
 /***/ }),
 
-/***/ "./node_modules/marko/src/components/bubble.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/marko/src/components/bubble.js ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = [
-    /* Mouse Events */
-    "click",
-    "dblclick",
-    "mousedown",
-    "mouseup",
-    // 'mouseover',
-    // 'mousemove',
-    // 'mouseout',
-    "dragstart",
-    "drag",
-    // 'dragenter',
-    // 'dragleave',
-    // 'dragover',
-    "drop",
-    "dragend",
-
-    /* Keyboard Events */
-    "keydown",
-    "keypress",
-    "keyup",
-
-    /* Form Events */
-    "select",
-    "change",
-    "submit",
-    "reset",
-    "input",
-
-    "attach", // Pseudo event supported by Marko
-    "detach" // Pseudo event supported by Marko
-
-    // 'focus', <-- Does not bubble
-    // 'blur', <-- Does not bubble
-    // 'focusin', <-- Not supported in all browsers
-    // 'focusout' <-- Not supported in all browsers
-];
-
-
-/***/ }),
-
 /***/ "./node_modules/marko/src/components/defineComponent.js":
 /*!**************************************************************!*\
   !*** ./node_modules/marko/src/components/defineComponent.js ***!
@@ -2594,6 +2572,7 @@ var getMarkoPropsFromEl = componentsUtil.___getMarkoPropsFromEl;
 // We make our best effort to allow multiple marko runtimes to be loaded in the
 // same window. Each marko runtime will get its own unique runtime ID.
 var listenersAttachedKey = "$MDE" + runtimeId;
+var delegatedEvents = {};
 
 function getEventFromEl(el, eventName) {
     var virtualProps = getMarkoPropsFromEl(el);
@@ -2629,7 +2608,10 @@ function delegateEvent(node, eventName, target, event) {
         return;
     }
 
-    var targetFunc = targetComponent[targetMethod];
+    var targetFunc =
+        typeof targetMethod === "function"
+            ? targetMethod
+            : targetComponent[targetMethod];
     if (!targetFunc) {
         throw Error("Method not found: " + targetMethod);
     }
@@ -2648,56 +2630,64 @@ function delegateEvent(node, eventName, target, event) {
     }
 }
 
-function attachBubbleEventListeners(doc) {
+function addDelegatedEventHandler(eventType) {
+    if (!delegatedEvents[eventType]) {
+        delegatedEvents[eventType] = true;
+    }
+}
+
+function addDelegatedEventHandlerToDoc(eventType, doc) {
     var body = doc.body || doc;
-    // Here's where we handle event delegation using our own mechanism
-    // for delegating events. For each event that we have white-listed
-    // as supporting bubble, we will attach a listener to the root
-    // document.body element. When we get notified of a triggered event,
-    // we again walk up the tree starting at the target associated
-    // with the event to find any mappings for event. Each mapping
-    // is from a DOM event type to a method of a component.
-    __webpack_require__(/*! ./bubble */ "./node_modules/marko/src/components/bubble.js").forEach(function addBubbleHandler(eventType) {
-        body.addEventListener(eventType, function(event) {
-            var propagationStopped = false;
+    var listeners = (doc[listenersAttachedKey] =
+        doc[listenersAttachedKey] || {});
+    if (!listeners[eventType]) {
+        body.addEventListener(
+            eventType,
+            (listeners[eventType] = function(event) {
+                var propagationStopped = false;
 
-            // Monkey-patch to fix #97
-            var oldStopPropagation = event.stopPropagation;
+                // Monkey-patch to fix #97
+                var oldStopPropagation = event.stopPropagation;
 
-            event.stopPropagation = function() {
-                oldStopPropagation.call(event);
-                propagationStopped = true;
-            };
+                event.stopPropagation = function() {
+                    oldStopPropagation.call(event);
+                    propagationStopped = true;
+                };
 
-            var curNode = event.target;
-            if (!curNode) {
-                return;
-            }
-
-            // event.target of an SVGElementInstance does not have a
-            // `getAttribute` function in IE 11.
-            // See https://github.com/marko-js/marko/issues/796
-            curNode = curNode.correspondingUseElement || curNode;
-
-            // Search up the tree looking DOM events mapped to target
-            // component methods
-            var propName = "on" + eventType;
-            var target;
-
-            // Attributes will have the following form:
-            // on<event_type>("<target_method>|<component_id>")
-
-            do {
-                if ((target = getEventFromEl(curNode, propName))) {
-                    delegateEvent(curNode, propName, target, event);
-
-                    if (propagationStopped) {
-                        break;
-                    }
+                var curNode = event.target;
+                if (!curNode) {
+                    return;
                 }
-            } while ((curNode = curNode.parentNode) && curNode.getAttribute);
-        });
-    });
+
+                // event.target of an SVGElementInstance does not have a
+                // `getAttribute` function in IE 11.
+                // See https://github.com/marko-js/marko/issues/796
+                curNode = curNode.correspondingUseElement || curNode;
+
+                // Search up the tree looking DOM events mapped to target
+                // component methods
+                var propName = "on" + eventType;
+                var target;
+
+                // Attributes will have the following form:
+                // on<event_type>("<target_method>|<component_id>")
+
+                do {
+                    if ((target = getEventFromEl(curNode, propName))) {
+                        delegateEvent(curNode, propName, target, event);
+
+                        if (propagationStopped) {
+                            break;
+                        }
+                    }
+                } while (
+                    (curNode = curNode.parentNode) &&
+                    curNode.getAttribute
+                );
+            }),
+            true
+        );
+    }
 }
 
 function noop() {}
@@ -2706,12 +2696,11 @@ exports.___handleNodeAttach = noop;
 exports.___handleNodeDetach = noop;
 exports.___delegateEvent = delegateEvent;
 exports.___getEventFromEl = getEventFromEl;
-
+exports.___addDelegatedEventHandler = addDelegatedEventHandler;
 exports.___init = function(doc) {
-    if (!doc[listenersAttachedKey]) {
-        doc[listenersAttachedKey] = true;
-        attachBubbleEventListeners(doc);
-    }
+    Object.keys(delegatedEvents).forEach(function(eventType) {
+        addDelegatedEventHandlerToDoc(eventType, doc);
+    });
 };
 
 
@@ -2807,6 +2796,7 @@ function indexServerComponentBoundaries(node) {
         } else if (node.nodeType === 1) {
             // HTML element node
             var markoKey = node.getAttribute("data-marko-key");
+            var markoProps = node.getAttribute("data-marko");
             if (markoKey) {
                 var separatorIndex = markoKey.indexOf(" ");
                 componentId = markoKey.substring(separatorIndex + 1);
@@ -2815,6 +2805,16 @@ function indexServerComponentBoundaries(node) {
                     keyedElementsByComponentId[componentId] ||
                     (keyedElementsByComponentId[componentId] = {});
                 keyedElements[markoKey] = node;
+            }
+            if (markoProps) {
+                markoProps = JSON.parse(markoProps);
+                Object.keys(markoProps).forEach(function(key) {
+                    if (key.slice(0, 2) === "on") {
+                        eventDelegation.___addDelegatedEventHandler(
+                            key.slice(2)
+                        );
+                    }
+                });
             }
             indexServerComponentBoundaries(node);
         }
@@ -2976,6 +2976,7 @@ function initServerRendered(renderedComponents, doc) {
 
     // Ensure that event handlers to handle delegating events are
     // always attached before initializing any components
+    indexServerComponentBoundaries(doc);
     eventDelegation.___init(doc);
 
     renderedComponents = warp10Finalize(renderedComponents);
@@ -3010,10 +3011,6 @@ function initServerRendered(renderedComponents, doc) {
             startNode = endNode = document.head;
         } else {
             var startNodeComment = serverComponentStartNodes[componentId];
-            if (!startNodeComment) {
-                indexServerComponentBoundaries(doc);
-                startNodeComment = serverComponentStartNodes[componentId];
-            }
             var endNodeComment = serverComponentEndNodes[componentId];
 
             startNode = startNodeComment.nextSibling;
@@ -3183,11 +3180,17 @@ var endComponent = __webpack_require__(/*! ./endComponent */ "./node_modules/mar
 
 var COMPONENT_BEGIN_ASYNC_ADDED_KEY = "$wa";
 
-function resolveComponentKey(globalComponentsContext, key, parentComponentDef) {
+function resolveComponentKey(
+    globalComponentsContext,
+    key,
+    ownerComponentDef,
+    parentComponentDef
+) {
     if (key[0] === "#") {
         return key.substring(1);
     } else {
-        return parentComponentDef.id + "-" + parentComponentDef.___nextKey(key);
+        parentComponentDef = parentComponentDef || ownerComponentDef;
+        return parentComponentDef.___nextKey(ownerComponentDef.id + "-" + key);
     }
 }
 
@@ -3244,7 +3247,7 @@ function createRendererFunc(
         var customEvents;
         var scope;
         var parentComponentDef = componentsContext.___componentDef;
-        var componentDefFromArgs = out.___assignedComponentDef;
+        var ownerComponentDef = out.___assignedComponentDef;
 
         if (component) {
             // If component is provided then we are currently rendering
@@ -3258,9 +3261,9 @@ function createRendererFunc(
             // DOM (if any) so we will need to resolve the component ID from
             // the assigned key. We also need to handle any custom event bindings
             // that were provided.
-            if (componentDefFromArgs) {
+            if (ownerComponentDef) {
                 // console.log('componentArgs:', componentArgs);
-                scope = componentDefFromArgs.id;
+                scope = ownerComponentDef.id;
                 out.___assignedComponentDef = null;
 
                 customEvents = out.___assignedCustomEvents;
@@ -3270,10 +3273,11 @@ function createRendererFunc(
                     id = resolveComponentKey(
                         globalComponentsContext,
                         key.toString(),
-                        componentDefFromArgs
+                        ownerComponentDef,
+                        parentComponentDef
                     );
                 } else {
-                    id = componentDefFromArgs.___nextComponentId();
+                    id = ownerComponentDef.___nextComponentId();
                 }
             } else {
                 id = globalComponentsContext.___nextComponentId();
@@ -3377,7 +3381,7 @@ function createRendererFunc(
             componentsContext,
             component,
             isSplit,
-            componentDefFromArgs,
+            ownerComponentDef,
             isImplicitComponent
         );
 
@@ -3618,6 +3622,7 @@ function destroyComponentForNode(node) {
     }
 }
 function destroyNodeRecursive(node, component) {
+    destroyComponentForNode(node);
     if (node.nodeType === 1) {
         var key;
 
@@ -3629,7 +3634,6 @@ function destroyNodeRecursive(node, component) {
 
         var curChild = node.firstChild;
         while (curChild) {
-            destroyComponentForNode(curChild);
             destroyNodeRecursive(curChild, component);
             curChild = curChild.nextSibling;
         }
@@ -4475,16 +4479,15 @@ function morphdom(
             fromNextSibling = curFromNodeChild.nextSibling;
 
             if ((fromComponent = curFromNodeChild.___markoComponent)) {
+                curFromNodeChild = fromComponent.___endNode.nextSibling;
                 if (
-                    globalComponentsContext.___renderedComponentsById[
+                    !globalComponentsContext.___renderedComponentsById[
                         fromComponent.id
                     ]
                 ) {
-                    // Skip over this component since it was rendered in the target VDOM
-                    // and will be moved into place later
-                    curFromNodeChild = fromComponent.___endNode.nextSibling;
-                    continue;
+                    destroyComponent(fromComponent);
                 }
+                continue;
             }
 
             curVFromNodeChild = curFromNodeChild.___markoVElement;
@@ -4983,8 +4986,9 @@ var helpers = {
                 var component = componentDef && componentDef.component;
                 var events =
                     customEvents &&
-                    customEvents.reduce((events, eventArray) => {
+                    customEvents.reduce(function(events, eventArray) {
                         events["on" + eventArray[0]] = componentDef.d(
+                            eventArray[0],
                             eventArray[1],
                             eventArray[2],
                             eventArray[3]
@@ -6534,37 +6538,45 @@ var dashedNames = {};
  * @param  {[type]} style [description]
  * @return {[type]}       [description]
  */
-module.exports = function(style) {
+module.exports = function styleHelper(style) {
     if (!style) {
         return null;
     }
 
     var type = typeof style;
 
-    if (type === "string") {
-        return style;
-    } else if (type === "object") {
+    if (type !== "string") {
         var styles = "";
-        for (var name in style) {
-            var value = style[name];
-            if (value != null) {
-                if (typeof value === "number" && value) {
-                    value += "px";
-                }
 
-                var nameDashed = dashedNames[name];
-                if (!nameDashed) {
-                    nameDashed = dashedNames[name] = name
-                        .replace(/([A-Z])/g, "-$1")
-                        .toLowerCase();
+        if (Array.isArray(style)) {
+            for (var i = 0, len = style.length; i < len; i++) {
+                var next = styleHelper(style[i]);
+                if (next)
+                    styles += next + (next[next.length - 1] !== ";" ? ";" : "");
+            }
+        } else if (type === "object") {
+            for (var name in style) {
+                var value = style[name];
+                if (value != null) {
+                    if (typeof value === "number" && value) {
+                        value += "px";
+                    }
+
+                    var nameDashed = dashedNames[name];
+                    if (!nameDashed) {
+                        nameDashed = dashedNames[name] = name
+                            .replace(/([A-Z])/g, "-$1")
+                            .toLowerCase();
+                    }
+                    styles += nameDashed + ":" + value + ";";
                 }
-                styles += nameDashed + ":" + value + ";";
             }
         }
+
         return styles || null;
-    } else {
-        return null;
     }
+
+    return style;
 };
 
 
@@ -6894,10 +6906,10 @@ module.exports = __webpack_require__(/*! ./runtime/vdom */ "./node_modules/marko
 
 /***/ }),
 
-/***/ "./node_modules/mini-css-extract-plugin/dist/loader.js!./node_modules/css-loader/index.js!./node_modules/less-loader/dist/cjs.js!./node_modules/marko-loader/src/code-loader.js?CODE=2e776f726b62656e63682d636f6e7461696e6572207b0a2020202020202020706f736974696f6e3a206162736f6c7574653b0a2020202020202020746f703a20303b0a20202020202020206c6566743a20303b0a202020202020202077696474683a20313030253b0a20202020202020206865696768743a20313030253b0a202020202020202070616464696e673a20333570783b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a202020207d0a0a202020202e776f726b62656e6368207b0a20202020202020206d617267696e3a2030206175746f3b0a20202020202020206865696768743a20313030253b0a2020202020202020626f726465723a2034707820736f6c69643b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a20202020202020206f766572666c6f773a206175746f3b0a202020207d!./components/workbench/index.marko":
-/*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/mini-css-extract-plugin/dist/loader.js!./node_modules/css-loader!./node_modules/less-loader/dist/cjs.js!./node_modules/marko-loader/src/code-loader.js?CODE=2e776f726b62656e63682d636f6e7461696e6572207b0a2020202020202020706f736974696f6e3a206162736f6c7574653b0a2020202020202020746f703a20303b0a20202020202020206c6566743a20303b0a202020202020202077696474683a20313030253b0a20202020202020206865696768743a20313030253b0a202020202020202070616464696e673a20333570783b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a202020207d0a0a202020202e776f726b62656e6368207b0a20202020202020206d617267696e3a2030206175746f3b0a20202020202020206865696768743a20313030253b0a2020202020202020626f726465723a2034707820736f6c69643b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a20202020202020206f766572666c6f773a206175746f3b0a202020207d!./components/workbench/index.marko ***!
-  \******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/mini-css-extract-plugin/dist/loader.js!./node_modules/css-loader/index.js!./node_modules/less-loader/dist/cjs.js?{\"paths\":[\"/Users/tim/Projects/spartan-ide/components\",\"/Users/tim/Projects/spartan-ide/node_modules\"]}!./node_modules/marko-loader/src/code-loader.js?CODE=2e776f726b62656e63682d636f6e7461696e6572207b0a2020202020202020706f736974696f6e3a206162736f6c7574653b0a2020202020202020746f703a20303b0a20202020202020206c6566743a20303b0a202020202020202077696474683a20313030253b0a20202020202020206865696768743a20313030253b0a202020202020202070616464696e673a20333570783b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a202020207d0a0a202020202e776f726b62656e6368207b0a20202020202020206d617267696e3a2030206175746f3b0a20202020202020206865696768743a20313030253b0a2020202020202020626f726465723a2034707820736f6c69643b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a20202020202020206f766572666c6f773a206175746f3b0a202020207d!./components/workbench/index.marko":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/mini-css-extract-plugin/dist/loader.js!./node_modules/css-loader!./node_modules/less-loader/dist/cjs.js?{"paths":["/Users/tim/Projects/spartan-ide/components","/Users/tim/Projects/spartan-ide/node_modules"]}!./node_modules/marko-loader/src/code-loader.js?CODE=2e776f726b62656e63682d636f6e7461696e6572207b0a2020202020202020706f736974696f6e3a206162736f6c7574653b0a2020202020202020746f703a20303b0a20202020202020206c6566743a20303b0a202020202020202077696474683a20313030253b0a20202020202020206865696768743a20313030253b0a202020202020202070616464696e673a20333570783b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a202020207d0a0a202020202e776f726b62656e6368207b0a20202020202020206d617267696e3a2030206175746f3b0a20202020202020206865696768743a20313030253b0a2020202020202020626f726465723a2034707820736f6c69643b0a2020202020202020626f782d73697a696e673a20626f726465722d626f783b0a20202020202020206f766572666c6f773a206175746f3b0a202020207d!./components/workbench/index.marko ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -8889,7 +8901,7 @@ module.exports = function(module) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-// Compiled using marko@4.11.2 - DO NOT EDIT
+// Compiled using marko@4.12.5 - DO NOT EDIT
 
 
 var marko_template = module.exports = __webpack_require__(/*! marko/src/vdom */ "./node_modules/marko/src/vdom.js").t(),
