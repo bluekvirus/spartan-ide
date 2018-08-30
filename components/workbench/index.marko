@@ -1,5 +1,8 @@
 div.workbench-container
     div.workbench style="width:${input.width}" on-click('clicked')
+        if(state.context)
+            include(state.context, state.meta)
+
 
 style.less {
     .workbench-container {

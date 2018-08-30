@@ -1,0 +1,72 @@
+/**
+ * Global Event Bus Component
+ *
+ * Install (to main.marko)
+ * ```
+ *      include("./event-bus") default-route="login"
+ * ```
+ *
+ * 1. For global co-op events, within `onCreate(input, output) and other life-cycle stubs`
+ * ```
+ *      [output./window.]global.ee.coop(this, <e>, handler/"handler")
+ *      [output./window.]global.ee.coopOnce(this, <e>, handler/"handler")
+ *
+ *      //trigger
+ *      [output./window.]global.ee.emit(<e>, ...params)
+ * ```
+ * 
+ * 2. For routing reaction in a component, use 1 with <e>= 'global:route'
+ * 
+ * @author Tim Lauv
+ * @created 2018.08.29
+ *
+ */
+
+class {
+
+    // SPA route: setup /#xyz/efg/... single page routing
+    onCreate(input, output) {
+        this.initParams = input;
+        let that = this;
+        window.addEventListener('hashchange', function(){
+            that.onRouteChanged.apply(that, arguments);
+        });
+
+        // export it to other components (the Marko way...)
+        output.global.ee = this;
+        // export it to window global (the old-school way...)
+        window.global = window.global || {}
+        window.global.ee = this;
+    }
+
+    onMount() {
+        if (window.location.hash) {
+            return this.onRouteChanged({oldURL: '#/', newURL: window.location.hash})
+        }
+        if (this.initParams.defaultRoute) {
+            this.navigateTo(this.initParams.defaultRoute);
+        }
+    }
+
+    onRouteChanged(e) {
+        let oldURL = e.oldURL.split('#')[1] || '/';
+        let newURL = e.newURL.split('#')[1] || '/';
+        this.emit('global:route', {old: oldURL, new: newURL});
+    }
+
+    // apis
+    coop(subscriber, e, fn) {
+        subscriber.subscribeTo(this).on(e, typeof fn == 'string'?subscriber[fn]:fn)
+    }
+
+    coopOnce(subscriber, e, fn) {
+        subscriber.subscribeTo(this).once(e, typeof fn == 'string'?subscriber[fn]:fn)
+    }
+
+    navigateTo(newURL) {
+        window.location.hash = newURL;
+    }
+
+}
+
+div style={display: 'none'} -- EVENT BUS HIDDEN TPL

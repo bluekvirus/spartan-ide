@@ -8,23 +8,23 @@
 require('marko/express');
 require('marko/node-require');
 
-var express = require('express');
-var compression = require('compression'); // Provides gzip compression for the HTTP response
-var serveStatic = require('serve-static');
-var mockjs = require('mockjs');
+let express = require('express');
+let compression = require('compression'); // Provides gzip compression for the HTTP response
+let serveStatic = require('serve-static');
+let mockjs = require('mockjs');
 
 // If the process was started using browser-refresh then enable
 // hot reloading for certain types of files to short-circuit
 // a full process restart. You *should* use browser-refresh
 // in development: https://www.npmjs.com/package/browser-refresh
 // save the special/partial reload obj for .remove() cleanup.
-var sR = require('./utils/browser-refresh').enable();
+let sR = require('./utils/browser-refresh').enable();
 
 // Grab cli params (--watch)
 const argv = require('yargs').argv;
 
-var app = express();
-var port = process.env.PORT || 9000;
+let app = express();
+let port = process.env.PORT || 9000;
 
 // :Middlewares:
 // Enable gzip compression for all HTTP responses
@@ -36,23 +36,23 @@ app.use('/specs', serveStatic(__dirname + '/specs'));
 
 // :Routes:
 // Map the "/" route to the home page
-var indexPageTpl = require('./pages/index.marko');
+let indexPageTpl = require('./pages/index.marko');
 app.get('/', function(req, res){
     res.marko(indexPageTpl, {});
 });
 
 // Map proxied apis according to proxy.js
-var proxiedCalls = require('./proxy');
-var proxyFactory = require('http-proxy-middleware');
-for (var p in proxiedCalls) {
-    var s = proxiedCalls[p];
+let proxiedCalls = require('./proxy');
+let proxyFactory = require('http-proxy-middleware');
+for (let p in proxiedCalls) {
+    let s = proxiedCalls[p];
     s = typeof s == 'string' ? {target: s} : s;
     app.use(p, proxyFactory(s));
 }
 
 // Map the "/mockdata/*" route to Mock.js templates (*.js with module.exports = { tpl })
 app.all('/mockdata/:tplName', function(req, res){
-    var mockTpl;
+    let mockTpl;
     try {
         mockTpl = require('./mockdata/' + req.params['tplName']);
         res.json(mockjs.mock(mockTpl));
@@ -63,7 +63,7 @@ app.all('/mockdata/:tplName', function(req, res){
 
 // Map the "/pages/*" route to dynamic marko pages
 app.get('/pages/:pageName', function(req, res){
-    var dynamicPage, error = {};
+    let dynamicPage, error = {};
     try {
         dynamicPage = require('./pages/' + req.params['pageName']);
     } catch (e) {
@@ -80,7 +80,7 @@ app.use(function(req, res, next){
 });
 
 // Webpack watch (optional on -w, --watch)
-var watcher;
+let watcher;
 if (argv.w || argv.watch) {
     const webpack = require('webpack');
     const compiler = webpack(require('./webpack.config'));

@@ -31,9 +31,9 @@ require('marko/components').init();
 
 // B: using client-side component rendering: (component tags in component)
 //    require the main component!! (single)
-var main = require('./components/main');
+let main = require('./components/main');
 document.addEventListener("DOMContentLoaded", (event) => {
-    var mainEl = document.getElementById('main');
+    let mainEl = document.getElementById('main');
     if(mainEl)
         main.renderSync({}).replace(document.getElementById('main'));
     console.log('Ready!');
