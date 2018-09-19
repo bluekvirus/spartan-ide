@@ -31,7 +31,10 @@ class {
         window.addEventListener('hashchange', function(){
             that.onRouteChanged.apply(that, arguments);
         });
-
+        this.on('global:debug:echo', function(ping){
+            console.log('pong:', ping);
+        });
+        
         // export it to other components (the Marko way...)
         output.global.ee = this;
         // export it to window global (the old-school way...)
@@ -61,6 +64,14 @@ class {
 
     coopOnce(subscriber, e, fn) {
         subscriber.subscribeTo(this).once(e, typeof fn == 'string'?subscriber[fn]:fn)
+    }
+
+    route(path, fn) { // fn(uri) -- where uri is e.new, the new path after #
+        this.on('global:route', e => {
+            if (e.new.match(RegExp('^' + path))) {
+                fn(e.new);
+            }
+        });
     }
 
     navigateTo(newURL) {

@@ -245,11 +245,20 @@ var marko_template = module.exports = __webpack_require__(/*! marko/src/vdom */ 
         window.addEventListener('hashchange', function () {
             that.onRouteChanged.apply(that, arguments);
         });
+        this.on('global:debug:echo', function (ping) {
+            console.log('pong:', ping);
+        });
         output.global.ee = this;
         window.global = window.global || {};
         window.global.ee = this;
     },
     onMount: function () {
+        if (window.location.hash) {
+            return this.onRouteChanged({
+                oldURL: '#/',
+                newURL: window.location.hash
+            });
+        }
         if (this.initParams.defaultRoute) {
             this.navigateTo(this.initParams.defaultRoute);
         }
@@ -267,6 +276,13 @@ var marko_template = module.exports = __webpack_require__(/*! marko/src/vdom */ 
     },
     coopOnce: function (subscriber, e, fn) {
         subscriber.subscribeTo(this).once(e, typeof fn == 'string' ? subscriber[fn] : fn);
+    },
+    route: function (path, fn) {
+        this.on('global:route', e => {
+            if (e.new.match(RegExp('^' + path))) {
+                fn(e.new);
+            }
+        });
     },
     navigateTo: function (newURL) {
         window.location.hash = newURL;
@@ -586,7 +602,7 @@ marko_template.Component = marko_defineComponent({}, marko_template._);
  * ```
  * 
  * With the above code, a SPA navigation to `#showcase/any` will load `/components/any.marko`
- * into the viewport.
+ * into the viewport. IF YOU DON'T SPECIFY root-path, `#workbench/any` will load the above component instead.
  * 
  * 
  * @author Tim Lauv
@@ -598,22 +614,27 @@ module.exports = class {
     onCreate(input, output) {
         this.state = {
             context: null,
+            meta: null,
         };
 
         let that = this;
-        output.global.ee.coop(this, 'global:route', e => {
-            if (!e.new.startsWith(input.rootPath || 'workbench/')) return;
-            e.new = e.new.replace(input.rootPath || 'workbench/', '');
 
-            let comp;
-            try {
-                comp = __webpack_require__("./components sync recursive ^\\.\\/.*$")("./" + (e.new).split('.').join('/'));
-            } catch (e) {
-                comp = null;
-                console.log(e);
-            }
-            that.setState('context', comp);
+        // default reaction to SPA route change
+        output.global.ee.route(input.rootPath || 'workbench/', uri => {
+                uri = uri.replace(input.rootPath || 'workbench/', '');
+
+                let comp;
+                try {
+                    comp = __webpack_require__("./components sync recursive ^\\.\\/.*$")("./" + uri.split('.').join('/'));
+                } catch (e) {
+                    comp = null;
+                    console.log(e);
+                }
+                that.setState('context', comp);
         });
+
+        // add your own routes
+
     }
 
     onUpdate() {
@@ -621,7 +642,7 @@ module.exports = class {
     }
 
     clicked() {
-        console.log('workbench clicked...');
+        window.global.ee.emit('global:debug:echo', 'workbench component clicked!');
     }
 }
 
@@ -671,7 +692,8 @@ function render(input, out, __component, component, state) {
 
   if (state.context) {
     include_tag({
-        _target: state.context
+        _target: state.context,
+        _arg: state.meta
       }, out, __component, "2");
   }
 

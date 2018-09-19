@@ -7,7 +7,7 @@
  * ```
  * 
  * With the above code, a SPA navigation to `#showcase/any` will load `/components/any.marko`
- * into the viewport.
+ * into the viewport. IF YOU DON'T SPECIFY root-path, `#workbench/any` will load the above component instead.
  * 
  * 
  * @author Tim Lauv
@@ -23,24 +23,23 @@ module.exports = class {
         };
 
         let that = this;
-        output.global.ee.coop(this, 'global:route', e => {
-            // default reaction to SPA route change
-            if (e.new.startsWith(input.rootPath || 'workbench/')) {
-                e.new = e.new.replace(input.rootPath || 'workbench/', '');
+
+        // default reaction to SPA route change
+        output.global.ee.route(input.rootPath || 'workbench/', uri => {
+                uri = uri.replace(input.rootPath || 'workbench/', '');
 
                 let comp;
                 try {
-                    comp = require('../' + (e.new).split('.').join('/'));
+                    comp = require('../' + uri.split('.').join('/'));
                 } catch (e) {
                     comp = null;
                     console.log(e);
                 }
                 that.setState('context', comp);
-            }
-
-            // add your own 
-            
         });
+
+        // add your own routes
+
     }
 
     onUpdate() {
@@ -48,7 +47,7 @@ module.exports = class {
     }
 
     clicked() {
-        console.log('workbench clicked...');
+        window.global.ee.emit('global:debug:echo', 'workbench component clicked!');
     }
 }
 
