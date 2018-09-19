@@ -9,6 +9,13 @@ We used **h5bp**, **marko**, **express**, **browser-refresh** and **webpack** to
 
 ## To Use
 
+1. Create pages under `/pages` folder (Caveat: no global var, e.g *window*)
+    - pages should be extending `@main` part of the `layout.marko` component (in turn, loads js/css bundles)
+    - pages with `<div id="main"/>` will load the `main.marko` component
+2. Create components under `/components` folder
+3. Create mockup service data under `/mockdata` folder
+4. Document api spec using swagger v3 under `/specs` folder
+5. Put additional fonts/images under `/static` folder
 
 ### Src folders
 - `/components/` for your marko components. (does not matter which side you are rendering)
@@ -26,7 +33,7 @@ We used **h5bp**, **marko**, **express**, **browser-refresh** and **webpack** to
     class {
         onCreate(input, output) {
             ...
-            output.global.ee.route('abc/xyz', uri => { ... });
+            window.global.ee.route('abc/xyz', uri => { ... });
             ...
         }
 
@@ -44,8 +51,8 @@ From time to time, you will need components loaded by different parent/region to
 class {
     onCreate(input, output) {
         ...
-        output.global.ee.coop(this, 'e', e => { ... });
-        output.global.ee.coopOnce(this, 'e', 'fn'); // 'fn' is the handler method name of 'this'
+        window.global.ee.coop(this, 'e', e => { ... });
+        window.global.ee.coopOnce(this, 'e', 'fn'); // 'fn' is the handler method name of 'this'
         ...
     }
 
@@ -58,6 +65,9 @@ class {
 
 ## ToDo List
 
+### client.js
+0. Setup and expose polling tickets.
+1. Setup and expose websocket channels.
 
 ### server.js
 1. Connect/Express middlewares for `/services` and `/tasks`.

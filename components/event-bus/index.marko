@@ -1,21 +1,22 @@
 /**
  * Global Event Bus Component
  *
- * Install (to main.marko)
+ * Manually Install (already included in client.js)
  * ```
- *      include("./event-bus") default-route="login"
+ *      include("./event-bus") default-route="login" // in any .marko file
+ *      
  * ```
  *
  * 1. For global co-op events, within `onCreate(input, output) and other life-cycle stubs`
  * ```
- *      [output./window.]global.ee.coop(this, <e>, handler/"handler")
- *      [output./window.]global.ee.coopOnce(this, <e>, handler/"handler")
+ *      window.global.ee.coop(this, <e>, handler/"handler")
+ *      window.global.ee.coopOnce(this, <e>, handler/"handler")
  *
  *      //trigger
- *      [output./window.]global.ee.emit(<e>, ...params)
+ *      window.global.ee.emit(<e>, ...params)
  * ```
  * 
- * 2. For routing reaction in a component, use 1 with <e>= 'global:route'
+ * 2. For routing reaction in a component, use <e> = 'global:route' or `global.ee.route(path, uri => {})`
  * 
  * @author Tim Lauv
  * @created 2018.08.29
@@ -35,7 +36,7 @@ class {
             console.log('pong:', ping);
         });
         
-        // export it to other components (the Marko way...)
+        // export it to other components (the Marko way...buggy when )
         output.global.ee = this;
         // export it to window global (the old-school way...)
         window.global = window.global || {}

@@ -31,10 +31,15 @@ require('marko/components').init();
 
 // B: using client-side component rendering: (component tags in component)
 //    require the main component!! (single)
-let main = require('./components/main');
+const eb = require('./components/event-bus');
 document.addEventListener("DOMContentLoaded", (event) => {
+    eb.renderSync({defaultRoute: 'login'}).appendTo(document.body);
+    
     let mainEl = document.getElementById('main');
-    if(mainEl)
+    if(mainEl) {
+        const main = require('./components/main');
         main.renderSync({}).replace(document.getElementById('main'));
+    }
+
     console.log('Ready!');
 });

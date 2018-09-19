@@ -25,7 +25,7 @@ module.exports = class {
         let that = this;
 
         // default reaction to SPA route change
-        output.global.ee.route(input.rootPath || 'workbench/', uri => {
+        window.global.ee.route(input.rootPath || 'workbench/', uri => {
                 uri = uri.replace(input.rootPath || 'workbench/', '');
 
                 let comp;

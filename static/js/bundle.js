@@ -126,11 +126,16 @@ __webpack_require__(/*! marko/components */ "./node_modules/marko/components-bro
 
 // B: using client-side component rendering: (component tags in component)
 //    require the main component!! (single)
-let main = __webpack_require__(/*! ./components/main */ "./components/main.marko");
+const eb = __webpack_require__(/*! ./components/event-bus */ "./components/event-bus/index.marko");
 document.addEventListener("DOMContentLoaded", (event) => {
+    eb.renderSync({defaultRoute: 'login'}).appendTo(document.body);
+    
     let mainEl = document.getElementById('main');
-    if(mainEl)
+    if(mainEl) {
+        const main = __webpack_require__(/*! ./components/main */ "./components/main.marko");
         main.renderSync({}).replace(document.getElementById('main'));
+    }
+
     console.log('Ready!');
 });
 
@@ -544,7 +549,6 @@ var marko_template = module.exports = __webpack_require__(/*! marko/src/vdom */ 
     }),
     marko_renderer = components_helpers.r,
     marko_defineComponent = components_helpers.c,
-    event_bus_template = __webpack_require__(/*! ./event-bus */ "./components/event-bus/index.marko"),
     workbench_template = __webpack_require__(/*! ./workbench */ "./components/workbench/index.marko"),
     marko_helpers = __webpack_require__(/*! marko/src/runtime/vdom/helpers */ "./node_modules/marko/src/runtime/vdom/helpers.js"),
     marko_loadTag = marko_helpers.t,
@@ -554,15 +558,10 @@ function render(input, out, __component, component, state) {
   var data = input;
 
   include_tag({
-      _target: event_bus_template,
-      defaultRoute: "login"
-    }, out, __component, "0");
-
-  include_tag({
       _target: workbench_template,
       width: "100%",
       rootPath: "showcase/"
-    }, out, __component, "1");
+    }, out, __component, "0");
 }
 
 marko_template._ = marko_renderer(render, {
@@ -620,7 +619,7 @@ module.exports = class {
         let that = this;
 
         // default reaction to SPA route change
-        output.global.ee.route(input.rootPath || 'workbench/', uri => {
+        window.global.ee.route(input.rootPath || 'workbench/', uri => {
                 uri = uri.replace(input.rootPath || 'workbench/', '');
 
                 let comp;
